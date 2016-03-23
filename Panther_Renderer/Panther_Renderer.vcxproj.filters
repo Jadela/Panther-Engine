@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DX12">
+      <UniqueIdentifier>{732ec363-7ae1-4874-a128-35efbca01d7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{4abfeeaf-130d-4d9f-aad7-b2bc7769fd02}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\DX12Texture.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12RendererPCH.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12Renderer.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12Sampler.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12DescriptorHeap.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Buffer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12Buffer.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12Material.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12Mesh.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandList.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DX12CommandList.h">
+      <Filter>DX12</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DX12Texture.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12RendererPCH.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12Renderer.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12Sampler.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12DescriptorHeap.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Buffer.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12Buffer.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12Material.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12Mesh.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandList.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DX12CommandList.cpp">
+      <Filter>DX12</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
