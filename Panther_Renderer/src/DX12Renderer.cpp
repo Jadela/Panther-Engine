@@ -251,6 +251,12 @@ namespace Panther
 		return std::move(texture);
 	}
 
+	std::unique_ptr<Material> DX12Renderer::CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity)
+	{
+		std::unique_ptr<Material> material = std::make_unique<DX12Material>(*this, a_ConstantsCapacity, a_InputParameterCapacity);
+		return std::move(material);
+	}
+
 	std::unique_ptr<Mesh> DX12Renderer::CreateMesh()
 	{
 		std::unique_ptr<Mesh> mesh = std::make_unique<DX12Mesh>(*this);

@@ -6,7 +6,7 @@ namespace Panther
 {
 	class DX12Renderer;
 
-	class DX12Material : Material
+	class DX12Material final : public Material
 	{
 	public:
 		DX12Material(DX12Renderer& a_Renderer, uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity);

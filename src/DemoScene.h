@@ -20,13 +20,6 @@ namespace Panther
 		bool Render() override;
 		void OnResize(Panther::uint32 a_Width, Panther::uint32 a_Height) override;
 
-		struct Vertex
-		{
-			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT4 color;
-			DirectX::XMFLOAT2 uv;
-		};
-
 	private:
 		std::unique_ptr<Panther::DX12DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
 		std::unique_ptr<Panther::DX12DescriptorHeap> m_SamplerDescriptorHeap = nullptr;

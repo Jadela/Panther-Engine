@@ -31,7 +31,7 @@ namespace Panther
 		HRESULT hr;
 		// Create a material.
 		{
-			m_TestMaterial = std::move(std::unique_ptr<Material>(new DX12Material(*renderer, 3, 4)));
+			m_TestMaterial = m_Renderer.CreateMaterial(3, 4);
 			m_TestMaterial->LoadShader(L"..\\rsc\\shaders\\shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
 			m_TestMaterial->LoadShader(L"..\\rsc\\shaders\\shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
 
@@ -199,8 +199,6 @@ namespace Panther
 
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)
 	{
-		DX12Renderer* renderer = (dynamic_cast<DX12Renderer*>(&m_Renderer));
-
-		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(renderer->m_Window.GetWidth()) / renderer->m_Window.GetHeight(), 0.1f, 100.0f);
+		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
 	}
 }
