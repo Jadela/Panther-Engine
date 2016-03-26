@@ -81,13 +81,13 @@ namespace Panther
 		const float pi = 3.1415926535897932384626433832795f;
 		const float _2pi = 2.0f * pi;
 
-		for (int i = 0; i <= a_Stacks; ++i)
+		for (uint32 i = 0; i <= a_Stacks; ++i)
 		{
 			// V texture coordinate.
 			float V = i / (float)a_Stacks;
 			float phi = V * pi;
 
-			for (int j = 0; j <= a_Slices; ++j)
+			for (uint32 j = 0; j <= a_Slices; ++j)
 			{
 				// U texture coordinate.
 				float U = j / (float)a_Stacks;
@@ -102,7 +102,7 @@ namespace Panther
 		}
 
 		// Now generate the index buffer
-		for (int i = 0; i < a_Slices * a_Stacks + a_Slices; ++i)
+		for (uint32 i = 0; i < a_Slices * a_Stacks + a_Slices; ++i)
 		{
 			m_Indices.push_back(i);
 			m_Indices.push_back(i + a_Slices + 1);

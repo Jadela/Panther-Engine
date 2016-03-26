@@ -24,8 +24,6 @@ namespace Panther
 	private:
 		DX12Material(const DX12Material&) = delete;
 
-		// TODO (JDL): Get rid of this.
-		friend class DemoScene;
 		friend class DX12CommandList;
 
 		// Renderer reference

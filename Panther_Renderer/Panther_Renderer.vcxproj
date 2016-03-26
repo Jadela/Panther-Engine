@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\CommandList.h" />
+    <ClInclude Include="src\DescriptorHeap.h" />
     <ClInclude Include="src\DX12Buffer.h" />
     <ClInclude Include="src\DX12CommandList.h" />
     <ClInclude Include="src\DX12DescriptorHeap.h" />
@@ -33,6 +34,7 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\Sampler.h" />
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>

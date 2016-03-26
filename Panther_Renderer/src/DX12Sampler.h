@@ -1,10 +1,11 @@
 #pragma once
+#include "Sampler.h"
 
 namespace Panther
 {
 	class DX12Renderer;
 
-	class DX12Sampler
+	class DX12Sampler final : public Sampler
 	{
 	public:
 		DX12Sampler();

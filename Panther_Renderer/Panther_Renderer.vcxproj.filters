@@ -54,6 +54,12 @@
     <ClInclude Include="src\DX12CommandList.h">
       <Filter>DX12</Filter>
     </ClInclude>
+    <ClInclude Include="src\DescriptorHeap.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sampler.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DX12Texture.cpp">

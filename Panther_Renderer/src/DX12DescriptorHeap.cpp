@@ -35,8 +35,22 @@ namespace Panther
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
 			m_D3DDevice.CreateConstantBufferView(&a_ConstantBufferDesc, m_DescriptorHandle);
-			m_DescriptorHandle.Offset(1,
-				m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+		}
+		else
+		{
+			throw std::runtime_error("Panther DX12 ERROR: Trying to register constant buffer in descriptor heap with wrong type.\nType: "           
+				+ GetTypeString());
+		}
+	}
+
+	void DX12DescriptorHeap::RegisterConstantBuffer(Buffer& a_ConstantBuffer)
+	{
+		DX12Buffer& constantBuffer(*static_cast<DX12Buffer*>(&a_ConstantBuffer));
+		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+		{
+			m_D3DDevice.CreateConstantBufferView(&constantBuffer.m_CBufferViewDescriptor, m_DescriptorHandle);
+			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 		}
 		else
 		{
@@ -45,27 +59,12 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterConstantBuffer(DX12Buffer& a_ConstantBuffer)
+	void DX12DescriptorHeap::RegisterTexture(Texture& a_Texture)
 	{
+		DX12Texture& texture(*static_cast<DX12Texture*>(&a_Texture));
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
-			m_D3DDevice.CreateConstantBufferView(&a_ConstantBuffer.m_CBufferViewDescriptor, m_DescriptorHandle);
-			m_DescriptorHandle.Offset(1,
-				m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-		}
-		else
-		{
-			throw std::runtime_error("Panther DX12 ERROR: Trying to register constant buffer in descriptor heap with wrong type.\nType: "
-				+ GetTypeString());
-		}
-	}
-
-	void DX12DescriptorHeap::RegisterTexture(DX12Texture& a_Texture)
-	{
-		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-		{
-			m_D3DDevice.CreateShaderResourceView(a_Texture.m_GPUResource.Get(), &a_Texture.m_ShaderResourceViewDescriptor,
-				m_DescriptorHandle);
+			m_D3DDevice.CreateShaderResourceView(texture.m_GPUResource.Get(), &texture.m_ShaderResourceViewDescriptor, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 		}
 		else
@@ -75,11 +74,11 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterSampler(DX12Sampler& a_Sampler)
+	void DX12DescriptorHeap::RegisterSampler(Sampler& a_Sampler)
 	{
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)
 		{
-			m_D3DDevice.CreateSampler(&a_Sampler.m_SamplerDescriptor, m_DescriptorHandle);
+			m_D3DDevice.CreateSampler(&static_cast<DX12Sampler*>(&a_Sampler)->m_SamplerDescriptor, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER));
 		}
 		else

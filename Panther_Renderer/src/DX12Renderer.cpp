@@ -6,6 +6,7 @@
 #include "DX12DescriptorHeap.h"
 #include "DX12Material.h"
 #include "DX12Mesh.h"
+#include "DX12Sampler.h"
 #include "DX12Texture.h"
 // TODO: Move over to new Panther projects.
 #include "../../src/Window.h"
@@ -242,6 +243,11 @@ namespace Panther
 		return std::make_unique<DX12Buffer>(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_Size, a_ElementSize);
 	}
 
+	std::unique_ptr<DescriptorHeap> DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type)
+	{
+		return std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), a_Capacity, a_Type);
+	}
+
 	std::unique_ptr<Texture> DX12Renderer::CreateTexture(const std::wstring & a_Path)
 	{
 		// Load texture from disk and upload to GPU.
@@ -253,20 +259,22 @@ namespace Panther
 
 	std::unique_ptr<Material> DX12Renderer::CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity)
 	{
-		std::unique_ptr<Material> material = std::make_unique<DX12Material>(*this, a_ConstantsCapacity, a_InputParameterCapacity);
-		return std::move(material);
+		return std::make_unique<DX12Material>(*this, a_ConstantsCapacity, a_InputParameterCapacity);
 	}
 
 	std::unique_ptr<Mesh> DX12Renderer::CreateMesh()
 	{
-		std::unique_ptr<Mesh> mesh = std::make_unique<DX12Mesh>(*this);
-		return std::move(mesh);
+		return std::make_unique<DX12Mesh>(*this);
+	}
+
+	std::unique_ptr<Sampler> DX12Renderer::CreateSampler()
+	{
+		return std::make_unique<DX12Sampler>();
 	}
 
 	std::unique_ptr<CommandList> DX12Renderer::CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material)
 	{
-		std::unique_ptr<CommandList> commandList = std::make_unique<DX12CommandList>(*this, a_Type, static_cast<DX12Material*>(a_Material));
-		return std::move(commandList);
+		return std::make_unique<DX12CommandList>(*this, a_Type, static_cast<DX12Material*>(a_Material));
 	}
 
 	void DX12Renderer::StartRender()

@@ -2,14 +2,14 @@
 #include "DemoScene.h"
 #include "Window.h"
 
-#include "../Panther_Renderer/src/DX12Buffer.h"
+#include "../Panther_Renderer/src/Buffer.h"
 #include "../Panther_Renderer/src/DX12CommandList.h"
 #include "../Panther_Renderer/src/DX12Renderer.h"
-#include "../Panther_Renderer/src/DX12Texture.h"
-#include "../Panther_Renderer/src/DX12Sampler.h"
+#include "../Panther_Renderer/src/Texture.h"
+#include "../Panther_Renderer/src/Sampler.h"
 #include "../Panther_Renderer/src/DX12DescriptorHeap.h"
-#include "../Panther_Renderer/src/DX12Material.h"
-#include "../Panther_Renderer/src/DX12Mesh.h"
+#include "../Panther_Renderer/src/Material.h"
+#include "../Panther_Renderer/src/Mesh.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -22,13 +22,12 @@ namespace Panther
 		L"..\\rsc\\textures\\test.tga"
 	};
 
-	DemoScene::DemoScene(Renderer& renderer) : Scene(renderer) {}
+	DemoScene::DemoScene(Renderer& a_Renderer) 
+		: Scene(a_Renderer) 
+	{}
 
 	bool DemoScene::Load()
 	{
-		DX12Renderer* renderer = dynamic_cast<DX12Renderer*>(&m_Renderer);
-
-		HRESULT hr;
 		// Create a material.
 		{
 			m_TestMaterial = m_Renderer.CreateMaterial(3, 4);
@@ -48,12 +47,12 @@ namespace Panther
 		}
 
 		// Constant buffer + Shader resource heap.
-		uint32 numDescriptors = (uint32)Countof(g_Textures) + 2;
-		m_CBVSRVUAVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*renderer->m_D3DDevice.Get(), numDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		uint32 CBVSRVUAVHeapSize = (uint32)Countof(g_Textures) + 2;
+		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		// Sampler heap.
-		numDescriptors = 1;
-		m_SamplerDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*renderer->m_D3DDevice.Get(), numDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+		uint32 samplerHeapSize = 1;
+		m_SamplerDescriptorHeap = m_Renderer.CreateDescriptorHeap(samplerHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
 		CommandList& commandList(m_Renderer.StartRecording());
 
@@ -67,60 +66,52 @@ namespace Panther
 		m_ConstantBuffer1 = m_Renderer.CreateBuffer(64);
 		m_ConstantBuffer2 = m_Renderer.CreateBuffer(64);
 
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*static_cast<DX12Buffer*>(m_ConstantBuffer1.get()));
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*static_cast<DX12Buffer*>(m_ConstantBuffer2.get()));
+		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ConstantBuffer1.get());
+		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ConstantBuffer2.get());
 
 		// Create the textures
 		for (auto filePath : g_Textures)
 		{
 			m_Textures.push_back(m_Renderer.CreateTexture(filePath));
-			m_CBVSRVUAVDescriptorHeap->RegisterTexture(*static_cast<DX12Texture*>(m_Textures.back().get()));
+			m_CBVSRVUAVDescriptorHeap->RegisterTexture(*m_Textures.back().get());
 		}
 
 		// Create sampler
-		DX12Sampler textureSampler;
-		m_SamplerDescriptorHeap->RegisterSampler(textureSampler);
+		m_Sampler = m_Renderer.CreateSampler();
+		m_SamplerDescriptorHeap->RegisterSampler(*m_Sampler.get());
 
 		if (!m_Renderer.StopRecordingAndSubmit()) return false;
 
 		// Create and record the bundles.
 		{
 			m_CubeBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_TestMaterial.get());
-			ID3D12GraphicsCommandList& B_GCL = *static_cast<DX12CommandList*>(m_CubeBundle.get())->m_CommandList.Get();
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE cbvGPUHandle(m_CBVSRVUAVDescriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), 2, renderer->m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-
-			ID3D12DescriptorHeap* ppHeaps[] = { m_CBVSRVUAVDescriptorHeap->m_D3DDescriptorHeap.Get(), m_SamplerDescriptorHeap->m_D3DDescriptorHeap.Get() };
-			B_GCL.SetDescriptorHeaps((uint32)Countof(ppHeaps), ppHeaps);
+			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
+			m_CubeBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_CubeBundle->SetMaterial(*m_TestMaterial, false);
 			m_CubeBundle->SetMesh(*m_CubeMesh);
-			B_GCL.SetGraphicsRootDescriptorTable(1, cbvGPUHandle);
-			B_GCL.SetGraphicsRootDescriptorTable(2, m_SamplerDescriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			B_GCL.DrawIndexedInstanced(m_CubeMesh->GetNumIndices(), 1, 0, 0, 0);
+			m_CubeBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 2);
+			m_CubeBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), 2, 0);
+			m_CubeBundle->Draw(m_CubeMesh->GetNumIndices());
 
-			hr = B_GCL.Close();
-			if (FAILED(hr)) throw std::runtime_error("Could not close bundle list.");
+			m_CubeBundle->Close();
 		}
 
 		{
 			m_SphereBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_TestMaterial.get());
-			ID3D12GraphicsCommandList& B_GCL = *static_cast<DX12CommandList*>(m_SphereBundle.get())->m_CommandList.Get();
-
-			CD3DX12_GPU_DESCRIPTOR_HANDLE cbvGPUHandle(m_CBVSRVUAVDescriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), 2, renderer->m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-
-			ID3D12DescriptorHeap* ppHeaps[] = { m_CBVSRVUAVDescriptorHeap->m_D3DDescriptorHeap.Get(), m_SamplerDescriptorHeap->m_D3DDescriptorHeap.Get() };
-			B_GCL.SetDescriptorHeaps((uint32)Countof(ppHeaps), ppHeaps);
+			
+			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
+			m_SphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_SphereBundle->SetMaterial(*m_TestMaterial, false);
 			m_SphereBundle->SetMesh(*m_SphereMesh);
-			B_GCL.SetGraphicsRootDescriptorTable(1, cbvGPUHandle);
-			B_GCL.SetGraphicsRootDescriptorTable(2, m_SamplerDescriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-			B_GCL.DrawIndexedInstanced(m_SphereMesh->GetNumIndices(), 1, 0, 0, 0);
+			m_SphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 2);
+			m_SphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), 2, 0);
+			m_SphereBundle->Draw(m_SphereMesh->GetNumIndices());
 
-			hr = B_GCL.Close();
-			if (FAILED(hr)) throw std::runtime_error("Could not close bundle list.");
+			m_SphereBundle->Close();
 		}
 
-		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(renderer->m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
+		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
 
 		m_Renderer.Synchronize();
 
@@ -150,8 +141,8 @@ namespace Panther
 
 		commandList.SetMaterial(*m_TestMaterial, true);
 		
-		ID3D12DescriptorHeap* ppHeaps[] = { m_CBVSRVUAVDescriptorHeap->m_D3DDescriptorHeap.Get(), m_SamplerDescriptorHeap->m_D3DDescriptorHeap.Get() };
-		D_GCL.SetDescriptorHeaps((uint32)Countof(ppHeaps), ppHeaps);
+		DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
+		commandList.UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 
 		D_GCL.RSSetViewports(1, &renderer->m_D3DViewport);
 		D_GCL.RSSetScissorRects(1, &renderer->m_D3DRectScissor);
@@ -168,8 +159,7 @@ namespace Panther
 		D_GCL.ClearRenderTargetView(rtvHandle, DirectX::Colors::CornflowerBlue, 0, nullptr);
 		D_GCL.ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-		CD3DX12_GPU_DESCRIPTOR_HANDLE cbvGPUHandle(m_CBVSRVUAVDescriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-		D_GCL.SetGraphicsRootDescriptorTable(0, cbvGPUHandle);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 0);
 
 		XMVECTOR rotationAxis = XMVectorSet(0, 1, 0, 0);
 		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(0, 0, 0);
@@ -179,8 +169,7 @@ namespace Panther
 		// Execute the commands stored in the bundle.
 		D_GCL.ExecuteBundle(static_cast<DX12CommandList*>(m_CubeBundle.get())->m_CommandList.Get());
 
-		cbvGPUHandle.Offset(renderer->m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-		D_GCL.SetGraphicsRootDescriptorTable(0, cbvGPUHandle);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 1);
 
 		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(2, 0, 0);
 		mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;

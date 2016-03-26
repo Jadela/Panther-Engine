@@ -4,15 +4,16 @@ namespace Panther
 {
 	class Buffer;
 	class CommandList;
-	class DX12DescriptorHeap;
+	class DescriptorHeap;
 	class Material;
 	class Mesh;
+	class Sampler;
 	class Texture;
 
 	class DemoScene : public Scene
 	{
 	public:
-		DemoScene(Panther::Renderer& renderer);
+		DemoScene(Panther::Renderer& a_Renderer);
 
 		bool Load() override;
 		void Unload() override;
@@ -21,8 +22,8 @@ namespace Panther
 		void OnResize(Panther::uint32 a_Width, Panther::uint32 a_Height) override;
 
 	private:
-		std::unique_ptr<Panther::DX12DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
-		std::unique_ptr<Panther::DX12DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
+		std::unique_ptr<Panther::DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
+		std::unique_ptr<Panther::DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
@@ -35,8 +36,8 @@ namespace Panther
 
 		std::unique_ptr<Panther::Material> m_TestMaterial = nullptr;
 
-		// Textures
 		std::vector<std::unique_ptr<Panther::Texture>> m_Textures;
+		std::unique_ptr<Panther::Sampler> m_Sampler = nullptr;
 
 		DirectX::XMMATRIX m_ProjectionMatrix;
 		DirectX::XMMATRIX m_ViewMatrix;

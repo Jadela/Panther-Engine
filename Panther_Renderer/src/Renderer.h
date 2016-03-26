@@ -5,8 +5,10 @@ namespace Panther
 {
 	class Buffer;
 	class CommandList;
+	class DescriptorHeap;
 	class Material;
 	class Mesh;
+	class Sampler;
 	class Texture;
 	class Window;
 
@@ -23,9 +25,11 @@ namespace Panther
 
 		virtual std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) = 0;
 		virtual std::unique_ptr<Buffer> CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) = 0;
+		virtual std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type) = 0;
 		virtual std::unique_ptr<Texture> CreateTexture(const std::wstring& a_Path) = 0;
 		virtual std::unique_ptr<Material> CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) = 0;
 		virtual std::unique_ptr<Mesh> CreateMesh() = 0;
+		virtual std::unique_ptr<Sampler> CreateSampler() = 0;
 		virtual std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) = 0;
 
 		virtual void StartRender() = 0;

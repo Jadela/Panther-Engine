@@ -17,8 +17,6 @@ namespace Panther
 	private:
 		friend class DX12DescriptorHeap;
 		friend class DX12Mesh;
-		// TODO (JDL): Get rid of friend with DemoScene.
-		friend class DemoScene;
 
 		DX12Renderer& m_Renderer;
 

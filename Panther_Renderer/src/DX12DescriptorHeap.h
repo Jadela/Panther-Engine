@@ -1,14 +1,9 @@
 #pragma once
-
-#include "../../Panther_Core/src/Core.h"
+#include "DescriptorHeap.h"
 
 namespace Panther
 {
-	class DX12Texture;
-	class DX12Buffer;
-	class DX12Sampler;
-
-	class DX12DescriptorHeap
+	class DX12DescriptorHeap final : public DescriptorHeap
 	{
 	public:
 		DX12DescriptorHeap() = delete;
@@ -16,18 +11,19 @@ namespace Panther
 		DX12DescriptorHeap(const DX12DescriptorHeap&) = delete;
 		~DX12DescriptorHeap();
 
-		void RegisterConstantBuffer(D3D12_CONSTANT_BUFFER_VIEW_DESC& a_ConstantBufferDesc);
-		void RegisterConstantBuffer(DX12Buffer& a_ConstantBuffer);
-		void RegisterTexture(DX12Texture& a_Texture);
-		void RegisterSampler(DX12Sampler& a_Sampler);
-		void RegisterRenderTarget(ID3D12Resource& a_RenderTarget);
-		void RegisterDepthStencil(ID3D12Resource& a_DepthStencil, D3D12_DEPTH_STENCIL_VIEW_DESC& a_DSVDesc);
+		void RegisterConstantBuffer(D3D12_CONSTANT_BUFFER_VIEW_DESC& a_ConstantBufferDesc) final override;
+		void RegisterConstantBuffer(Buffer& a_ConstantBuffer) final override;
+		void RegisterTexture(Texture& a_Texture) final override;
+		void RegisterSampler(Sampler& a_Sampler) final override;
+		void RegisterRenderTarget(ID3D12Resource& a_RenderTarget) final override;
+		void RegisterDepthStencil(ID3D12Resource& a_DepthStencil, D3D12_DEPTH_STENCIL_VIEW_DESC& a_DSVDesc) final override;
 
-		void SetCPUHandleIndex(uint32 a_Index);
+		void SetCPUHandleIndex(uint32 a_Index) final override;
 
 	private:
 		friend class DemoScene;
 		friend class DX12Renderer;
+		friend class DX12CommandList;
 
 		std::string GetTypeString();
 
