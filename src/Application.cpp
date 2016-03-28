@@ -128,7 +128,7 @@ namespace Panther
 		}
 
 		m_Scene = new DemoScene(*m_Renderer);
-		return m_Scene->Load();
+		m_Scene->Load();
 		return true;
 	}
 
@@ -164,7 +164,7 @@ namespace Panther
 
 				// Render
 				m_Renderer->StartRender();
-				if (!m_Scene->Render()) break;
+				m_Scene->Render();
 				m_Renderer->EndRender();
 			}
 		}

@@ -12,10 +12,10 @@ namespace Panther
 		Scene(Panther::Renderer& renderer);
 		virtual ~Scene() {}
 
-		virtual bool Load() = 0;
+		virtual void Load() = 0;
 		virtual void Unload() = 0;
 		virtual void Update(float a_DT) = 0;
-		virtual bool Render() = 0;
+		virtual void Render() = 0;
 		virtual void OnResize(Panther::uint32 a_Width, Panther::uint32 a_Height) = 0;
 
 	protected:

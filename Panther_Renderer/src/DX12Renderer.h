@@ -14,7 +14,7 @@ namespace Panther
 		// Public methods
 		bool Initialize() final override;
 		CommandList& StartRecording() final override;
-		bool StopRecordingAndSubmit() final override;
+		void SubmitCommandLists(CommandList** a_CommandLists, uint32 a_NumCommandLists) final override;
 		bool Synchronize() final override;
 
 		std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) final override;

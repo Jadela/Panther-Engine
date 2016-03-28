@@ -3,11 +3,11 @@
 #include "Window.h"
 
 #include "../Panther_Renderer/src/Buffer.h"
-#include "../Panther_Renderer/src/DX12CommandList.h"
-#include "../Panther_Renderer/src/DX12Renderer.h"
+#include "../Panther_Renderer/src/CommandList.h"
+#include "../Panther_Renderer/src/Renderer.h"
 #include "../Panther_Renderer/src/Texture.h"
 #include "../Panther_Renderer/src/Sampler.h"
-#include "../Panther_Renderer/src/DX12DescriptorHeap.h"
+#include "../Panther_Renderer/src/DescriptorHeap.h"
 #include "../Panther_Renderer/src/Material.h"
 #include "../Panther_Renderer/src/Mesh.h"
 
@@ -26,7 +26,7 @@ namespace Panther
 		: Scene(a_Renderer) 
 	{}
 
-	bool DemoScene::Load()
+	void DemoScene::Load()
 	{
 		// Create a material.
 		{
@@ -80,7 +80,10 @@ namespace Panther
 		m_Sampler = m_Renderer.CreateSampler();
 		m_SamplerDescriptorHeap->RegisterSampler(*m_Sampler.get());
 
-		if (!m_Renderer.StopRecordingAndSubmit()) return false;
+		commandList.Close();
+
+		CommandList* commandLists[] = {&commandList};
+		m_Renderer.SubmitCommandLists(commandLists, 1);
 
 		// Create and record the bundles.
 		{
@@ -114,8 +117,6 @@ namespace Panther
 		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
 
 		m_Renderer.Synchronize();
-
-		return true;
 	}
 
 	void DemoScene::Unload()
@@ -132,32 +133,21 @@ namespace Panther
 		m_Angle += 90.0f * a_DT;
 	}
 
-	bool DemoScene::Render()
+	void DemoScene::Render()
 	{
-		DX12Renderer* renderer = dynamic_cast<DX12Renderer*>(&m_Renderer);
-
 		CommandList& commandList(m_Renderer.StartRecording());
-		ID3D12GraphicsCommandList& D_GCL = *static_cast<DX12CommandList*>(&commandList)->m_CommandList.Get();
 
 		commandList.SetMaterial(*m_TestMaterial, true);
 		
 		DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 		commandList.UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 
-		D_GCL.RSSetViewports(1, &renderer->m_D3DViewport);
-		D_GCL.RSSetScissorRects(1, &renderer->m_D3DRectScissor);
+		commandList.UseDefaultViewport();
 
 		// Indicate that the back buffer will be used as a render target.
-		D_GCL.ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderer->m_renderTargets[renderer->m_FrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(renderer->m_RTVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-			renderer->m_FrameIndex, renderer->m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(renderer->m_DSVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-		D_GCL.OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
-
-		// Record commands.
-		D_GCL.ClearRenderTargetView(rtvHandle, DirectX::Colors::CornflowerBlue, 0, nullptr);
-		D_GCL.ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		commandList.SetAndClearRenderTarget(DirectX::Colors::CornflowerBlue);
 
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 0);
 
@@ -166,8 +156,8 @@ namespace Panther
 		XMMATRIX mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
 		m_ConstantBuffer1->CopyTo(&mvp, sizeof(XMMATRIX));
 
-		// Execute the commands stored in the bundle.
-		D_GCL.ExecuteBundle(static_cast<DX12CommandList*>(m_CubeBundle.get())->m_CommandList.Get());
+		// Execute cube bundle.
+		commandList.ExecuteBundle(*m_CubeBundle.get());
 
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 1);
 
@@ -175,15 +165,15 @@ namespace Panther
 		mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
 		m_ConstantBuffer2->CopyTo(&mvp, sizeof(mvp));
 
-		// Execute the commands stored in the bundle.
-		D_GCL.ExecuteBundle(static_cast<DX12CommandList*>(m_SphereBundle.get())->m_CommandList.Get());
+		// Execute sphere bundle.
+		commandList.ExecuteBundle(*m_SphereBundle.get());
 
 		// Indicate that the back buffer will now be used to present.
-		D_GCL.ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderer->m_renderTargets[renderer->m_FrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
-		if (!m_Renderer.StopRecordingAndSubmit()) return false;
-
-		return true;
+		commandList.Close();
+		CommandList* commandLists[] = { &commandList };
+		m_Renderer.SubmitCommandLists(commandLists, 1);
 	}
 
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)

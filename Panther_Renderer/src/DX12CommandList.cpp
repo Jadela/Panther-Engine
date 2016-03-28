@@ -28,6 +28,17 @@ namespace Panther
 	{
 	}
 
+	void DX12CommandList::SetAndClearRenderTarget(const float a_Color[4])
+	{
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.m_RTVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+			m_Renderer.m_FrameIndex, m_Renderer.m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.m_DSVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+		m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+		m_CommandList->ClearRenderTargetView(rtvHandle, a_Color, 0, nullptr);
+		m_CommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	}
+
 	void DX12CommandList::SetMaterial(Material& a_Material, bool a_ResetState)
 	{
 		DX12Material* mat = static_cast<DX12Material*>(&a_Material);
@@ -58,18 +69,36 @@ namespace Panther
 	void DX12CommandList::UseDescriptorHeaps(DescriptorHeap** a_DescriptorHeaps, const uint32 a_NumDescriptorHeaps)
 	{
 		ID3D12DescriptorHeap** D3DDescriptorHeaps = new ID3D12DescriptorHeap*[a_NumDescriptorHeaps];
-
 		for (uint32 i = 0; i < a_NumDescriptorHeaps; ++i)
-		{
 			D3DDescriptorHeaps[i] = static_cast<DX12DescriptorHeap*>(a_DescriptorHeaps[i])->m_D3DDescriptorHeap.Get();
-		}
+
 		m_CommandList->SetDescriptorHeaps(a_NumDescriptorHeaps, D3DDescriptorHeaps);
 		delete[] D3DDescriptorHeaps;
+	}
+
+	void DX12CommandList::UseDefaultViewport()
+	{
+		m_CommandList->RSSetViewports(1, &m_Renderer.m_D3DViewport);
+		m_CommandList->RSSetScissorRects(1, &m_Renderer.m_D3DRectScissor);
+	}
+
+	void DX12CommandList::ExecuteBundle(CommandList& a_Bundle)
+	{
+		DX12CommandList* bundle = static_cast<DX12CommandList*>(&a_Bundle);
+		if (bundle->m_CommandListType != D3D12_COMMAND_LIST_TYPE_BUNDLE) 
+			throw std::runtime_error("Panther DX12 ERROR: ExecuteBundle received a commandlist that was not a bundle!");
+
+		m_CommandList->ExecuteBundle(bundle->m_CommandList.Get());
 	}
 
 	void DX12CommandList::Draw(uint32 a_NumIndices)
 	{
 		m_CommandList->DrawIndexedInstanced(a_NumIndices, 1, 0, 0, 0);
+	}
+
+	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
+	{
+		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.m_renderTargets[m_Renderer.m_FrameIndex].Get(), a_OldState, a_NewState));
 	}
 
 	void DX12CommandList::Close()

@@ -15,10 +15,10 @@ namespace Panther
 	public:
 		DemoScene(Panther::Renderer& a_Renderer);
 
-		bool Load() override;
+		void Load() override;
 		void Unload() override;
 		void Update(float a_DT) override;
-		bool Render() override;
+		void Render() override;
 		void OnResize(Panther::uint32 a_Width, Panther::uint32 a_Height) override;
 
 	private:

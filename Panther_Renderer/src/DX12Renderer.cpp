@@ -215,12 +215,14 @@ namespace Panther
 		return *m_CommandList.get();
 	}
 
-	bool DX12Renderer::StopRecordingAndSubmit()
+	void DX12Renderer::SubmitCommandLists(CommandList** a_CommandLists, uint32 a_NumCommandLists)
 	{
-		if (FAILED(m_CommandList->m_CommandList->Close())) throw std::runtime_error("Could not close command list.");
-		ID3D12CommandList* ppCommandLists[] = { m_CommandList->m_CommandList.Get() };
-		m_D3DCommandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-		return true;
+		ID3D12CommandList** commandLists = new ID3D12CommandList*[a_NumCommandLists];
+		for (uint32 i = 0; i < a_NumCommandLists; ++i)
+			commandLists[i] = static_cast<DX12CommandList*>(a_CommandLists[i])->m_CommandList.Get();
+
+		m_D3DCommandQueue->ExecuteCommandLists(a_NumCommandLists, commandLists);
+		delete[] commandLists;
 	}
 
 	bool DX12Renderer::Synchronize()
@@ -364,8 +366,7 @@ namespace Panther
 			hr = m_D3DSwapChain->Present1(1, 0, &m_PresentParameters);
 		else
 			hr = m_D3DSwapChain->Present1(0, 0, &m_PresentParameters);
-		if (FAILED(hr))
-			MessageBox(m_Window.GetHandle(), L"Failed to present screen.", L"Direct3D Error", MB_OK | MB_ICONERROR);
+		if (FAILED(hr)) throw std::runtime_error("Swapchain present failed!");
 	}
 
 	bool DX12Renderer::WaitForPreviousFrame()

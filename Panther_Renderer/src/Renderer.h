@@ -20,7 +20,7 @@ namespace Panther
 
 		virtual bool Initialize() = 0;
 		virtual CommandList& StartRecording() = 0;
-		virtual bool StopRecordingAndSubmit() = 0;
+		virtual void SubmitCommandLists(CommandList** a_CommandLists, uint32 a_NumCommandLists) = 0;
 		virtual bool Synchronize() = 0;
 
 		virtual std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) = 0;
