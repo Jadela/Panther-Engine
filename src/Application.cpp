@@ -203,6 +203,15 @@ namespace Panther
 				app.m_Scene->OnResize(width, height);
 		}
 		break;
+		case WM_DPICHANGED:
+		{
+			Panther::uint32 x = (Panther::uint32)LOWORD(wParam);
+			Panther::uint32 y = (Panther::uint32)HIWORD(wParam);
+			RECT rect = *reinterpret_cast<RECT *>(lParam);
+			if (!SetWindowPos(hwnd, 0, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOACTIVATE | SWP_NOZORDER))
+				return 1;
+		}
+		break;
 		default:
 			return DefWindowProc(hwnd, message, wParam, lParam);
 		}
