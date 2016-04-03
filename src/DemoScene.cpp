@@ -17,9 +17,10 @@ using namespace Microsoft::WRL;
 namespace Panther
 {
 	// Hardcoded texture file locations.
-	const std::wstring g_Textures[1] =
+	const std::wstring g_Textures[] =
 	{
-		L"..\\rsc\\textures\\test.tga"
+		L"../rsc/textures/test.tga",
+		L"../rsc/textures/duckCM.tga"
 	};
 
 	DemoScene::DemoScene(Renderer& a_Renderer) 
@@ -31,8 +32,8 @@ namespace Panther
 		// Create a material.
 		{
 			m_TestMaterial = m_Renderer.CreateMaterial(3, 4);
-			m_TestMaterial->LoadShader(L"..\\rsc\\shaders\\shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_TestMaterial->LoadShader(L"..\\rsc\\shaders\\shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
+			m_TestMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
+			m_TestMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
 
 			m_TestMaterial->DeclareShaderConstant(Material::ConstantType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
 			m_TestMaterial->DeclareShaderConstant(Material::ConstantType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
@@ -47,7 +48,7 @@ namespace Panther
 		}
 
 		// Constant buffer + Shader resource heap.
-		uint32 CBVSRVUAVHeapSize = (uint32)Countof(g_Textures) + 2;
+		uint32 CBVSRVUAVHeapSize = (uint32)Countof(g_Textures) + 3;
 		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 		// Sampler heap.
@@ -62,12 +63,17 @@ namespace Panther
 		m_SphereMesh = m_Renderer.CreateMesh();
 		m_SphereMesh->InitAsSphere(commandList, 1.0f);
 
-		// Create the constant buffers.
-		m_ConstantBuffer1 = m_Renderer.CreateBuffer(64);
-		m_ConstantBuffer2 = m_Renderer.CreateBuffer(64);
+		m_DuckMesh = m_Renderer.CreateMesh();
+		m_DuckMesh->InitViaASSIMP(commandList, "../rsc/models/duck.fbx");
 
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ConstantBuffer1.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ConstantBuffer2.get());
+		// Create the constant buffers.
+		m_CubeMatrixBuffer = m_Renderer.CreateBuffer(64);
+		m_SphereMatrixBuffer = m_Renderer.CreateBuffer(64);
+		m_DuckMatrixBuffer = m_Renderer.CreateBuffer(64);
+
+		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
+		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
+		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
 
 		// Create the textures
 		for (auto filePath : g_Textures)
@@ -93,7 +99,7 @@ namespace Panther
 			m_CubeBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_CubeBundle->SetMaterial(*m_TestMaterial, false);
 			m_CubeBundle->SetMesh(*m_CubeMesh);
-			m_CubeBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 2);
+			m_CubeBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 3);
 			m_CubeBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), 2, 0);
 			m_CubeBundle->Draw(m_CubeMesh->GetNumIndices());
 
@@ -102,16 +108,30 @@ namespace Panther
 
 		{
 			m_SphereBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_TestMaterial.get());
-			
+
 			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 			m_SphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_SphereBundle->SetMaterial(*m_TestMaterial, false);
 			m_SphereBundle->SetMesh(*m_SphereMesh);
-			m_SphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 2);
+			m_SphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 3);
 			m_SphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), 2, 0);
 			m_SphereBundle->Draw(m_SphereMesh->GetNumIndices());
 
 			m_SphereBundle->Close();
+		}
+
+		{
+			m_DuckBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_TestMaterial.get());
+
+			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
+			m_DuckBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
+			m_DuckBundle->SetMaterial(*m_TestMaterial, false);
+			m_DuckBundle->SetMesh(*m_DuckMesh);
+			m_DuckBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 1, 4);
+			m_DuckBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), 2, 0);
+			m_DuckBundle->Draw(m_DuckMesh->GetNumIndices());
+
+			m_DuckBundle->Close();
 		}
 
 		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
@@ -152,21 +172,30 @@ namespace Panther
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 0);
 
 		XMVECTOR rotationAxis = XMVectorSet(0, 1, 0, 0);
-		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(0, 0, 0);
+		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(-3, 0, 0);
 		XMMATRIX mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
-		m_ConstantBuffer1->CopyTo(&mvp, sizeof(XMMATRIX));
+		m_CubeMatrixBuffer->CopyTo(&mvp, sizeof(XMMATRIX));
 
 		// Execute cube bundle.
 		commandList.ExecuteBundle(*m_CubeBundle.get());
 
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 1);
 
-		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(2, 0, 0);
+		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(0, 0, 0);
 		mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
-		m_ConstantBuffer2->CopyTo(&mvp, sizeof(mvp));
+		m_SphereMatrixBuffer->CopyTo(&mvp, sizeof(mvp));
 
 		// Execute sphere bundle.
 		commandList.ExecuteBundle(*m_SphereBundle.get());
+
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 2);
+
+		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(3, 0, 0);
+		mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
+		m_DuckMatrixBuffer->CopyTo(&mvp, sizeof(mvp));
+
+		// Execute duck bundle.
+		commandList.ExecuteBundle(*m_DuckBundle.get());
 
 		// Indicate that the back buffer will now be used to present.
 		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

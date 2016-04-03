@@ -29,7 +29,7 @@ PSInput VSMain(float3 position : POSITION, float3 normal : NORMAL, float4 color 
 float4 PSMain(PSInput input) : SV_TARGET
 {
 	float ambient = 0.1f;
-	float diffuse = max(dot(input.normal, float4(1, 0, 0, 0)), 0.0f);
+	float diffuse = max(dot(input.normal, float4(0.707, 0, -0.707, 0)), 0.0f);
 	float illum = ambient + diffuse;
 
 	return g_txDiffuse.Sample(g_sampler, input.uv) * illum;

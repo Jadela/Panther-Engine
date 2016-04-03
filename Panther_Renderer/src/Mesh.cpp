@@ -5,6 +5,10 @@
 #include "CommandList.h"
 #include "Renderer.h"
 
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+
 using namespace DirectX;
 
 namespace Panther
@@ -111,6 +115,39 @@ namespace Panther
 			m_Indices.push_back(i + a_Slices + 1);
 			m_Indices.push_back(i);
 			m_Indices.push_back(i + 1);
+		}
+
+		Initialize(a_CommandList);
+	}
+
+	void Mesh::InitViaASSIMP(CommandList & a_CommandList, std::string a_FileName)
+	{
+		Assimp::Importer importer;
+
+		const aiScene* scene(importer.ReadFile(a_FileName, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded));
+		if (!scene) throw std::runtime_error("Panther ASSIMP Error: Import failed, ASSIMP error string: " + std::string(importer.GetErrorString()));
+
+		aiMesh* mesh = scene->mMeshes[0];
+		if (!mesh) throw std::runtime_error("Panther ASSIMP Error: Imported model contains no meshes!");
+
+		m_Vertices.resize(mesh->mNumVertices);
+		m_Indices.resize(mesh->mNumFaces * mesh->mFaces->mNumIndices);
+
+		for (uint32 i = 0; i < mesh->mNumVertices; ++i)
+		{
+			m_Vertices[i] = { 
+				XMFLOAT3(mesh->mVertices[i].x * 0.01f, mesh->mVertices[i].y * 0.01f, mesh->mVertices[i].z * 0.01f),
+				XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z),
+				XMFLOAT4(1,1,1,1), 
+				XMFLOAT2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y) 
+			};
+		}
+
+		for (uint32 i = 0; i < mesh->mNumFaces; ++i)
+		{
+			m_Indices[i * 3 + 0] = mesh->mFaces[i].mIndices[0];
+			m_Indices[i * 3 + 1] = mesh->mFaces[i].mIndices[1];
+			m_Indices[i * 3 + 2] = mesh->mFaces[i].mIndices[2];
 		}
 
 		Initialize(a_CommandList);

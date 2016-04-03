@@ -27,12 +27,15 @@ namespace Panther
 
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
+		std::unique_ptr<CommandList> m_DuckBundle = nullptr;
 
 		std::unique_ptr<Mesh> m_CubeMesh = nullptr;
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
+		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
 
-		std::unique_ptr<Panther::Buffer> m_ConstantBuffer1 = nullptr;
-		std::unique_ptr<Panther::Buffer> m_ConstantBuffer2 = nullptr;
+		std::unique_ptr<Panther::Buffer> m_CubeMatrixBuffer = nullptr;
+		std::unique_ptr<Panther::Buffer> m_SphereMatrixBuffer = nullptr;
+		std::unique_ptr<Panther::Buffer> m_DuckMatrixBuffer = nullptr;
 
 		std::unique_ptr<Panther::Material> m_TestMaterial = nullptr;
 
