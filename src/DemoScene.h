@@ -2,6 +2,7 @@
 
 namespace Panther
 {
+	// Panther Renderer
 	class Buffer;
 	class CommandList;
 	class DescriptorHeap;
@@ -9,21 +10,25 @@ namespace Panther
 	class Mesh;
 	class Sampler;
 	class Texture;
+	// Panther Utilities
+	class Camera;
+	class Transform;
 
-	class DemoScene : public Scene
+	class DemoScene final : public Scene
 	{
 	public:
-		DemoScene(Panther::Renderer& a_Renderer);
+		DemoScene(Renderer& a_Renderer);
 
-		void Load() override;
-		void Unload() override;
-		void Update(float a_DT) override;
-		void Render() override;
-		void OnResize(Panther::uint32 a_Width, Panther::uint32 a_Height) override;
+		void Load() final override;
+		void Unload() final override;
+		void Update(float a_DT) final override;
+		void Render() final override;
+		void OnResize(uint32 a_Width, uint32 a_Height) final override;
+		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown) final override;
 
 	private:
-		std::unique_ptr<Panther::DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
-		std::unique_ptr<Panther::DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
+		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
+		std::unique_ptr<DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
@@ -33,19 +38,19 @@ namespace Panther
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
 		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
 
-		std::unique_ptr<Panther::Buffer> m_CubeMatrixBuffer = nullptr;
-		std::unique_ptr<Panther::Buffer> m_SphereMatrixBuffer = nullptr;
-		std::unique_ptr<Panther::Buffer> m_DuckMatrixBuffer = nullptr;
+		std::unique_ptr<Buffer> m_CubeMatrixBuffer = nullptr;
+		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
+		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
 
-		std::unique_ptr<Panther::Material> m_TestMaterial = nullptr;
+		std::unique_ptr<Material> m_TestMaterial = nullptr;
 
-		std::vector<std::unique_ptr<Panther::Texture>> m_Textures;
-		std::unique_ptr<Panther::Sampler> m_Sampler = nullptr;
+		std::vector<std::unique_ptr<Texture>> m_Textures;
+		std::unique_ptr<Sampler> m_Sampler = nullptr;
 
-		DirectX::XMMATRIX m_ProjectionMatrix;
-		DirectX::XMMATRIX m_ViewMatrix;
-		DirectX::XMMATRIX m_ModelMatrix;
+		std::unique_ptr<Camera> m_Camera = nullptr;
 
-		float m_Angle = 0;
+		std::unique_ptr<Transform> m_CubeTransform = nullptr;
+		std::unique_ptr<Transform> m_SphereTransform = nullptr;
+		std::unique_ptr<Transform> m_DuckTransform = nullptr;
 	};
 }

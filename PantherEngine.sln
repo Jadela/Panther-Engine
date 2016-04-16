@@ -1,10 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PantherEngine", "PantherEngine.vcxproj", "{5FA4F39C-73A1-4BA4-9E64-FCE4B7346E43}"
 	ProjectSection(ProjectDependencies) = postProject
+		{23248A7B-A205-424B-B44C-06BB66F4FC71} = {23248A7B-A205-424B-B44C-06BB66F4FC71}
 		{98144C83-3F06-474A-8566-015A098E7294} = {98144C83-3F06-474A-8566-015A098E7294}
 		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7} = {92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}
 	EndProjectSection
@@ -17,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Renderer", "Panther
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Core", "Panther_Core\Panther_Core.vcxproj", "{98144C83-3F06-474A-8566-015A098E7294}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Utilities", "Panther_Utilities\Panther_Utilities.vcxproj", "{23248A7B-A205-424B-B44C-06BB66F4FC71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +39,10 @@ Global
 		{98144C83-3F06-474A-8566-015A098E7294}.Debug DX12|Win64.Build.0 = Debug|x64
 		{98144C83-3F06-474A-8566-015A098E7294}.Release DX12|Win64.ActiveCfg = Release|x64
 		{98144C83-3F06-474A-8566-015A098E7294}.Release DX12|Win64.Build.0 = Release|x64
+		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Debug DX12|Win64.ActiveCfg = Debug|x64
+		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Debug DX12|Win64.Build.0 = Debug|x64
+		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Release DX12|Win64.ActiveCfg = Release|x64
+		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Release DX12|Win64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,5 +51,6 @@ Global
 		{5FA4F39C-73A1-4BA4-9E64-FCE4B7346E43} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
 		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
 		{98144C83-3F06-474A-8566-015A098E7294} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
+		{23248A7B-A205-424B-B44C-06BB66F4FC71} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
 	EndGlobalSection
 EndGlobal

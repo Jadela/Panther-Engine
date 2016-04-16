@@ -212,6 +212,16 @@ namespace Panther
 				return 1;
 		}
 		break;
+		case WM_MOUSEMOVE:
+		{
+			int32 x = LOWORD(lParam);
+			int32 y = HIWORD(lParam);
+			if (app.m_Scene)
+			{
+				app.m_Scene->OnMouseMove(x, y, (wParam & MK_LBUTTON) != 0);
+			}
+		}
+		break;
 		default:
 			return DefWindowProc(hwnd, message, wParam, lParam);
 		}

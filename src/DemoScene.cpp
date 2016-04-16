@@ -10,6 +10,8 @@
 #include "../Panther_Renderer/src/DescriptorHeap.h"
 #include "../Panther_Renderer/src/Material.h"
 #include "../Panther_Renderer/src/Mesh.h"
+#include "../Panther_Utilities/src/Camera.h"
+#include "../Panther_Utilities/src/Transform.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -133,10 +135,14 @@ namespace Panther
 
 			m_DuckBundle->Close();
 		}
-
-		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
-
 		m_Renderer.Synchronize();
+
+		m_Camera = std::make_unique<Camera>(Transform(XMFLOAT3(0, 0, -10)));
+		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight());
+
+		m_CubeTransform = std::make_unique<Transform>(XMFLOAT3(-3, 0, 0));
+		m_SphereTransform = std::make_unique<Transform>(XMFLOAT3(0, 0, 0));
+		m_DuckTransform = std::make_unique<Transform>(XMFLOAT3(3, 0, 0));
 	}
 
 	void DemoScene::Unload()
@@ -145,12 +151,9 @@ namespace Panther
 
 	void DemoScene::Update(float a_DT)
 	{
-		XMVECTOR eyePosition = XMVectorSet(0, 0, -10, 1);
-		XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
-		XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
-		m_ViewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-
-		m_Angle += 90.0f * a_DT;
+		m_CubeTransform->AddRotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+		m_SphereTransform->AddRotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+		m_DuckTransform->AddRotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
 	}
 
 	void DemoScene::Render()
@@ -163,38 +166,27 @@ namespace Panther
 		commandList.UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 
 		commandList.UseDefaultViewport();
-
-		// Indicate that the back buffer will be used as a render target.
 		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
 		commandList.SetAndClearRenderTarget(DirectX::Colors::CornflowerBlue);
 
+		XMMATRIX vpMatrix = m_Camera->GetViewProjectionMatrix();
+
+		// Cube
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 0);
-
-		XMVECTOR rotationAxis = XMVectorSet(0, 1, 0, 0);
-		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(-3, 0, 0);
-		XMMATRIX mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
+		XMMATRIX mvp = m_CubeTransform->GetTransformMatrix() * vpMatrix;
 		m_CubeMatrixBuffer->CopyTo(&mvp, sizeof(XMMATRIX));
-
-		// Execute cube bundle.
 		commandList.ExecuteBundle(*m_CubeBundle.get());
 
+		// Sphere
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 1);
-
-		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(0, 0, 0);
-		mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
+		mvp = m_SphereTransform->GetTransformMatrix() * vpMatrix;
 		m_SphereMatrixBuffer->CopyTo(&mvp, sizeof(mvp));
-
-		// Execute sphere bundle.
 		commandList.ExecuteBundle(*m_SphereBundle.get());
 
+		// Duck
 		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), 0, 2);
-
-		m_ModelMatrix = XMMatrixRotationAxis(rotationAxis, XMConvertToRadians(m_Angle)) * XMMatrixTranslation(3, 0, 0);
-		mvp = m_ModelMatrix * m_ViewMatrix * m_ProjectionMatrix;
+		mvp = m_DuckTransform->GetTransformMatrix() * vpMatrix;
 		m_DuckMatrixBuffer->CopyTo(&mvp, sizeof(mvp));
-
-		// Execute duck bundle.
 		commandList.ExecuteBundle(*m_DuckBundle.get());
 
 		// Indicate that the back buffer will now be used to present.
@@ -207,6 +199,15 @@ namespace Panther
 
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)
 	{
-		m_ProjectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight(), 0.1f, 100.0f);
+		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight());
+	}
+
+	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown)
+	{
+		UpdateMouseDelta(XMINT2(a_DeltaX, a_DeltaY));
+		if (a_LMBDown)
+		{
+			m_Camera->ApplyRotation(0.0f, -m_MousePositionDelta.y * 0.1f, -m_MousePositionDelta.x * 0.1f);
+		}
 	}
 }
