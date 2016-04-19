@@ -151,9 +151,15 @@ namespace Panther
 
 	void DemoScene::Update(float a_DT)
 	{
-		m_CubeTransform->AddRotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
-		m_SphereTransform->AddRotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
-		m_DuckTransform->AddRotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+		m_CubeTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+		m_SphereTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+		m_DuckTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+
+		float speedMultipler = (m_Shift ? 8.0f : 4.0f);
+		XMVECTOR cameraTranslate = XMVectorSet(static_cast<float>(m_D - m_A), 0.0f, static_cast<float>(m_W - m_S), 1.0f) * speedMultipler * a_DT;
+		XMVECTOR cameraPan = XMVectorSet(0.0f, static_cast<float>(m_E - m_Q), 0.0f, 1.0f) * speedMultipler * a_DT;
+		m_Camera->Translate(cameraTranslate, Space::Local);
+		m_Camera->Translate(cameraPan, Space::World);
 	}
 
 	void DemoScene::Render()
@@ -202,12 +208,96 @@ namespace Panther
 		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.m_Window.GetWidth()) / m_Renderer.m_Window.GetHeight());
 	}
 
-	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown)
+	void DemoScene::OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt)
+	{
+		switch (a_Key)
+		{
+		case Key::W:
+		{
+			m_W = 1;
+		}
+		break;
+		case Key::S:
+		{
+			m_S = 1;
+		}
+		break;
+		case Key::A:
+		{
+			m_A = 1;
+		}
+		break;
+		case Key::D:
+		{
+			m_D = 1;
+		}
+		break;
+		case Key::Q:
+		{
+			m_Q = 1;
+		}
+		break;
+		case Key::E:
+		{
+			m_E = 1;
+		}
+		break;
+		case Key::ShiftKey:
+		{
+			m_Shift = 1;
+		}
+		break;
+		}
+	}
+
+	void DemoScene::OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt)
+	{
+		switch (a_Key)
+		{
+		case Key::W:
+		{
+			m_W = 0;
+		}
+		break;
+		case Key::S:
+		{
+			m_S = 0;
+		}
+		break;
+		case Key::A:
+		{
+			m_A = 0;
+		}
+		break;
+		case Key::D:
+		{
+			m_D = 0;
+		}
+		break;
+		case Key::Q:
+		{
+			m_Q = 0;
+		}
+		break;
+		case Key::E:
+		{
+			m_E = 0;
+		}
+		break;
+		case Key::ShiftKey:
+		{
+			m_Shift = 0;
+		}
+		break;
+		}
+	}
+
+	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)
 	{
 		UpdateMouseDelta(XMINT2(a_DeltaX, a_DeltaY));
-		if (a_LMBDown)
+		if (a_RMBDown)
 		{
-			m_Camera->ApplyRotation(0.0f, -m_MousePositionDelta.y * 0.1f, -m_MousePositionDelta.x * 0.1f);
+			m_Camera->Rotate(0.0f, -m_MousePositionDelta.y * 0.1f, -m_MousePositionDelta.x * 0.1f);
 		}
 	}
 }

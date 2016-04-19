@@ -30,17 +30,25 @@ namespace Panther
 		m_Scale = a_NewScale;
 	}
 
-	void Transform::AddTranslation(XMVECTOR a_Translation)
+	void Transform::Translate(XMVECTOR a_Translation, Space a_RelativeTo)
 	{
-		m_Position += a_Translation;
+		switch (a_RelativeTo)
+		{
+		case Space::World:
+			m_Position += a_Translation;
+			break;
+		case Space::Local:
+			m_Position += XMVector3Rotate(a_Translation, m_Rotation);
+			break;
+		}
 	}
 
-	void Transform::AddRotation(XMVECTOR a_Rotation)
+	void Transform::Rotate(XMVECTOR a_Rotation)
 	{
 		m_Rotation = XMQuaternionMultiply(m_Rotation, a_Rotation);
 	}
 
-	void Transform::AddScale(XMVECTOR a_Scale)
+	void Transform::Scale(XMVECTOR a_Scale)
 	{
 		m_Scale += a_Scale;
 	}

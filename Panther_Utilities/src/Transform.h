@@ -1,9 +1,11 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include "Space.h"
 
 namespace Panther
 {
+
 	class Transform
 	{
 	public:
@@ -15,9 +17,9 @@ namespace Panther
 		void SetRotation(DirectX::XMVECTOR a_NewOrientation);
 		void SetScale(DirectX::XMVECTOR a_NewScale);
 
-		void AddTranslation(DirectX::XMVECTOR a_Translation);
-		void AddRotation(DirectX::XMVECTOR a_Rotation);
-		void AddScale(DirectX::XMVECTOR a_Scale);
+		void Translate(DirectX::XMVECTOR a_Translation, Space a_RelativeTo = Space::Local);
+		void Rotate(DirectX::XMVECTOR a_Rotation);
+		void Scale(DirectX::XMVECTOR a_Scale);
 
 		DirectX::XMMATRIX GetTransformMatrix();
 

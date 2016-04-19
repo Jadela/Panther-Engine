@@ -20,5 +20,8 @@
     <ClInclude Include="src\Transform.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="src\Space.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

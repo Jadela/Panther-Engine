@@ -1,5 +1,6 @@
 #pragma once
 #include "../Panther_Core/src/Core.h"
+#include "../Panther_Core/src/Keys.h"
 
 namespace Panther
 {
@@ -17,7 +18,9 @@ namespace Panther
 		virtual void Update(float a_DT) = 0;
 		virtual void Render() = 0;
 		virtual void OnResize(uint32 a_Width, uint32 a_Height) = 0;
-		virtual void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown) = 0;
+		virtual void OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) = 0;
+		virtual void OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) = 0;
+		virtual void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) = 0;
 
 	protected:
 		Panther::Renderer& m_Renderer;

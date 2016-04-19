@@ -9,6 +9,9 @@
     <ClInclude Include="src\Core.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="src\Keys.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core.cpp">

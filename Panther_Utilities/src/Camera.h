@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Transform.h"
+#include "Space.h"
 
 namespace Panther
 {
@@ -16,7 +17,8 @@ namespace Panther
 		void SetNearZ(float a_NewNearZ);
 		void SetFarZ(float a_NewFarZ);
 
-		void ApplyRotation(float a_Roll, float a_Pitch, float a_Yaw);
+		void Translate(DirectX::XMVECTOR a_Translation, Space a_RelativeTo = Space::Local);
+		void Rotate(float a_Roll, float a_Pitch, float a_Yaw);
 
 		DirectX::XMMATRIX GetViewProjectionMatrix();
 	private:

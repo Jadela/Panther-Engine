@@ -42,7 +42,12 @@ namespace Panther
 		CalculateProjectionMatrix();
 	}
 
-	void Camera::ApplyRotation(float a_Roll, float a_Pitch, float a_Yaw)
+	void Camera::Translate(DirectX::XMVECTOR a_Translation, Space a_RelativeTo)
+	{
+		m_Transform.Translate(a_Translation, a_RelativeTo);
+	}
+
+	void Camera::Rotate(float a_Roll, float a_Pitch, float a_Yaw)
 	{
 		m_Roll += a_Roll;
 		m_Pitch += a_Pitch;

@@ -5,6 +5,8 @@
 #include "../Panther_Renderer/src/DX12Renderer.h"
 #include "DemoScene.h"
 
+#include "../Panther_Core/src/Keys.h"
+
 #define WINDOW_CLASS_NAME L"DX12DemoWindow"
 
 namespace Panther
@@ -212,13 +214,61 @@ namespace Panther
 				return 1;
 		}
 		break;
+		case WM_KEYDOWN:
+		{
+			MSG charMsg;
+			// Get the unicode character (UTF-16)
+			uint32 c = 0;
+			// For printable characters, the next message will be WM_CHAR.
+			// This message contains the character code we need to send the KeyPressed event.
+			// Inspired by the SDL implementation.
+			if (PeekMessage(&charMsg, hwnd, 0, 0, PM_NOREMOVE) && charMsg.message == WM_CHAR)
+			{
+				GetMessage(&charMsg, hwnd, 0, 0);
+				c = (uint32)charMsg.wParam;
+			}
+			bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
+			bool control = GetAsyncKeyState(VK_CONTROL) > 0;
+			bool alt = GetAsyncKeyState(VK_MENU) > 0;
+			Key key = (Key)wParam;
+			if (app.m_Scene)
+			{
+				app.m_Scene->OnKeyDown(key, c, KeyState::Pressed, control, shift, alt);
+			}
+		}
+		break;    
+		case WM_KEYUP:
+		{
+			bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
+			bool control = GetAsyncKeyState(VK_CONTROL) > 0;
+			bool alt = GetAsyncKeyState(VK_MENU) > 0;
+			Key key = (Key)wParam;
+			uint32 c = 0;
+			uint32 scanCode = (lParam & 0x00FF0000) >> 16;
+
+			// Determine which key was released by converting the key code and the scan code
+			// to a printable character (if possible).
+			// Inspired by the SDL implementation.
+			ubyte8 keyboardState[256];
+			GetKeyboardState(keyboardState);
+			wchar_t translatedCharacters[4];
+			if (int32 result = ToUnicodeEx((uint32)wParam, scanCode, keyboardState, translatedCharacters, 4, 0, NULL) > 0)
+			{
+				c = translatedCharacters[0];
+			}
+			if (app.m_Scene)
+			{
+				app.m_Scene->OnKeyUp(key, c, KeyState::Released, shift, control, alt);
+			}
+		}
+		break;
 		case WM_MOUSEMOVE:
 		{
 			int32 x = LOWORD(lParam);
 			int32 y = HIWORD(lParam);
 			if (app.m_Scene)
 			{
-				app.m_Scene->OnMouseMove(x, y, (wParam & MK_LBUTTON) != 0);
+				app.m_Scene->OnMouseMove(x, y, (wParam & MK_LBUTTON) != 0, (wParam & MK_RBUTTON) != 0); 
 			}
 		}
 		break;
