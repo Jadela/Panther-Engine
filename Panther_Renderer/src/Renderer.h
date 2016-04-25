@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Panther_Core/src/Core.h"
+#include "Sampler.h"
 
 namespace Panther
 {
@@ -8,7 +9,6 @@ namespace Panther
 	class DescriptorHeap;
 	class Material;
 	class Mesh;
-	class Sampler;
 	class Texture;
 	class Window;
 
@@ -29,7 +29,7 @@ namespace Panther
 		virtual std::unique_ptr<Texture> CreateTexture(const std::wstring& a_Path) = 0;
 		virtual std::unique_ptr<Material> CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) = 0;
 		virtual std::unique_ptr<Mesh> CreateMesh() = 0;
-		virtual std::unique_ptr<Sampler> CreateSampler() = 0;
+		virtual std::unique_ptr<Sampler> CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode = Sampler::TextureCoordinateMode::Wrap) = 0;
 		virtual std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) = 0;
 
 		virtual void StartRender() = 0;

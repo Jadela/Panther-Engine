@@ -57,13 +57,13 @@ namespace Panther
 		m_CommandList->IASetIndexBuffer(&mesh->m_IndexBufferView);
 	}
 
-	void DX12CommandList::SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, uint32 a_Slot, uint32 a_HeapElementOffset)
+	void DX12CommandList::SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset)
 	{
 		DX12DescriptorHeap* descriptorHeap = static_cast<DX12DescriptorHeap*>(&a_DescriptorHeap);
 		CD3DX12_GPU_DESCRIPTOR_HANDLE descriptorHeapGPUHandle(descriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), 
 			a_HeapElementOffset, m_Renderer.m_D3DDevice->GetDescriptorHandleIncrementSize(descriptorHeap->m_Type));
 
-		m_CommandList->SetGraphicsRootDescriptorTable(a_Slot, descriptorHeapGPUHandle);
+		m_CommandList->SetGraphicsRootDescriptorTable(a_Slot.m_Slot, descriptorHeapGPUHandle);
 	}
 
 	void DX12CommandList::UseDescriptorHeaps(DescriptorHeap** a_DescriptorHeaps, const uint32 a_NumDescriptorHeaps)

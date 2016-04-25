@@ -143,12 +143,16 @@ namespace Panther
 		static const float targetFramerate = 30.0f;
 		static const float maxTimeStep = 1.0f / targetFramerate;
 
-		while (msg.message != WM_QUIT)
+		while (!m_RequestQuit)
 		{
 			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
+				if (msg.message == WM_QUIT)
+				{
+					m_RequestQuit = true;
+				}
 			}
 			else
 			{
@@ -170,8 +174,12 @@ namespace Panther
 				m_Renderer->EndRender();
 			}
 		}
-
 		return static_cast<Panther::int32>(msg.wParam);
+	}
+
+	void Application::Quit()
+	{
+		m_RequestQuit = true;
 	}
 
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

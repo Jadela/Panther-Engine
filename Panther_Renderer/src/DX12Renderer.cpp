@@ -269,9 +269,9 @@ namespace Panther
 		return std::make_unique<DX12Mesh>(*this);
 	}
 
-	std::unique_ptr<Sampler> DX12Renderer::CreateSampler()
+	std::unique_ptr<Sampler> DX12Renderer::CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode)
 	{
-		return std::make_unique<DX12Sampler>();
+		return std::make_unique<DX12Sampler>((D3D12_TEXTURE_ADDRESS_MODE)((int)a_TextureCoordinateMode + 1));
 	}
 
 	std::unique_ptr<CommandList> DX12Renderer::CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material)

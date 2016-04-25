@@ -12,10 +12,10 @@ namespace Panther
 		DX12Material(DX12Renderer& a_Renderer, uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity);
 		~DX12Material();
 
-		void DeclareShaderConstant(ConstantType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader) final override;
+		DescriptorSlot DeclareShaderDescriptor(DescriptorType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader) final override;
 		void DeclareInputParameter(std::string a_Semantic, InputType a_Type, uint32 a_VectorElementCount) final override;
 		void LoadShader(std::wstring a_Path, std::string a_EntryPoint, ShaderType a_Type) final override;
-		void Compile() final override;
+		void Compile(DepthWrite a_DepthWrite = DepthWrite::On) final override;
 
 		ID3D12PipelineState* GetPSO();
 		ID3D12RootSignature* GetRootSig();

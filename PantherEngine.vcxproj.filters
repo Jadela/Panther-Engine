@@ -67,8 +67,11 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="rsc\shaders\shaders.hlsl">
+    <None Include="rsc\shaders\shaders.hlsl">
       <Filter>Resources\Shaders</Filter>
-    </CustomBuild>
+    </None>
+    <None Include="rsc\shaders\skydome.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

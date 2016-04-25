@@ -19,7 +19,7 @@ namespace Panther
 	{
 	}
 
-	void DX12Material::DeclareShaderConstant(ConstantType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader)
+	Material::DescriptorSlot DX12Material::DeclareShaderDescriptor(DescriptorType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader)
 	{
 		if (m_RootParameters.size() >= m_ConstantsCapacity)
 		{
@@ -29,13 +29,13 @@ namespace Panther
 		D3D12_DESCRIPTOR_RANGE_TYPE descRangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
 		switch (a_Type)
 		{
-		case ConstantType::ShaderResource:
+		case DescriptorType::ShaderResource:
 			descRangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 			break;
-		case ConstantType::ConstantBuffer:
+		case DescriptorType::ConstantBuffer:
 			descRangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 			break;
-		case ConstantType::Sampler:
+		case DescriptorType::Sampler:
 			descRangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
 			break;
 		default:
@@ -57,6 +57,9 @@ namespace Panther
 			break;
 		}
 
+		DescriptorSlot descriptorSlot;
+		descriptorSlot.m_Slot = (uint32)m_DescriptorRanges.size();
+
 		// Define a single CBV parameter.
 		CD3DX12_DESCRIPTOR_RANGE descriptorRange(descRangeType, a_Amount, a_BaseShaderRegister);
 		m_DescriptorRanges.push_back(descriptorRange);
@@ -64,6 +67,8 @@ namespace Panther
 		CD3DX12_ROOT_PARAMETER rootParameter;
 		rootParameter.InitAsDescriptorTable(1, &m_DescriptorRanges.back(), shaderVisibility);
 		m_RootParameters.push_back(rootParameter);
+
+		return descriptorSlot;
 	}
 
 	void DX12Material::DeclareInputParameter(std::string a_Semantic, InputType a_Type, uint32 a_VectorElementCount)
@@ -129,24 +134,25 @@ namespace Panther
 #else
 		Panther::uint32 compileFlags = 0;
 #endif
+		ID3DBlob* errorBlob = nullptr;
 		switch (a_Type)
 		{
 		case ShaderType::Vertex:
 			if (m_VertexBlob != nullptr) throw std::runtime_error("Vertex shader has already been loaded for this material before!");
-			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, nullptr, a_EntryPoint.c_str(), "vs_5_0", compileFlags, 0, &m_VertexBlob, nullptr);
+			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, nullptr, a_EntryPoint.c_str(), "vs_5_0", compileFlags, 0, &m_VertexBlob, &errorBlob);
 			break;
 		case ShaderType::Pixel:
 			if (m_PixelBlob != nullptr) throw std::runtime_error("Pixel shader has already been loaded for this material before!");
-			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, nullptr, a_EntryPoint.c_str(), "ps_5_0", compileFlags, 0, &m_PixelBlob, nullptr);
+			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, nullptr, a_EntryPoint.c_str(), "ps_5_0", compileFlags, 0, &m_PixelBlob, &errorBlob);
 			break;
 		default:
 			throw std::runtime_error("Trying to load shader of unknown type!");
 			break;
-		}	
-		if (FAILED(hr)) throw std::runtime_error("Could not load shader.");
+		}
+		if (FAILED(hr)) throw std::runtime_error("Could not load shader: " + std::string((char*)errorBlob->GetBufferPointer()));
 	}
 
-	void DX12Material::Compile()
+	void DX12Material::Compile(DepthWrite a_DepthWrite)
 	{
 		// Compile the root signature.
 		CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
@@ -163,15 +169,18 @@ namespace Panther
 		hr = m_Renderer.m_D3DDevice->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
 		if (FAILED(hr)) throw std::runtime_error("Could not create root signature.");
 
+		D3D12_DEPTH_STENCIL_DESC DSDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		DSDesc.DepthWriteMask = (a_DepthWrite == DepthWrite::On) ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
+
 		// Describe and create a graphics pipeline state object (PSO).
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = {};
 		PSDesc.InputLayout = { &m_InputLayout[0], (uint32)m_InputLayout.size() };
 		PSDesc.pRootSignature = m_RootSignature.Get();
 		PSDesc.VS = { m_VertexBlob->GetBufferPointer(),	m_VertexBlob->GetBufferSize() };
 		PSDesc.PS = { m_PixelBlob->GetBufferPointer(), m_PixelBlob->GetBufferSize() };
-		PSDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);;
+		PSDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		PSDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-		PSDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		PSDesc.DepthStencilState = DSDesc;
 		PSDesc.SampleMask = UINT_MAX;
 		PSDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		PSDesc.NumRenderTargets = 1;

@@ -1,10 +1,10 @@
 #pragma once
 #include "../../Panther_Core/src/Core.h"
+#include "Material.h"
 
 namespace Panther
 {
 	class DescriptorHeap;
-	class Material;
 	class Mesh;
 
 	class CommandList
@@ -15,7 +15,7 @@ namespace Panther
 		virtual void SetAndClearRenderTarget(const float a_Color[4]) = 0;
 		virtual void SetMaterial(Material& a_Material, bool a_ResetState) = 0;
 		virtual void SetMesh(Mesh& a_Mesh) = 0;
-		virtual void SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, uint32 a_Slot, uint32 a_HeapElementOffset) = 0;
+		virtual void SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset) = 0;
 		virtual void UseDescriptorHeaps(DescriptorHeap** a_DescriptorHeaps, const uint32 a_NumDescriptorHeaps) = 0;
 		virtual void UseDefaultViewport() = 0;
 		virtual void ExecuteBundle(CommandList& a_Bundle) = 0;

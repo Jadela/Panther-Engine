@@ -23,7 +23,7 @@ namespace Panther
 		std::unique_ptr<Texture> CreateTexture(const std::wstring& a_Path) final override;
 		std::unique_ptr<Material> CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) final override;
 		std::unique_ptr<Mesh> CreateMesh() final override;
-		std::unique_ptr<Sampler> CreateSampler() final override;
+		std::unique_ptr<Sampler> CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode = Sampler::TextureCoordinateMode::Wrap) final override;
 		std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) final override;
 
 		void StartRender() final override;

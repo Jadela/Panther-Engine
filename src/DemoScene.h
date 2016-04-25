@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "../Panther_Renderer/src/Material.h"
 
 namespace Panther
 {
@@ -6,7 +7,6 @@ namespace Panther
 	class Buffer;
 	class CommandList;
 	class DescriptorHeap;
-	class Material;
 	class Mesh;
 	class Sampler;
 	class Texture;
@@ -32,6 +32,7 @@ namespace Panther
 		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
 		std::unique_ptr<DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 
+		std::unique_ptr<CommandList> m_SkySphereBundle = nullptr;
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
 		std::unique_ptr<CommandList> m_DuckBundle = nullptr;
@@ -43,11 +44,30 @@ namespace Panther
 		std::unique_ptr<Buffer> m_CubeMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
+		std::unique_ptr<Buffer> m_SkydomeVertexConstantBuffer = nullptr;
+		std::unique_ptr<Buffer> m_LightPositionBuffer = nullptr;
+		std::unique_ptr<Buffer> m_SkydomePixelConstantBuffer = nullptr;
 
-		std::unique_ptr<Material> m_TestMaterial = nullptr;
+		// Skybox Material
+		std::unique_ptr<Material> m_SkyDomeMaterial = nullptr;
+		Material::DescriptorSlot m_SkyDomeVertexCBSlot = {};
+		Material::DescriptorSlot m_SkyDomePixelCBSlot = {};
+		Material::DescriptorSlot m_SkyDomeDayTextureSlot = {};
+		Material::DescriptorSlot m_SkyDomeDuskTextureSlot = {};
+		Material::DescriptorSlot m_SkyDomeSunTextureSlot = {};
+		Material::DescriptorSlot m_SkyDomeMoonTextureSlot = {};
+		Material::DescriptorSlot m_SkyDomeClampedSamplerSlot = {};
+
+		// Default Material
+		std::unique_ptr<Material> m_DefaultMaterial = nullptr;
+		Material::DescriptorSlot m_DefaultVertexCBSlot = {};
+		Material::DescriptorSlot m_DefaultPixelCBSlot = {};
+		Material::DescriptorSlot m_DefaultTextureSlot = {};
+		Material::DescriptorSlot m_DefaultSamplerSlot = {};
 
 		std::vector<std::unique_ptr<Texture>> m_Textures;
-		std::unique_ptr<Sampler> m_Sampler = nullptr;
+		std::unique_ptr<Sampler> m_DefaultSampler = nullptr;
+		std::unique_ptr<Sampler> m_SkyboxSampler = nullptr;
 
 		std::unique_ptr<Camera> m_Camera = nullptr;
 
@@ -59,5 +79,8 @@ namespace Panther
 		int32 m_W = 0, m_A = 0, m_S = 0, m_D = 0;
 		int32 m_Q = 0, m_E = 0;
 		bool m_Shift = true;
+
+		// Skydome
+		float m_SunAngle = 90.0f;
 	};
 }

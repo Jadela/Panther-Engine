@@ -20,6 +20,7 @@ namespace Panther
 		void Translate(DirectX::XMVECTOR a_Translation, Space a_RelativeTo = Space::Local);
 		void Rotate(float a_Roll, float a_Pitch, float a_Yaw);
 
+		DirectX::XMMATRIX GetSkyMatrix();
 		DirectX::XMMATRIX GetViewProjectionMatrix();
 	private:
 		Transform m_Transform = Transform();

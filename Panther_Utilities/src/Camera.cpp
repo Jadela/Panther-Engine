@@ -55,6 +55,11 @@ namespace Panther
 		m_Transform.SetRotation(XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll)));
 	}
 
+	XMMATRIX Camera::GetSkyMatrix()
+	{
+		return XMMatrixScaling(-1, 1, 1) * XMMatrixTranslationFromVector(m_Transform.m_Position);
+	}
+
 	XMMATRIX Camera::GetViewProjectionMatrix()
 	{
 		XMMATRIX rotationMatrix = XMMatrixTranspose(XMMatrixRotationQuaternion(m_Transform.m_Rotation));

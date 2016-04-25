@@ -36,7 +36,7 @@
     <Image Include="rsc\Panther.ico" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="rsc\shaders\shaders.hlsl">
+    <None Include="rsc\shaders\shaders.hlsl">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy %(Identity) "$(OutDir)" &gt; NUL</Command>
@@ -50,7 +50,14 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying shaders to output directory.</Message>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-    </CustomBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\shaders\skydome.hlsl">
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5FA4F39C-73A1-4BA4-9E64-FCE4B7346E43}</ProjectGuid>
@@ -124,6 +131,12 @@
     <ManifestResourceCompile>
       <ResourceOutputFileName />
     </ManifestResourceCompile>
+    <PostBuildEvent>
+      <Command>CopyShaders.bat $(ProjectDir) $(OutDir)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying shaders from resource folder to output folder...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,6 +164,12 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Manifest>
+    <PostBuildEvent>
+      <Command>CopyShaders.bat $(ProjectDir) $(OutDir)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying shaders from resource folder to output folder...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

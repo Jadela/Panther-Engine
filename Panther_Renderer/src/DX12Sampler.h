@@ -8,7 +8,8 @@ namespace Panther
 	class DX12Sampler final : public Sampler
 	{
 	public:
-		DX12Sampler();
+		DX12Sampler() = delete;
+		explicit DX12Sampler(D3D12_TEXTURE_ADDRESS_MODE a_TextureCoordinateMode = D3D12_TEXTURE_ADDRESS_MODE_WRAP);
 		explicit DX12Sampler(D3D12_SAMPLER_DESC& a_SamplerDescriptor);
 
 	private:
