@@ -5,7 +5,7 @@
 #include "DX12Renderer.h"
 
 #include "../../Panther_Core/src/Core.h"
-#include "../../src/Window.h"
+#include "../../Panther_Demo/src/Window.h"
 
 namespace Panther
 {

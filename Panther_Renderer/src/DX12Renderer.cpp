@@ -9,7 +9,7 @@
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
 // TODO: Move over to new Panther projects.
-#include "../../src/Window.h"
+#include "../../Panther_Demo/src/Window.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
