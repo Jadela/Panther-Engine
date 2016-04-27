@@ -7,24 +7,24 @@ cbuffer VertexCB : register(b0)
 
 struct VtP
 {
-	float4 position	: SV_POSITION;
-	float2 uv		: UV;
+	float4 Position	: SV_POSITION;
+	float2 UV		: TEXCOORD;
 	float3 Sun_WS	: SUN_WS;
 	float4 Sun_SS	: SUN_SS;
 	float4 Pos_SS	: POSITION;
 	float4 Moon_SS	: MOON_SS;
 };
 
-VtP VSMain(float3 position : POSITION, float2 uv : UV)
+VtP VSMain(float3 Position : POSITION, float2 UV : TEXCOORD)
 {
 	VtP output;
 
-	output.position = mul(MVP, float4(position, 1));
-	output.uv = uv;
+	output.Position = mul(MVP, float4(Position, 1));
+	output.UV = UV;
 	output.Sun_WS = SunDirection;
 	output.Sun_SS = mul(MVP, float4(SunDirection, 1));
 	output.Moon_SS = mul(MVP, float4(-SunDirection, 1));
-	output.Pos_SS = output.position;
+	output.Pos_SS = output.Position;
 
 	return output;
 }
@@ -72,7 +72,7 @@ float4 PSMain(VtP input) : SV_TARGET
 	float SunAngle = input.Sun_WS.y * 90;
 	float day = clamp(SunAngle / SunFullBrightAngle, 0.0f, 1.0f);
 	float night = clamp(SunAngle / SunFullDarkAngle, 0.0f, 1.0f) * 0.8f;
-	float4 skyColor = (1.0f - night) * (day * dayTexture.Sample(clampedSampler, input.uv.yx) + (1.0f - day) * nightTexture.Sample(clampedSampler, input.uv.yx));
+	float4 skyColor = (1.0f - night) * (day * dayTexture.Sample(clampedSampler, input.UV.yx) + (1.0f - day) * nightTexture.Sample(clampedSampler, input.UV.yx));
 	
 	return skyColor + SunC + MoonC;
 }

@@ -51,7 +51,7 @@ namespace Panther
 			m_SkyDomeClampedSamplerSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
 
 			m_SkyDomeMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_SkyDomeMaterial->DeclareInputParameter("UV", Material::InputType::Float, 2);
+			m_SkyDomeMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
 
 			m_SkyDomeMaterial->Compile(Material::DepthWrite::Off);
 		}
@@ -70,7 +70,7 @@ namespace Panther
 			m_DefaultMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
 			m_DefaultMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
 			m_DefaultMaterial->DeclareInputParameter("COLOR", Material::InputType::Float, 4);
-			m_DefaultMaterial->DeclareInputParameter("UV", Material::InputType::Float, 2);
+			m_DefaultMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
 
 			m_DefaultMaterial->Compile();
 		}

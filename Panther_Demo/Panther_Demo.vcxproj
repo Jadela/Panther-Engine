@@ -201,6 +201,14 @@
   <ItemGroup>
     <ResourceCompile Include="Panther_Demo.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\shaders\shaders.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="rsc\shaders\skydome.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

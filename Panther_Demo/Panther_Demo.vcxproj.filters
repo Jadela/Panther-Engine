@@ -50,4 +50,12 @@
       <Filter>Resources</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="rsc\shaders\shaders.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+    <FxCompile Include="rsc\shaders\skydome.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>
