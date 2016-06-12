@@ -12,6 +12,8 @@ namespace Panther
 		Camera(Transform a_Transform);
 		~Camera();
 
+		const Transform& GetTransform() const;
+
 		void SetFOV(float a_NewFOV);
 		void SetAspectRatio(float a_NewAspectRatio);
 		void SetNearZ(float a_NewNearZ);
@@ -21,6 +23,7 @@ namespace Panther
 		void Rotate(float a_Roll, float a_Pitch, float a_Yaw);
 
 		DirectX::XMMATRIX GetSkyMatrix();
+		DirectX::XMMATRIX GetViewMatrix();
 		DirectX::XMMATRIX GetViewProjectionMatrix();
 	private:
 		Transform m_Transform = Transform();

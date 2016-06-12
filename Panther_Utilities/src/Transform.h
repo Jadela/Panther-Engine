@@ -13,6 +13,8 @@ namespace Panther
 		Transform(DirectX::XMFLOAT3 a_Position, DirectX::XMVECTOR a_Rotation = DirectX::XMQuaternionIdentity(), DirectX::XMFLOAT3 a_Scale = DirectX::XMFLOAT3(1, 1, 1));
 		~Transform();
 
+		const DirectX::XMVECTOR& GetPosition() const;
+
 		void SetPosition(DirectX::XMVECTOR a_NewPosition);
 		void SetRotation(DirectX::XMVECTOR a_NewOrientation);
 		void SetScale(DirectX::XMVECTOR a_NewScale);

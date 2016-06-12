@@ -15,6 +15,11 @@ namespace Panther
 	Transform::~Transform()
 	{}
 
+	const DirectX::XMVECTOR & Transform::GetPosition() const
+	{
+		return m_Position;
+	}
+
 	void Transform::SetPosition(XMVECTOR a_NewPosition)
 	{
 		m_Position = a_NewPosition;

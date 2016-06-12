@@ -33,14 +33,18 @@ namespace Panther
 		std::unique_ptr<DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 
 		std::unique_ptr<CommandList> m_SkySphereBundle = nullptr;
+		std::unique_ptr<CommandList> m_WaterBundle = nullptr;
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
 		std::unique_ptr<CommandList> m_DuckBundle = nullptr;
 
+		std::unique_ptr<Mesh> m_PlaneMesh = nullptr;
 		std::unique_ptr<Mesh> m_CubeMesh = nullptr;
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
 		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
 
+		std::unique_ptr<Buffer> m_WaterVertexCBuffer = nullptr;
+		std::unique_ptr<Buffer> m_WaterPixelCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_CubeMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
@@ -58,6 +62,13 @@ namespace Panther
 		Material::DescriptorSlot m_SkyDomeMoonTextureSlot = {};
 		Material::DescriptorSlot m_SkyDomeClampedSamplerSlot = {};
 
+		// Water Material
+		std::unique_ptr<Material> m_WaterMaterial = nullptr;
+		Material::DescriptorSlot m_WaterVertexCBSlot = {};
+		Material::DescriptorSlot m_WaterPixelCBSlot = {};
+		Material::DescriptorSlot m_WaterTexture0Slot = {};
+		Material::DescriptorSlot m_WaterSamplerSlot = {};
+
 		// Default Material
 		std::unique_ptr<Material> m_DefaultMaterial = nullptr;
 		Material::DescriptorSlot m_DefaultVertexCBSlot = {};
@@ -71,6 +82,7 @@ namespace Panther
 
 		std::unique_ptr<Camera> m_Camera = nullptr;
 
+		std::unique_ptr<Transform> m_WaterTransform = nullptr;
 		std::unique_ptr<Transform> m_CubeTransform = nullptr;
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
 		std::unique_ptr<Transform> m_DuckTransform = nullptr;    
@@ -82,5 +94,8 @@ namespace Panther
 
 		// Skydome
 		float m_SunAngle = 90.0f;
+
+		// Water
+		float m_WaterOffset = 0.0f;
 	};
 }

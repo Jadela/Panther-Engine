@@ -22,16 +22,48 @@ namespace Panther
 	{
 	}
 
+	void Mesh::InitAsPlane(CommandList & a_CommandList, DirectX::XMFLOAT3 a_Scale, uint32 a_DivisionsX, uint32 a_DivisionsY)
+	{
+		assert(a_DivisionsX > 0 && a_DivisionsY > 0);
+		uint32 vertsX = a_DivisionsX + 1;
+		uint32 vertsY = a_DivisionsY + 1;
+
+		m_Vertices.reserve(vertsX * vertsY);
+		m_Indices.reserve(a_DivisionsX * a_DivisionsY * 6);
+		for (uint32 y = 0; y <= a_DivisionsY; ++y)
+		{
+			float posY = ((float)y / a_DivisionsY - 0.5f) * a_Scale.y;
+			float texY = (float)y / a_DivisionsY;
+			for (uint32 x = 0; x <= a_DivisionsX; ++x)
+			{
+				float posX = ((float)x / a_DivisionsX - 0.5f) * a_Scale.x;
+				float texX = (float)x / a_DivisionsX;
+				m_Vertices.push_back({ XMFLOAT3(posX, posY, 0), XMFLOAT3(0, 0, 1), XMFLOAT4(texX, texY, 0, 1), XMFLOAT2(texX, texY) });
+				if (x != 0 && y != 0)
+				{
+					m_Indices.push_back((y - 1) * vertsX + (x - 1));
+					m_Indices.push_back((y - 1) * vertsX + x);
+					m_Indices.push_back(y * vertsX + (x - 1));
+
+					m_Indices.push_back(y * vertsX + x);
+					m_Indices.push_back(y * vertsX + (x - 1));
+					m_Indices.push_back((y - 1) * vertsX + x);
+				}
+			}
+		}
+		Initialize(a_CommandList);
+	}
+
 	void Mesh::InitAsCube(CommandList& a_CommandList, XMFLOAT3 a_Scale)
 	{
-		XMFLOAT3 p0 = XMFLOAT3(-1.0f * a_Scale.x, -1.0f * a_Scale.y, -1.0f * a_Scale.z);
-		XMFLOAT3 p1 = XMFLOAT3(-1.0f * a_Scale.x, 1.0f * a_Scale.y, -1.0f * a_Scale.z);
-		XMFLOAT3 p2 = XMFLOAT3(1.0f * a_Scale.x, 1.0f * a_Scale.y, -1.0f * a_Scale.z);
-		XMFLOAT3 p3 = XMFLOAT3(1.0f * a_Scale.x, -1.0f * a_Scale.y, -1.0f * a_Scale.z);
-		XMFLOAT3 p4 = XMFLOAT3(-1.0f * a_Scale.x, -1.0f * a_Scale.y, 1.0f * a_Scale.z);
-		XMFLOAT3 p5 = XMFLOAT3(-1.0f * a_Scale.x, 1.0f * a_Scale.y, 1.0f * a_Scale.z);
-		XMFLOAT3 p6 = XMFLOAT3(1.0f * a_Scale.x, 1.0f * a_Scale.y, 1.0f * a_Scale.z);
-		XMFLOAT3 p7 = XMFLOAT3(1.0f * a_Scale.x, -1.0f * a_Scale.y, 1.0f * a_Scale.z);
+		XMFLOAT3 p0 = XMFLOAT3(-0.5f * a_Scale.x, -0.5f * a_Scale.y, -0.5f * a_Scale.z);
+		XMFLOAT3 p1 = XMFLOAT3(-0.5f * a_Scale.x, 0.5f * a_Scale.y, -0.5f * a_Scale.z);
+		XMFLOAT3 p2 = XMFLOAT3(0.5f * a_Scale.x, 0.5f * a_Scale.y, -0.5f * a_Scale.z);
+		XMFLOAT3 p3 = XMFLOAT3(0.5f * a_Scale.x, -0.5f * a_Scale.y, -0.5f * a_Scale.z);
+		XMFLOAT3 p4 = XMFLOAT3(-0.5f * a_Scale.x, -0.5f * a_Scale.y, 0.5f * a_Scale.z);
+		XMFLOAT3 p5 = XMFLOAT3(-0.5f * a_Scale.x, 0.5f * a_Scale.y, 0.5f * a_Scale.z);
+		XMFLOAT3 p6 = XMFLOAT3(0.5f * a_Scale.x, 0.5f * a_Scale.y, 0.5f * a_Scale.z);
+		XMFLOAT3 p7 = XMFLOAT3(0.5f * a_Scale.x, -0.5f * a_Scale.y, 0.5f * a_Scale.z);
 		m_Vertices =
 		{
 			{ p0,	XMFLOAT3(-1.0f, 0.0f, 0.0f),	XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f) },

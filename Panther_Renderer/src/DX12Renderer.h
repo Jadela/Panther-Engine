@@ -40,7 +40,17 @@ namespace Panther
 		friend class DX12Material;
 		friend class DX12CommandList;
 
-		// Private methods
+		// Factory methods
+		// DXGI
+		Microsoft::WRL::ComPtr<IDXGIFactory4> CreateDXGIFactory();
+		Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(Microsoft::WRL::ComPtr<IDXGIFactory4>& a_DXGIFactory, 
+			Microsoft::WRL::ComPtr<ID3D12CommandQueue>& a_CommandQueue, HWND a_Window, const DXGI_SWAP_CHAIN_DESC1& a_SwapChainDesc,
+			const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_SwapChainFullscreenDesc);
+		// D3D12
+		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
+			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
+
+		// Other private methods
 		bool ResizeSwapChain(uint32 width, uint32 height);
 		void Present();
 		bool WaitForPreviousFrame();

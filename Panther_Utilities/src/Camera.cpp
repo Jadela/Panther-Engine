@@ -17,6 +17,11 @@ namespace Panther
 
 	Camera::~Camera()
 	{}
+	
+	const Transform& Camera::GetTransform() const
+	{
+		return m_Transform;
+	}
 
 	void Camera::SetFOV(float a_NewFOV)
 	{
@@ -60,13 +65,18 @@ namespace Panther
 		return XMMatrixScaling(-1, 1, 1) * XMMatrixTranslationFromVector(m_Transform.m_Position);
 	}
 
-	XMMATRIX Camera::GetViewProjectionMatrix()
+	XMMATRIX Camera::GetViewMatrix()
 	{
 		XMMATRIX rotationMatrix = XMMatrixTranspose(XMMatrixRotationQuaternion(m_Transform.m_Rotation));
 		XMMATRIX translationMatrix = XMMatrixTranslationFromVector(-(m_Transform.m_Position));
 
 		XMMATRIX viewMatrix = translationMatrix * rotationMatrix;
-		return viewMatrix * m_ProjectionMatrix;
+		return viewMatrix;
+	}
+
+	XMMATRIX Camera::GetViewProjectionMatrix()
+	{
+		return GetViewMatrix() * m_ProjectionMatrix;
 	}
 
 	void Camera::CalculateProjectionMatrix()

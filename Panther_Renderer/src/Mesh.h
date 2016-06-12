@@ -23,6 +23,7 @@ namespace Panther
 		explicit Mesh(Renderer& a_Renderer);
 		virtual ~Mesh();
 
+		void InitAsPlane(CommandList& a_CommandList, DirectX::XMFLOAT3 a_Scale = DirectX::XMFLOAT3(1, 1, 1), uint32 a_DivisionsX = 1, uint32 a_DivisionsY = 1);
 		void InitAsCube(CommandList& a_CommandList, DirectX::XMFLOAT3 a_Scale = DirectX::XMFLOAT3(1,1,1));
 		void InitAsSphere(CommandList& a_CommandList, float a_Radius = 0.5f, uint32 a_Slices = 32, uint32 a_Stacks = 32);
 		void InitViaASSIMP(CommandList& a_CommandList, std::string a_FileName);

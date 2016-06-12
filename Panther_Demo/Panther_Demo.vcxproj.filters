@@ -51,11 +51,17 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="rsc\shaders\shaders.hlsl">
+    <None Include="rsc\shaders\shaders.hlsl">
       <Filter>Resources</Filter>
-    </FxCompile>
-    <FxCompile Include="rsc\shaders\skydome.hlsl">
+    </None>
+    <None Include="rsc\shaders\skydome.hlsl">
       <Filter>Resources</Filter>
-    </FxCompile>
+    </None>
+    <None Include="rsc\shaders\water.hlsl">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="rsc\shaders\lighting.hlsl">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

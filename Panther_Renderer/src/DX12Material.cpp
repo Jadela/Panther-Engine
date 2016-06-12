@@ -139,11 +139,11 @@ namespace Panther
 		{
 		case ShaderType::Vertex:
 			if (m_VertexBlob != nullptr) throw std::runtime_error("Vertex shader has already been loaded for this material before!");
-			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, nullptr, a_EntryPoint.c_str(), "vs_5_0", compileFlags, 0, &m_VertexBlob, &errorBlob);
+			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, a_EntryPoint.c_str(), "vs_5_0", compileFlags, 0, &m_VertexBlob, &errorBlob);
 			break;
 		case ShaderType::Pixel:
 			if (m_PixelBlob != nullptr) throw std::runtime_error("Pixel shader has already been loaded for this material before!");
-			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, nullptr, a_EntryPoint.c_str(), "ps_5_0", compileFlags, 0, &m_PixelBlob, &errorBlob);
+			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, a_EntryPoint.c_str(), "ps_5_0", compileFlags, 0, &m_PixelBlob, &errorBlob);
 			break;
 		default:
 			throw std::runtime_error("Trying to load shader of unknown type!");
