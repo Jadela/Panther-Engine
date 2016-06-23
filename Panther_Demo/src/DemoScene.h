@@ -37,17 +37,20 @@ namespace Panther
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
 		std::unique_ptr<CommandList> m_DuckBundle = nullptr;
+		std::unique_ptr<CommandList> m_ICMmBundle = nullptr;
 
 		std::unique_ptr<Mesh> m_PlaneMesh = nullptr;
 		std::unique_ptr<Mesh> m_CubeMesh = nullptr;
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
 		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
+		std::unique_ptr<Mesh> m_ICMmMesh = nullptr;
 
 		std::unique_ptr<Buffer> m_WaterVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_WaterPixelCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_CubeMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
+		std::unique_ptr<Buffer> m_ICMmMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomeVertexConstantBuffer = nullptr;
 		std::unique_ptr<Buffer> m_LightPositionBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomePixelConstantBuffer = nullptr;
@@ -56,10 +59,7 @@ namespace Panther
 		std::unique_ptr<Material> m_SkyDomeMaterial = nullptr;
 		Material::DescriptorSlot m_SkyDomeVertexCBSlot = {};
 		Material::DescriptorSlot m_SkyDomePixelCBSlot = {};
-		Material::DescriptorSlot m_SkyDomeDayTextureSlot = {};
-		Material::DescriptorSlot m_SkyDomeDuskTextureSlot = {};
-		Material::DescriptorSlot m_SkyDomeSunTextureSlot = {};
-		Material::DescriptorSlot m_SkyDomeMoonTextureSlot = {};
+		Material::DescriptorSlot m_SkyDomeTexturesSlot = {};
 		Material::DescriptorSlot m_SkyDomeClampedSamplerSlot = {};
 
 		// Water Material
@@ -85,7 +85,8 @@ namespace Panther
 		std::unique_ptr<Transform> m_WaterTransform = nullptr;
 		std::unique_ptr<Transform> m_CubeTransform = nullptr;
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
-		std::unique_ptr<Transform> m_DuckTransform = nullptr;    
+		std::unique_ptr<Transform> m_DuckTransform = nullptr;
+		std::unique_ptr<Transform> m_ICMmTransform = nullptr;
 		
 		// For panning the camera.
 		int32 m_W = 0, m_A = 0, m_S = 0, m_D = 0;
