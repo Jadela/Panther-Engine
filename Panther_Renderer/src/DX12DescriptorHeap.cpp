@@ -9,7 +9,7 @@ namespace Panther
 {
 
 	DX12DescriptorHeap::DX12DescriptorHeap(ID3D12Device& a_D3DDevice, uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type) :
-		m_D3DDevice(a_D3DDevice), m_Type(a_Type), m_Capacity(a_Capacity)
+		m_D3DDevice(a_D3DDevice), m_Type(a_Type), m_Capacity(a_Capacity), m_Offset(0)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC heapDescriptor = {};
 		heapDescriptor.NumDescriptors = m_Capacity;
@@ -30,12 +30,13 @@ namespace Panther
 	{
 	}
 
-	void DX12DescriptorHeap::RegisterConstantBuffer(D3D12_CONSTANT_BUFFER_VIEW_DESC& a_ConstantBufferDesc)
+	uint32 DX12DescriptorHeap::RegisterConstantBuffer(D3D12_CONSTANT_BUFFER_VIEW_DESC& a_ConstantBufferDesc)
 	{
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
 			m_D3DDevice.CreateConstantBufferView(&a_ConstantBufferDesc, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+			return m_Offset++;
 		}
 		else
 		{
@@ -44,13 +45,14 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterConstantBuffer(Buffer& a_ConstantBuffer)
+	uint32 DX12DescriptorHeap::RegisterConstantBuffer(Buffer& a_ConstantBuffer)
 	{
 		DX12Buffer& constantBuffer(*static_cast<DX12Buffer*>(&a_ConstantBuffer));
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
 			m_D3DDevice.CreateConstantBufferView(&constantBuffer.m_CBufferViewDescriptor, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+			return m_Offset++;
 		}
 		else
 		{
@@ -59,13 +61,14 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterTexture(Texture& a_Texture)
+	uint32 DX12DescriptorHeap::RegisterTexture(Texture& a_Texture)
 	{
 		DX12Texture& texture(*static_cast<DX12Texture*>(&a_Texture));
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
 			m_D3DDevice.CreateShaderResourceView(texture.m_GPUResource.Get(), &texture.m_ShaderResourceViewDescriptor, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+			return m_Offset++;
 		}
 		else
 		{
@@ -74,12 +77,13 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterSampler(Sampler& a_Sampler)
+	uint32 DX12DescriptorHeap::RegisterSampler(Sampler& a_Sampler)
 	{
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER)
 		{
 			m_D3DDevice.CreateSampler(&static_cast<DX12Sampler*>(&a_Sampler)->m_SamplerDescriptor, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER));
+			return m_Offset++;
 		}
 		else
 		{
@@ -88,12 +92,13 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterRenderTarget(ID3D12Resource& a_RenderTarget)
+	uint32 DX12DescriptorHeap::RegisterRenderTarget(ID3D12Resource& a_RenderTarget)
 	{
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
 		{
 			m_D3DDevice.CreateRenderTargetView(&a_RenderTarget, nullptr, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+			return m_Offset++;
 		}
 		else
 		{
@@ -102,12 +107,13 @@ namespace Panther
 		}
 	}
 
-	void DX12DescriptorHeap::RegisterDepthStencil(ID3D12Resource & a_DepthStencil, D3D12_DEPTH_STENCIL_VIEW_DESC& a_DSVDesc)
+	uint32 DX12DescriptorHeap::RegisterDepthStencil(ID3D12Resource & a_DepthStencil, D3D12_DEPTH_STENCIL_VIEW_DESC& a_DSVDesc)
 	{
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV)
 		{
 			m_D3DDevice.CreateDepthStencilView(&a_DepthStencil, &a_DSVDesc, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
+			return m_Offset++;
 		}
 		else
 		{

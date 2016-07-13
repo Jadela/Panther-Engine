@@ -18,6 +18,7 @@ namespace Panther
 	{
 	public:
 		DemoScene(Renderer& a_Renderer);
+		~DemoScene();
 
 		void Load() final override;
 		void Unload() final override;
@@ -29,6 +30,9 @@ namespace Panther
 		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) final override;
 
 	private:
+
+		void LoadTextures();
+
 		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
 		std::unique_ptr<DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 
@@ -51,9 +55,19 @@ namespace Panther
 		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_ICMmMatrixBuffer = nullptr;
-		std::unique_ptr<Buffer> m_SkydomeVertexConstantBuffer = nullptr;
+		std::unique_ptr<Buffer> m_SkydomeVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_LightPositionBuffer = nullptr;
-		std::unique_ptr<Buffer> m_SkydomePixelConstantBuffer = nullptr;
+		std::unique_ptr<Buffer> m_SkydomePixelCBuffer = nullptr;
+
+		uint32 m_WaterVertexCBufferSlot = 0;
+		uint32 m_WaterPixelCBufferSlot = 0;
+		uint32 m_CubeMatrixBufferSlot = 0;
+		uint32 m_SphereMatrixBufferSlot = 0;
+		uint32 m_DuckMatrixBufferSlot = 0;
+		uint32 m_ICMmMatrixBufferSlot = 0;
+		uint32 m_SkydomeVertexCBufferSlot = 0;
+		uint32 m_LightPositionBufferSlot = 0;
+		uint32 m_SkydomePixelCBufferSlot = 0;
 
 		// Skybox Material
 		std::unique_ptr<Material> m_SkyDomeMaterial = nullptr;
@@ -74,11 +88,14 @@ namespace Panther
 		Material::DescriptorSlot m_DefaultVertexCBSlot = {};
 		Material::DescriptorSlot m_DefaultPixelCBSlot = {};
 		Material::DescriptorSlot m_DefaultTextureSlot = {};
-		Material::DescriptorSlot m_DefaultSamplerSlot = {};
+		Material::DescriptorSlot m_DefaultSamplerDescriptorSlot = {};
 
-		std::vector<std::unique_ptr<Texture>> m_Textures;
+		uint32* m_TextureSlots = nullptr;
 		std::unique_ptr<Sampler> m_DefaultSampler = nullptr;
 		std::unique_ptr<Sampler> m_SkyboxSampler = nullptr;
+
+		uint32 m_DefaultSamplerSlot = 0;
+		uint32 m_SkyboxSamplerSlot = 0;
 
 		std::unique_ptr<Camera> m_Camera = nullptr;
 

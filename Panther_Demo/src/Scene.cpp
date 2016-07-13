@@ -17,7 +17,7 @@ namespace Panther
 	Scene::Scene(Panther::Renderer& renderer)
 		: m_Renderer(renderer)
 	{}
-
+	
 	void Scene::UpdateMouseDelta(DirectX::XMINT2 a_NewMousePosition)
 	{
 		m_MousePositionDelta = m_PreviousMousePosition - a_NewMousePosition;

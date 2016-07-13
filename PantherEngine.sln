@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{1E892989-8A4E-4812-9521-9012BBC7D7F6}"
 EndProject
@@ -15,6 +15,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Utilities", "Panther_Utilities\Panther_Utilities.vcxproj", "{23248A7B-A205-424B-B44C-06BB66F4FC71}"
 	ProjectSection(ProjectDependencies) = postProject
 		{98144C83-3F06-474A-8566-015A098E7294} = {98144C83-3F06-474A-8566-015A098E7294}
+		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7} = {92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Demo", "Panther_Demo\Panther_Demo.vcxproj", "{142FE21A-AF2B-409B-AAB4-D0E922A51E93}"

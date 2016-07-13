@@ -34,7 +34,15 @@ namespace Panther
 
 	DemoScene::DemoScene(Renderer& a_Renderer) 
 		: Scene(a_Renderer) 
-	{}
+	{
+		m_TextureSlots = new TextureID[Countof(g_Textures)];
+		m_TextureManager = std::make_unique<TextureManager>(a_Renderer, (uint32)Countof(g_Textures));
+	}
+
+	DemoScene::~DemoScene()
+	{
+		delete[] m_TextureSlots;
+	}
 
 	void DemoScene::Load()
 	{
@@ -82,7 +90,7 @@ namespace Panther
 			m_DefaultVertexCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
 			m_DefaultPixelCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
 			m_DefaultTextureSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
-			m_DefaultSamplerSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
+			m_DefaultSamplerDescriptorSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
 
 			m_DefaultMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
 			m_DefaultMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
@@ -123,34 +131,30 @@ namespace Panther
 		m_CubeMatrixBuffer = m_Renderer.CreateBuffer(192);
 		m_SphereMatrixBuffer = m_Renderer.CreateBuffer(192);
 		m_DuckMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_SkydomeVertexConstantBuffer = m_Renderer.CreateBuffer(64 + 16);
+		m_SkydomeVertexCBuffer = m_Renderer.CreateBuffer(64 + 16);
 		m_LightPositionBuffer = m_Renderer.CreateBuffer(32);
-		m_SkydomePixelConstantBuffer = m_Renderer.CreateBuffer(16);
+		m_SkydomePixelCBuffer = m_Renderer.CreateBuffer(16);
 		m_ICMmMatrixBuffer = m_Renderer.CreateBuffer(192);
-
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexConstantBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelConstantBuffer.get());
-		m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ICMmMatrixBuffer.get());
+		
+		m_WaterVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get());
+		m_WaterPixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get());
+		m_CubeMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
+		m_SphereMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
+		m_DuckMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
+		m_ICMmMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ICMmMatrixBuffer.get());
+		m_SkydomeVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get());
+		m_SkydomePixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get());
+		m_LightPositionBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get());
 
 		// Create the textures
-		for (auto filePath : g_Textures)
-		{
-			m_Textures.push_back(m_Renderer.CreateTexture(filePath));
-			m_CBVSRVUAVDescriptorHeap->RegisterTexture(*m_Textures.back().get());
-		}
+		LoadTextures();
 
 		// Create sampler
 		m_DefaultSampler = m_Renderer.CreateSampler();
 		m_SkyboxSampler = m_Renderer.CreateSampler(Sampler::TextureCoordinateMode::Clamp);
 
-		m_SamplerDescriptorHeap->RegisterSampler(*m_DefaultSampler.get());
-		m_SamplerDescriptorHeap->RegisterSampler(*m_SkyboxSampler.get());
+		m_DefaultSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_DefaultSampler.get());
+		m_SkyboxSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_SkyboxSampler.get());
 
 		commandList.Close();
 
@@ -165,8 +169,8 @@ namespace Panther
 			m_SkySphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_SkySphereBundle->SetMaterial(*m_SkyDomeMaterial, false);
 			m_SkySphereBundle->SetMesh(*m_SphereMesh);
-			m_SkySphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeTexturesSlot, 11);
-			m_SkySphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_SkyDomeClampedSamplerSlot, 1);
+			m_SkySphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeTexturesSlot, m_TextureSlots[2]);
+			m_SkySphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_SkyDomeClampedSamplerSlot, m_SkyboxSamplerSlot);
 			m_SkySphereBundle->Draw(m_SphereMesh->GetNumIndices());
 
 			m_SkySphereBundle->Close();
@@ -179,8 +183,8 @@ namespace Panther
 			m_WaterBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_WaterBundle->SetMaterial(*m_WaterMaterial, false);
 			m_WaterBundle->SetMesh(*m_PlaneMesh);
-			m_WaterBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterTexture0Slot, 15);
-			m_WaterBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_WaterSamplerSlot, 0);
+			m_WaterBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterTexture0Slot, m_TextureSlots[6]);
+			m_WaterBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_WaterSamplerSlot, m_DefaultSamplerSlot);
 			m_WaterBundle->Draw(m_PlaneMesh->GetNumIndices());
 
 			m_WaterBundle->Close();
@@ -193,8 +197,8 @@ namespace Panther
 			m_CubeBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_CubeBundle->SetMaterial(*m_DefaultMaterial, false);
 			m_CubeBundle->SetMesh(*m_CubeMesh);
-			m_CubeBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, 9);
-			m_CubeBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot, 0);
+			m_CubeBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[0]);
+			m_CubeBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
 			m_CubeBundle->Draw(m_CubeMesh->GetNumIndices());
 
 			m_CubeBundle->Close();
@@ -207,8 +211,8 @@ namespace Panther
 			m_SphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_SphereBundle->SetMaterial(*m_DefaultMaterial, false);
 			m_SphereBundle->SetMesh(*m_SphereMesh);
-			m_SphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, 9);
-			m_SphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot, 0);
+			m_SphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[0]);
+			m_SphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
 			m_SphereBundle->Draw(m_SphereMesh->GetNumIndices());
 
 			m_SphereBundle->Close();
@@ -221,8 +225,8 @@ namespace Panther
 			m_DuckBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_DuckBundle->SetMaterial(*m_DefaultMaterial, false);
 			m_DuckBundle->SetMesh(*m_DuckMesh);
-			m_DuckBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, 10);
-			m_DuckBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot, 0);
+			m_DuckBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[1]);
+			m_DuckBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
 			m_DuckBundle->Draw(m_DuckMesh->GetNumIndices());
 
 			m_DuckBundle->Close();
@@ -235,8 +239,8 @@ namespace Panther
 			m_ICMmBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 			m_ICMmBundle->SetMaterial(*m_DefaultMaterial, false);
 			m_ICMmBundle->SetMesh(*m_ICMmMesh);
-			m_ICMmBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, 16);
-			m_ICMmBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot, 0);
+			m_ICMmBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[7]);
+			m_ICMmBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
 			m_ICMmBundle->Draw(m_ICMmMesh->GetNumIndices());
 
 			m_ICMmBundle->Close();
@@ -254,7 +258,16 @@ namespace Panther
 		m_ICMmTransform = std::make_unique<Transform>(XMFLOAT3(0, -1.5, 0), XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), XMConvertToRadians(90)), XMFLOAT3(100, 954, 109));
 
 		m_ICMmTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90)));
-	} 
+	}
+
+	void DemoScene::LoadTextures()
+	{
+		for (int i = 0; i < Countof(g_Textures); ++i)
+		{
+			const std::wstring filePath = g_Textures[i];
+			m_TextureSlots[i] = m_CBVSRVUAVDescriptorHeap->RegisterTexture(*m_TextureManager->GetTexture(m_TextureManager->LoadTexture(filePath)));
+		}
+	}
 
 	void DemoScene::Unload()
 	{
@@ -309,15 +322,15 @@ namespace Panther
 		};
 	
 		// Skydome	
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, 5);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, m_SkydomeVertexCBufferSlot);
 		SkydomeVertexCB skydomeCB;
 		skydomeCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
 		skydomeCB.m_SunPos = XMVectorSet(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
-		m_SkydomeVertexConstantBuffer->CopyTo(&skydomeCB, sizeof(SkydomeVertexCB));
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, 7);
+		m_SkydomeVertexCBuffer->CopyTo(&skydomeCB, sizeof(SkydomeVertexCB));
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, m_SkydomePixelCBufferSlot);
 		SkydomePixelCB skydomeCB2;
 		skydomeCB2.m_ScreenResolution = XMVectorSet((float)m_Renderer.m_Window.GetWidth(), (float)m_Renderer.m_Window.GetHeight(), 0, 0);
-		m_SkydomePixelConstantBuffer->CopyTo(&skydomeCB2, sizeof(SkydomePixelCB));
+		m_SkydomePixelCBuffer->CopyTo(&skydomeCB2, sizeof(SkydomePixelCB));
 		commandList.ExecuteBundle(*m_SkySphereBundle.get());
 
 		// Use water shader
@@ -339,13 +352,13 @@ namespace Panther
 		};
 
 		// Water
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBSlot, 0);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBSlot, m_WaterVertexCBufferSlot);
 		WaterVertexCB waterVertexCB;
 		waterVertexCB.m_WorldMatrix = m_WaterTransform->GetTransformMatrix();
 		waterVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
 		waterVertexCB.m_MVP = m_WaterTransform->GetTransformMatrix() * vpMatrix;
 		m_WaterVertexCBuffer->CopyTo(&waterVertexCB, sizeof(WaterVertexCB));
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBSlot, 1);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBSlot, m_WaterPixelCBufferSlot);
 		WaterPixelCB waterPixelCB;
 		waterPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		waterPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
@@ -370,14 +383,14 @@ namespace Panther
 			XMVECTOR m_CameraPosition;
 		};
 
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultPixelCBSlot, 6);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultPixelCBSlot, m_LightPositionBufferSlot);
 		DefaultPixelCB defaultPixelCB;
 		defaultPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		defaultPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		m_LightPositionBuffer->CopyTo(&defaultPixelCB, sizeof(DefaultPixelCB));
 
 		// Cube
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, 2);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_CubeMatrixBufferSlot);
 		DefaultVertexCB defaultVertexCB;
 		defaultVertexCB.m_WorldMatrix = m_CubeTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_CubeTransform->GetTransformMatrix()));
@@ -386,7 +399,7 @@ namespace Panther
 		commandList.ExecuteBundle(*m_CubeBundle.get());
 
 		// Sphere
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, 3);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_SphereMatrixBufferSlot);
 		defaultVertexCB.m_WorldMatrix = m_SphereTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_SphereTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
@@ -394,7 +407,7 @@ namespace Panther
 		commandList.ExecuteBundle(*m_SphereBundle.get());
 
 		// Duck
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, 4);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_DuckMatrixBufferSlot);
 		defaultVertexCB.m_WorldMatrix = m_DuckTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_DuckTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
@@ -402,7 +415,7 @@ namespace Panther
 		commandList.ExecuteBundle(*m_DuckBundle.get());
 
 		// ICMm
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, 8);
+		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_ICMmMatrixBufferSlot);
 		defaultVertexCB.m_WorldMatrix = m_ICMmTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_ICMmTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_ICMmTransform->GetTransformMatrix() * vpMatrix;

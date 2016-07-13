@@ -2,6 +2,9 @@
 #include "../../Panther_Core/src/Core.h"
 #include "../../Panther_Core/src/Keys.h"
 
+// Required otherwise the unique_ptr won't compile due destructor problem.
+#include "../../Panther_Utilities/src/TextureManager.h"
+
 namespace Panther
 {
 	class Renderer;
@@ -10,8 +13,8 @@ namespace Panther
 	{
 	public:
 		Scene() = delete;
-		Scene(Panther::Renderer& renderer);
-		virtual ~Scene() {}
+		Scene(Renderer& renderer);
+		virtual ~Scene() = default;
 
 		virtual void Load() = 0;
 		virtual void Unload() = 0;
@@ -23,10 +26,12 @@ namespace Panther
 		virtual void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) = 0;
 
 	protected:
-		Panther::Renderer& m_Renderer;
+		void UpdateMouseDelta(DirectX::XMINT2 a_NewMousePosition);
+
+		Renderer& m_Renderer;
+		std::unique_ptr<TextureManager> m_TextureManager;
 		DirectX::XMINT2 m_MousePositionDelta;
 
-		void UpdateMouseDelta(DirectX::XMINT2 a_NewMousePosition);
 	private:
 		DirectX::XMINT2 m_PreviousMousePosition;
 	};
