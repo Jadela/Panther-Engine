@@ -5,6 +5,7 @@
 #include "DX12Renderer.h"
 #include "DX12Material.h"
 #include "DX12Mesh.h"
+#include "DX12RenderTarget.h"
 
 namespace Panther
 {
@@ -98,7 +99,7 @@ namespace Panther
 
 	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
 	{
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.m_renderTargets[m_Renderer.m_FrameIndex].Get(), a_OldState, a_NewState));
+		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.m_RenderTargets[m_Renderer.m_FrameIndex]->m_TargetBuffer.Get(), a_OldState, a_NewState));
 	}
 
 	void DX12CommandList::Close()

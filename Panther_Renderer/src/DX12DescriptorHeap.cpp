@@ -4,6 +4,7 @@
 #include "DX12Buffer.h"
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
+#include "DX12RenderTarget.h"
 
 namespace Panther
 {
@@ -28,21 +29,6 @@ namespace Panther
 
 	DX12DescriptorHeap::~DX12DescriptorHeap()
 	{
-	}
-
-	uint32 DX12DescriptorHeap::RegisterConstantBuffer(D3D12_CONSTANT_BUFFER_VIEW_DESC& a_ConstantBufferDesc)
-	{
-		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-		{
-			m_D3DDevice.CreateConstantBufferView(&a_ConstantBufferDesc, m_DescriptorHandle);
-			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-			return m_Offset++;
-		}
-		else
-		{
-			throw std::runtime_error("Panther DX12 ERROR: Trying to register constant buffer in descriptor heap with wrong type.\nType: "           
-				+ GetTypeString());
-		}
 	}
 
 	uint32 DX12DescriptorHeap::RegisterConstantBuffer(Buffer& a_ConstantBuffer)
@@ -92,11 +78,11 @@ namespace Panther
 		}
 	}
 
-	uint32 DX12DescriptorHeap::RegisterRenderTarget(ID3D12Resource& a_RenderTarget)
+	uint32 DX12DescriptorHeap::RegisterRenderTarget(RenderTarget& a_RenderTarget)
 	{
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
 		{
-			m_D3DDevice.CreateRenderTargetView(&a_RenderTarget, nullptr, m_DescriptorHandle);
+			m_D3DDevice.CreateRenderTargetView(static_cast<DX12RenderTarget*>(&a_RenderTarget)->m_TargetBuffer.Get(), nullptr, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 			return m_Offset++;
 		}

@@ -1,12 +1,12 @@
 #pragma once
 #include "../../Panther_Core/src/Core.h"
+#include "DescriptorHeap.h"
 #include "Sampler.h"
 
 namespace Panther
 {
 	class Buffer;
 	class CommandList;
-	class DescriptorHeap;
 	class Material;
 	class Mesh;
 	class Texture;
@@ -25,7 +25,7 @@ namespace Panther
 
 		virtual std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) = 0;
 		virtual std::unique_ptr<Buffer> CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) = 0;
-		virtual std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type) = 0;
+		virtual std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type) = 0;
 		virtual std::unique_ptr<Texture> CreateTexture(const std::wstring& a_Path) = 0;
 		virtual std::unique_ptr<Material> CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) = 0;
 		virtual std::unique_ptr<Mesh> CreateMesh() = 0;

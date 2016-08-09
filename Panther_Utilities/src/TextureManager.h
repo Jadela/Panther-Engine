@@ -2,7 +2,7 @@
 
 #include <string>
 #include <memory>
-#include "D3D12.h" // TODO: Remove this type in Renderer.h & get rid of this include.
+#include "D3D12.h" // TODO: Remove DX12 types in Descriptorheap.h & get rid of this include.
 
 #include "../../Panther_Core/src/Core.h"
 #include "../../Panther_Renderer/src/Renderer.h"

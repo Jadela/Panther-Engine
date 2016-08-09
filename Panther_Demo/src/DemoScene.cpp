@@ -102,11 +102,11 @@ namespace Panther
 
 		// Constant buffer + Shader resource heap.
 		uint32 CBVSRVUAVHeapSize = 9 + (uint32)Countof(g_Textures);
-		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView); // Using type constant buffer view but shouldn't really matter.
 
 		// Sampler heap.
 		uint32 samplerHeapSize = 2;
-		m_SamplerDescriptorHeap = m_Renderer.CreateDescriptorHeap(samplerHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+		m_SamplerDescriptorHeap = m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeap::DescriptorHeapType::Sampler);
 
 		CommandList& commandList(m_Renderer.StartRecording());
 

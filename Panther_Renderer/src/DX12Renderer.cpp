@@ -8,6 +8,7 @@
 #include "DX12DescriptorHeap.h"
 #include "DX12Material.h"
 #include "DX12Mesh.h"
+#include "DX12RenderTarget.h"
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
 // TODO: Move over to new Panther projects.
@@ -224,9 +225,24 @@ namespace Panther
 		return std::make_unique<DX12Buffer>(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_Size, a_ElementSize);
 	}
 
-	std::unique_ptr<DescriptorHeap> DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type)
+	std::unique_ptr<DescriptorHeap> DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type)
 	{
-		return std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), a_Capacity, a_Type);
+		D3D12_DESCRIPTOR_HEAP_TYPE type = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
+		switch (a_Type)
+		{
+		case DescriptorHeap::DescriptorHeapType::ConstantBufferView:
+		case DescriptorHeap::DescriptorHeapType::ShaderResourceView:
+			type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			break;
+		case DescriptorHeap::DescriptorHeapType::Sampler:
+			type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
+			break;
+		default:
+			throw std::runtime_error("Attempting to create descriptor heap of unsupported type!");
+			break;
+		}
+
+		return std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), a_Capacity, type);
 	}
 
 	std::unique_ptr<Texture> DX12Renderer::CreateTexture(const std::wstring & a_Path)
@@ -334,7 +350,9 @@ namespace Panther
 
 		// Release the render target views.
 		for (int32 i = 0; i < 2; i++)
-			m_renderTargets[i].Reset();
+		{
+			m_RenderTargets[i].reset();
+		}
 		m_depthStencil.Reset();
 
 		// Resize the swap chain buffers.
@@ -349,9 +367,8 @@ namespace Panther
 			// Create a RTV for each frame.
 			for (uint32 n = 0; n < 2; n++)
 			{
-				hr = m_D3DSwapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n]));
-				if (FAILED(hr)) throw std::runtime_error("Could't get swapchain buffer.");
-				m_RTVDescriptorHeap->RegisterRenderTarget(*m_renderTargets[n].Get());
+				m_RenderTargets[n] = std::make_unique<DX12RenderTarget>(*m_D3DSwapChain.Get(), n);
+				m_RTVDescriptorHeap->RegisterRenderTarget(*m_RenderTargets[n].get());
 			}
 		}
 

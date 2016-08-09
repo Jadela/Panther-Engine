@@ -19,7 +19,7 @@ namespace Panther
 
 		std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) final override;
 		std::unique_ptr<Buffer> CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) final override;
-		std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type) final override;
+		std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type) final override;
 		std::unique_ptr<Texture> CreateTexture(const std::wstring& a_Path) final override;
 		std::unique_ptr<Material> CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) final override;
 		std::unique_ptr<Mesh> CreateMesh() final override;
@@ -39,6 +39,7 @@ namespace Panther
 		friend class DX12Buffer;
 		friend class DX12Material;
 		friend class DX12CommandList;
+		friend class DX12RenderTarget;
 
 		// Factory methods
 		// DXGI
@@ -62,7 +63,7 @@ namespace Panther
 		Microsoft::WRL::ComPtr<ID3D12Device> m_D3DDevice = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3DCommandQueue = nullptr;
 		Microsoft::WRL::ComPtr<IDXGISwapChain3> m_D3DSwapChain = nullptr;
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_renderTargets[2] = { nullptr, nullptr };
+		std::unique_ptr<DX12RenderTarget> m_RenderTargets[2] = { nullptr, nullptr };
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_depthStencil = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DCommandAllocator = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DBundleAllocator = nullptr;

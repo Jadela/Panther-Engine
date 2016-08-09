@@ -11,11 +11,10 @@ namespace Panther
 		DX12DescriptorHeap(const DX12DescriptorHeap&) = delete;
 		~DX12DescriptorHeap();
 
-		uint32 RegisterConstantBuffer(D3D12_CONSTANT_BUFFER_VIEW_DESC& a_ConstantBufferDesc) final override;
 		uint32 RegisterConstantBuffer(Buffer& a_ConstantBuffer) final override;
 		uint32 RegisterTexture(Texture& a_Texture) final override;
 		uint32 RegisterSampler(Sampler& a_Sampler) final override;
-		uint32 RegisterRenderTarget(ID3D12Resource& a_RenderTarget) final override;
+		uint32 RegisterRenderTarget(RenderTarget& a_RenderTarget) final override;
 		uint32 RegisterDepthStencil(ID3D12Resource& a_DepthStencil, D3D12_DEPTH_STENCIL_VIEW_DESC& a_DSVDesc) final override;
 
 		void SetCPUHandleIndex(uint32 a_Index) final override;

@@ -21,11 +21,13 @@
     <ClInclude Include="src\DX12Mesh.h" />
     <ClInclude Include="src\DX12Renderer.h" />
     <ClInclude Include="src\DX12RendererPCH.h" />
+    <ClInclude Include="src\DX12RenderTarget.h" />
     <ClInclude Include="src\DX12Sampler.h" />
     <ClInclude Include="src\DX12Texture.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\RenderTarget.h" />
     <ClInclude Include="src\Sampler.h" />
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
@@ -42,6 +44,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release DX12|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug DX12|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\DX12RenderTarget.cpp" />
     <ClCompile Include="src\DX12Sampler.cpp" />
     <ClCompile Include="src\DX12Texture.cpp" />
     <ClCompile Include="src\Material.cpp" />
@@ -53,7 +56,7 @@
     <ProjectGuid>{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Panther_Renderer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DX12|x64'" Label="Configuration">
