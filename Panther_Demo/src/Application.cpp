@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "../resource.h"
 #include "Window.h"
-#include "../../Panther_Renderer/src/DX12Renderer.h"
+#include "../../Panther_Renderer/src/RendererFactory.h"
 #include "DemoScene.h"
 
 #include "../../Panther_Core/src/Keys.h"
@@ -96,7 +96,7 @@ namespace Panther
 		return true;
 	}
 
-	bool Application::CreateRenderer(RendererType a_RendererType)
+	bool Application::CreateRenderer(GraphicsAPI a_GraphicsAPI)
 	{
 		if (!m_Window || !m_Window->IsValid())
 		{
@@ -104,14 +104,13 @@ namespace Panther
 			return false;
 		}
 
-		switch (a_RendererType)
+		switch (a_GraphicsAPI)
 		{
-		case DX12RENDERER:
-			m_Renderer = new Panther::DX12Renderer(*m_Window);
+		case GraphicsAPI::DIRECTX12:
+			m_Renderer = RendererFactory::CreateRenderer(*m_Window, RendererFactory::RendererType::DX12RENDERER);
 			break;
-		case VKRENDERER:
-			MessageBox(m_Window->GetHandle(), L"Vulkan renderer is not implemented yet.", L"Application Error", MB_OK | MB_ICONERROR);
-			return false;
+		case GraphicsAPI::VULKAN:
+			m_Renderer = RendererFactory::CreateRenderer(*m_Window, RendererFactory::RendererType::VKRENDERER);
 			break;
 		default:
 			MessageBox(m_Window->GetHandle(), L"Invalid renderer specified.", L"Application Error", MB_OK | MB_ICONERROR);

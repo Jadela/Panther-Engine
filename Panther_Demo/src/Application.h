@@ -11,14 +11,14 @@ namespace Panther
 	class Application
 	{
 	public:
-		enum RendererType { DX12RENDERER, VKRENDERER };
+		enum class GraphicsAPI { DIRECTX12, VULKAN };
 
 		static void			Create(HINSTANCE hInstance);
 		static void			Destroy();
 		static Application& Get(); 
 
 		bool CreateGameWindow(const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed);
-		bool CreateRenderer(RendererType a_RendererType);
+		bool CreateRenderer(GraphicsAPI a_GraphicsAPI);
 		bool LoadDemoScene();
 		int32 Run();
 		void Quit();

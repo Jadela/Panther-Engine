@@ -1,7 +1,6 @@
 #include "Panther_Demo_PCH.h"
 #include "Scene.h"
 
-#include "../../Panther_Renderer/src/DX12Renderer.h"
 #include "Window.h"
 
 using namespace DirectX;

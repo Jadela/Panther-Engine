@@ -7,12 +7,8 @@
 #include <windows.h>
 
 // DirectX includes
-#include <d3d12.h>
-#include <dxgi1_4.h>
-#include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
-#include <d3dx12.h>
 
 // STD includes
 #include <string>
@@ -23,12 +19,3 @@
 #include <memory>
 #include <stdexcept>
 #include <algorithm>
-
-// Windows Runtime Template Library
-#include <wrl.h>
-
-// Link library dependencies
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "winmm.lib")

@@ -3,7 +3,7 @@
 
 #include "../../Panther_Core/src/Core.h"
 
-const Panther::Application::RendererType rendertype = Panther::Application::RendererType::DX12RENDERER;
+const Panther::Application::GraphicsAPI rendertype = Panther::Application::GraphicsAPI::DIRECTX12;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {

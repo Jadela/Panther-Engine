@@ -66,6 +66,9 @@
     <ClInclude Include="src\DX12RenderTarget.h">
       <Filter>DX12</Filter>
     </ClInclude>
+    <ClInclude Include="src\RendererFactory.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DX12Texture.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="src\DX12RenderTarget.cpp">
       <Filter>DX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RendererFactory.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -27,6 +27,7 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\RendererFactory.h" />
     <ClInclude Include="src\RenderTarget.h" />
     <ClInclude Include="src\Sampler.h" />
     <ClInclude Include="src\Texture.h" />
@@ -50,6 +51,7 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\RendererFactory.cpp" />
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
