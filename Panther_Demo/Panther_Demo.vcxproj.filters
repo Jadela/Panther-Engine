@@ -21,9 +21,6 @@
     <ClInclude Include="src\Scene.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Panther_Demo_PCH.h">
-      <Filter>Common</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp">
@@ -39,9 +36,6 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Window.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Panther_Demo_PCH.cpp">
       <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>

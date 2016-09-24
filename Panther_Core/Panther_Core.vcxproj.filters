@@ -12,6 +12,9 @@
     <ClInclude Include="src\Keys.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="src\Vector.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core.cpp">

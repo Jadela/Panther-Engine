@@ -1,4 +1,3 @@
-#include "Panther_Demo_PCH.h"
 #include "DemoScene.h"
 #include "Window.h"
 #include "Application.h"
@@ -525,10 +524,10 @@ namespace Panther
 
 	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)
 	{
-		UpdateMouseDelta(XMINT2(a_DeltaX, a_DeltaY));
+		UpdateMouseDelta(Vector2<int>(a_DeltaX, a_DeltaY));
 		if (a_RMBDown)
 		{
-			m_Camera->Rotate(0.0f, -m_MousePositionDelta.y * 0.1f, -m_MousePositionDelta.x * 0.1f);
+			m_Camera->Rotate(0.0f, -m_MousePositionDelta.GetY() * 0.1f, -m_MousePositionDelta.GetX() * 0.1f);
 		}
 	}
 }

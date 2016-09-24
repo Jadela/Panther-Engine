@@ -1,4 +1,6 @@
-#include "Panther_Demo_PCH.h"
+#include <string>
+#include <windows.h>
+
 #include "Window.h"
 
 namespace Panther

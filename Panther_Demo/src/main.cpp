@@ -1,6 +1,11 @@
-#include "Panther_Demo_PCH.h"
-#include "Application.h"
+#ifndef WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN	// Exclude rarely-used stuff from Windows headers.
+#endif
 
+#include <windows.h>
+#include <stdexcept>
+
+#include "Application.h"
 #include "../../Panther_Core/src/Core.h"
 
 const Panther::Application::GraphicsAPI rendertype = Panther::Application::GraphicsAPI::DIRECTX12;

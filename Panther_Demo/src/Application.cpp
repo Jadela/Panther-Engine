@@ -1,4 +1,8 @@
-#include "Panther_Demo_PCH.h"
+#include <algorithm>
+#include <assert.h>
+#include <string>
+#include <windows.h>
+
 #include "Application.h"
 #include "../resource.h"
 #include "Window.h"

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <DirectXColors.h>
+
 #include "../../Panther_Core/src/Core.h"
 
 namespace Panther

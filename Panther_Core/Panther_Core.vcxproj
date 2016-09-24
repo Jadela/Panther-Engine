@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\Keys.h" />
+    <ClInclude Include="src\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core.cpp" />

@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Panther_Core/src/Core.h"
 #include "../../Panther_Core/src/Keys.h"
+#include "../../Panther_Core/src/Vector.h"
 
 // Required otherwise the unique_ptr won't compile due destructor problem.
 #include "../../Panther_Utilities/src/TextureManager.h"
@@ -26,13 +27,13 @@ namespace Panther
 		virtual void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) = 0;
 
 	protected:
-		void UpdateMouseDelta(DirectX::XMINT2 a_NewMousePosition);
+		void UpdateMouseDelta(Vector2<int> a_NewMousePosition);
 
 		Renderer& m_Renderer;
 		std::unique_ptr<TextureManager> m_TextureManager;
-		DirectX::XMINT2 m_MousePositionDelta;
+		Vector2<int> m_MousePositionDelta;
 
 	private:
-		DirectX::XMINT2 m_PreviousMousePosition;
+		Vector2<int> m_PreviousMousePosition;
 	};
 }
