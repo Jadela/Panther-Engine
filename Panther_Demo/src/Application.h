@@ -21,7 +21,8 @@ namespace Panther
 		bool CreateRenderer(GraphicsAPI a_GraphicsAPI);
 		bool LoadDemoScene();
 		int32 Run();
-		void Quit();
+		
+		static void Quit();
 
 	private:
 		friend LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -37,6 +38,6 @@ namespace Panther
 		Window*		m_Window = nullptr;
 		Renderer*	m_Renderer = nullptr;
 		Scene*		m_Scene = nullptr;
-		bool		m_RequestQuit = false;
+		static bool	m_RequestQuit;
 	};
 }

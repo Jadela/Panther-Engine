@@ -18,6 +18,7 @@ namespace Panther
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	Application* Application::m_Singleton = nullptr;
+	bool Application::m_RequestQuit = false;
 
 	Application::Application(HINSTANCE hInstance)
 		: m_hInstance(hInstance)

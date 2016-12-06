@@ -474,7 +474,7 @@ namespace Panther
 		break;
 		case Key::Escape:
 		{
-			Application::Get().Quit();
+			Application::Quit();
 		}
 		break;
 		}
