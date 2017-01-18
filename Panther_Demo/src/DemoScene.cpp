@@ -26,8 +26,7 @@ namespace Panther
 		L"../rsc/textures/SkyNight.tga",
 		L"../rsc/textures/Sun.tga",
 		L"../rsc/textures/Moon.tga",
-		L"../rsc/textures/WaterNormal.tga",
-		L"../rsc/textures/ICMm B Color.tga"
+		L"../rsc/textures/WaterNormal.tga"
 	};
 
 	DemoScene::DemoScene(Renderer& a_Renderer) 
@@ -99,7 +98,7 @@ namespace Panther
 		}
 
 		// Constant buffer + Shader resource heap.
-		uint32 CBVSRVUAVHeapSize = 9 + (uint32)Countof(g_Textures);
+		uint32 CBVSRVUAVHeapSize = 8 + (uint32)Countof(g_Textures);
 		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView); // Using type constant buffer view but shouldn't really matter.
 
 		// Sampler heap.
@@ -120,9 +119,6 @@ namespace Panther
 		m_DuckMesh = m_Renderer.CreateMesh();
 		m_DuckMesh->InitViaASSIMP(commandList, "../rsc/models/duck.fbx");
 
-		m_ICMmMesh = m_Renderer.CreateMesh();
-		m_ICMmMesh->InitViaASSIMP(commandList, "../rsc/models/ICMm B.fbx");
-
 		// Create the constant buffers.
 		m_WaterVertexCBuffer = m_Renderer.CreateBuffer(192);
 		m_WaterPixelCBuffer = m_Renderer.CreateBuffer(112);
@@ -132,14 +128,12 @@ namespace Panther
 		m_SkydomeVertexCBuffer = m_Renderer.CreateBuffer(64 + 16);
 		m_LightPositionBuffer = m_Renderer.CreateBuffer(32);
 		m_SkydomePixelCBuffer = m_Renderer.CreateBuffer(16);
-		m_ICMmMatrixBuffer = m_Renderer.CreateBuffer(192);
 		
 		m_WaterVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get());
 		m_WaterPixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get());
 		m_CubeMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
 		m_SphereMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
 		m_DuckMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
-		m_ICMmMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ICMmMatrixBuffer.get());
 		m_SkydomeVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get());
 		m_SkydomePixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get());
 		m_LightPositionBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get());
@@ -230,20 +224,6 @@ namespace Panther
 			m_DuckBundle->Close();
 		}
 
-		{
-			m_ICMmBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get());
-
-			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-			m_ICMmBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
-			m_ICMmBundle->SetMaterial(*m_DefaultMaterial, false);
-			m_ICMmBundle->SetMesh(*m_ICMmMesh);
-			m_ICMmBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[7]);
-			m_ICMmBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
-			m_ICMmBundle->Draw(m_ICMmMesh->GetNumIndices());
-
-			m_ICMmBundle->Close();
-		}
-
 		m_Renderer.Synchronize();
 
 		m_Camera = std::make_unique<Camera>(Transform(XMFLOAT3(0, 0, -10)));
@@ -253,9 +233,6 @@ namespace Panther
 		m_CubeTransform = std::make_unique<Transform>(XMFLOAT3(-3, 0, 0));
 		m_SphereTransform = std::make_unique<Transform>(XMFLOAT3(0, 0, 0));
 		m_DuckTransform = std::make_unique<Transform>(XMFLOAT3(3, 0, 0));
-		m_ICMmTransform = std::make_unique<Transform>(XMFLOAT3(0, -1.5, 0), XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), XMConvertToRadians(90)), XMFLOAT3(100, 954, 109));
-
-		m_ICMmTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90)));
 	}
 
 	void DemoScene::LoadTextures()
@@ -411,14 +388,6 @@ namespace Panther
 		defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
 		m_DuckMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
 		commandList.ExecuteBundle(*m_DuckBundle.get());
-
-		// ICMm
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_ICMmMatrixBufferSlot);
-		defaultVertexCB.m_WorldMatrix = m_ICMmTransform->GetTransformMatrix();
-		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_ICMmTransform->GetTransformMatrix()));
-		defaultVertexCB.m_MVP = m_ICMmTransform->GetTransformMatrix() * vpMatrix;
-		m_ICMmMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
-		commandList.ExecuteBundle(*m_ICMmBundle.get());
 
 		// Indicate that the back buffer will now be used to present.
 		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

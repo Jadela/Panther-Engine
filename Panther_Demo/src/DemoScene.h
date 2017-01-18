@@ -30,7 +30,6 @@ namespace Panther
 		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) final override;
 
 	private:
-
 		void LoadTextures();
 
 		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
@@ -41,20 +40,17 @@ namespace Panther
 		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
 		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
 		std::unique_ptr<CommandList> m_DuckBundle = nullptr;
-		std::unique_ptr<CommandList> m_ICMmBundle = nullptr;
 
 		std::unique_ptr<Mesh> m_PlaneMesh = nullptr;
 		std::unique_ptr<Mesh> m_CubeMesh = nullptr;
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
 		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
-		std::unique_ptr<Mesh> m_ICMmMesh = nullptr;
 
 		std::unique_ptr<Buffer> m_WaterVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_WaterPixelCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_CubeMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
-		std::unique_ptr<Buffer> m_ICMmMatrixBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomeVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_LightPositionBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomePixelCBuffer = nullptr;
@@ -64,7 +60,6 @@ namespace Panther
 		uint32 m_CubeMatrixBufferSlot = 0;
 		uint32 m_SphereMatrixBufferSlot = 0;
 		uint32 m_DuckMatrixBufferSlot = 0;
-		uint32 m_ICMmMatrixBufferSlot = 0;
 		uint32 m_SkydomeVertexCBufferSlot = 0;
 		uint32 m_LightPositionBufferSlot = 0;
 		uint32 m_SkydomePixelCBufferSlot = 0;
@@ -103,7 +98,6 @@ namespace Panther
 		std::unique_ptr<Transform> m_CubeTransform = nullptr;
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
 		std::unique_ptr<Transform> m_DuckTransform = nullptr;
-		std::unique_ptr<Transform> m_ICMmTransform = nullptr;
 		
 		// For panning the camera.
 		int32 m_W = 0, m_A = 0, m_S = 0, m_D = 0;
