@@ -101,7 +101,7 @@ namespace Panther
 		return true;
 	}
 
-	bool Application::CreateRenderer(GraphicsAPI a_GraphicsAPI)
+	bool Application::CreateRenderer(EGraphicsAPI a_GraphicsAPI)
 	{
 		if (!m_Window || !m_Window->IsValid())
 		{
@@ -111,10 +111,10 @@ namespace Panther
 
 		switch (a_GraphicsAPI)
 		{
-		case GraphicsAPI::DIRECTX12:
+		case EGraphicsAPI::DIRECTX12:
 			m_Renderer = RendererFactory::CreateRenderer(*m_Window, RendererFactory::RendererType::DX12RENDERER);
 			break;
-		case GraphicsAPI::VULKAN:
+		case EGraphicsAPI::VULKAN:
 			m_Renderer = RendererFactory::CreateRenderer(*m_Window, RendererFactory::RendererType::VKRENDERER);
 			break;
 		default:

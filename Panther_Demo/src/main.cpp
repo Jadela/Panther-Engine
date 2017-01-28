@@ -8,7 +8,7 @@
 #include "Application.h"
 #include "../../Panther_Core/src/Core.h"
 
-const Panther::Application::GraphicsAPI rendertype = Panther::Application::GraphicsAPI::DIRECTX12;
+const Panther::Application::EGraphicsAPI rendertype = Panther::Application::EGraphicsAPI::DIRECTX12;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
