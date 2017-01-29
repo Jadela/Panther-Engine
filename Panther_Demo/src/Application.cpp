@@ -1,38 +1,41 @@
+#include "Application.h"
+
 #include <algorithm>
 #include <assert.h>
-#include <string>
-#include <windows.h>
-
-#include "Application.h"
-#include "../resource.h"
-#include "Window.h"
-#include "../../Panther_Renderer/src/RendererFactory.h"
-#include "DemoScene.h"
 
 #include "../../Panther_Core/src/Keys.h"
-
-#define WINDOW_CLASS_NAME L"DX12DemoWindow"
+#include "../../Panther_Renderer/src/RendererFactory.h"
+#include "../resource.h"
+#include "Window.h"
+#include "DemoScene.h"
 
 namespace Panther
 {
-	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
+		// before CreateWindow returns, and thus before mhMainWnd is valid.
+		return Application::Get().WndProc(hwnd, msg, wParam, lParam);
+	}
 
-	Application* Application::m_Singleton = nullptr;
-	bool Application::m_RequestQuit = false;
+	Application* Application::m_App = nullptr;
 
 	Application::Application(HINSTANCE hInstance)
 		: m_hInstance(hInstance)
 	{
+		assert(m_App == nullptr);
+		m_App = this;
+
 		WNDCLASSEX wndClass = { 0 };
 		wndClass.cbSize = sizeof(WNDCLASSEX);
 		wndClass.style = CS_HREDRAW | CS_VREDRAW;
-		wndClass.lpfnWndProc = WndProc;
+		wndClass.lpfnWndProc = MainWndProc;
 		wndClass.hInstance = m_hInstance;
 		wndClass.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
 		wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wndClass.lpszMenuName = nullptr;
-		wndClass.lpszClassName = WINDOW_CLASS_NAME;
+		wndClass.lpszClassName = L"DX12DemoWindow";
 
 		if (!RegisterClassEx(&wndClass))
 		{
@@ -54,33 +57,80 @@ namespace Panther
 			delete m_Window;
 	}
 
-	void Application::Create(HINSTANCE hInstance)
-	{
-		if (!m_Singleton)
-			m_Singleton = new Application(hInstance);
-	}
-
-	void Application::Destroy()
-	{
-		if (!m_Singleton)
-		{
-			delete m_Singleton;
-			m_Singleton = nullptr;
-		}
-	}
-
 	Application& Application::Get()
 	{
-		assert(m_Singleton);
-		return *m_Singleton;
+		return *m_App;
 	}
 
-	bool Application::CreateGameWindow(const std::wstring& a_WindowName, Panther::uint32 a_Width, Panther::uint32 a_Height, bool a_VSync, bool a_Windowed)
+	bool Application::Initialize(EGraphicsAPI a_GraphicsAPI)
 	{
-		RECT windowRect = { 0, 0, (Panther::int32)a_Width, (Panther::int32)a_Height };
+		if (!CreateGameWindow(L"DX12 Demo", 800, 600, false, true))
+			return false;
+
+		if (!CreateRenderer(a_GraphicsAPI))
+			return false;
+
+		// NOTE (JDL): This should be done differently.
+		if (!LoadDemoScene())
+			return false;
+
+		return true;
+	}
+
+	int32 Application::Run()
+	{
+		MSG msg = { 0 };
+
+		static DWORD previousTime = timeGetTime();
+		static float totalTime = 0.0f;
+		static const float targetFramerate = 30.0f;
+		static const float maxTimeStep = 1.0f / targetFramerate;
+
+		while (!m_RequestQuit)
+		{
+			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				if (msg.message == WM_QUIT)
+				{
+					m_RequestQuit = true;
+				}
+			}
+			else
+			{
+				DWORD currentTime = timeGetTime();
+				float deltaTime = (currentTime - previousTime) / 1000.0f;
+				previousTime = currentTime;
+
+				// Cap the delta time to the max time step (useful if your 
+				// debugging and you don't want the deltaTime value to explode.
+				deltaTime = std::min<float>(deltaTime, maxTimeStep);
+				totalTime += deltaTime;
+
+				// Update
+				m_Scene->Update(deltaTime);
+
+				// Render
+				m_Renderer->StartRender();
+				m_Scene->Render();
+				m_Renderer->EndRender();
+			}
+		}
+		return static_cast<int32>(msg.wParam);
+	}
+
+	void Application::Quit()
+	{
+		Get().m_RequestQuit = true;
+	}
+
+	bool Application::CreateGameWindow(const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed)
+	{
+		RECT windowRect = { 0, 0, (int32)a_Width, (int32)a_Height };
 		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-		HWND hWnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, WINDOW_CLASS_NAME,
+		HWND hWnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DX12DemoWindow",
 			a_WindowName.c_str(), WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			windowRect.right - windowRect.left,
@@ -138,155 +188,100 @@ namespace Panther
 		return true;
 	}
 
-	Panther::int32 Application::Run()
+	LRESULT Application::WndProc(HWND a_WindowHandle, UINT a_Message, WPARAM wParam, LPARAM lParam)
 	{
-		MSG msg = { 0 };
-
-		static DWORD previousTime = timeGetTime();
-		static float totalTime = 0.0f;
-		static const float targetFramerate = 30.0f;
-		static const float maxTimeStep = 1.0f / targetFramerate;
-
-		while (!m_RequestQuit)
+		switch (a_Message)
 		{
-			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-				if (msg.message == WM_QUIT)
-				{
-					m_RequestQuit = true;
-				}
-			}
-			else
-			{
-				DWORD currentTime = timeGetTime();
-				float deltaTime = (currentTime - previousTime) / 1000.0f;
-				previousTime = currentTime;
-
-				// Cap the delta time to the max time step (useful if your 
-				// debugging and you don't want the deltaTime value to explode.
-				deltaTime = std::min<float>(deltaTime, maxTimeStep);
-				totalTime += deltaTime;
-
-				// Update
-				m_Scene->Update(deltaTime);
-
-				// Render
-				m_Renderer->StartRender();
-				m_Scene->Render();
-				m_Renderer->EndRender();
-			}
-		}
-		return static_cast<Panther::int32>(msg.wParam);
-	}
-
-	void Application::Quit()
-	{
-		m_RequestQuit = true;
-	}
-
-	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-	{
-		Panther::Application& app = Panther::Application::Get();
-		PAINTSTRUCT paintStruct;
-		HDC hDC;
-
-		switch (message)
-		{
-		case WM_PAINT:
-		{
-			hDC = BeginPaint(hwnd, &paintStruct);
-			EndPaint(hwnd, &paintStruct);
-		}
-		break;
+		// WM_DESTROY is sent when the window is being destroyed.
 		case WM_DESTROY:
 		{
 			PostQuitMessage(0);
+			return 0;
 		}
-		break;
+		// WM_SIZE is sent when the user resizes the window.  
 		case WM_SIZE:
 		{
-			Panther::uint32 width = (Panther::uint32)LOWORD(lParam);
-			Panther::uint32 height = (Panther::uint32)HIWORD(lParam);
+			uint32 width = (uint32)LOWORD(lParam);
+			uint32 height = (uint32)HIWORD(lParam);
 
-			app.m_Window->Resize(width, height);
-			if (app.m_Renderer)
-				app.m_Renderer->OnResize(width, height);
-			if (app.m_Scene)
-				app.m_Scene->OnResize(width, height);
+			m_Window->Resize(width, height);
+			if (m_Renderer)
+				m_Renderer->OnResize(width, height);
+			if (m_Scene)
+				m_Scene->OnResize(width, height);
+			return 0;
 		}
-		break;
 		case WM_DPICHANGED:
 		{
-			Panther::uint32 x = (Panther::uint32)LOWORD(wParam);
-			Panther::uint32 y = (Panther::uint32)HIWORD(wParam);
-			RECT rect = *reinterpret_cast<RECT *>(lParam);
-			if (!SetWindowPos(hwnd, 0, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_NOACTIVATE | SWP_NOZORDER))
-				return 1;
+			const RECT* rect = (RECT*)lParam;
+			SetWindowPos(a_WindowHandle,
+				nullptr,
+				rect->left,
+				rect->top,
+				rect->right - rect->left,
+				rect->bottom - rect->top,
+				SWP_NOZORDER | SWP_NOACTIVATE);
+			return 0;
 		}
-		break;
 		case WM_KEYDOWN:
 		{
-			MSG charMsg;
-			// Get the unicode character (UTF-16)
-			uint32 c = 0;
-			// For printable characters, the next message will be WM_CHAR.
-			// This message contains the character code we need to send the KeyPressed event.
-			// Inspired by the SDL implementation.
-			if (PeekMessage(&charMsg, hwnd, 0, 0, PM_NOREMOVE) && charMsg.message == WM_CHAR)
+			if (m_Scene)
 			{
-				GetMessage(&charMsg, hwnd, 0, 0);
-				c = (uint32)charMsg.wParam;
+				MSG charMsg;
+				// Get the unicode character (UTF-16)
+				uint32 c = 0;
+				// For printable characters, the next a_Message will be WM_CHAR.
+				// This message contains the character code we need to send the KeyPressed event.
+				// Inspired by the SDL implementation.
+				if (PeekMessage(&charMsg, a_WindowHandle, 0, 0, PM_NOREMOVE) && charMsg.message == WM_CHAR)
+				{
+					GetMessage(&charMsg, a_WindowHandle, 0, 0);
+					c = (uint32)charMsg.wParam;
+				}
+				bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
+				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
+				bool alt = GetAsyncKeyState(VK_MENU) > 0;
+				Key key = (Key)wParam;
+				m_Scene->OnKeyDown(key, c, KeyState::Pressed, control, shift, alt);
 			}
-			bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
-			bool control = GetAsyncKeyState(VK_CONTROL) > 0;
-			bool alt = GetAsyncKeyState(VK_MENU) > 0;
-			Key key = (Key)wParam;
-			if (app.m_Scene)
-			{
-				app.m_Scene->OnKeyDown(key, c, KeyState::Pressed, control, shift, alt);
-			}
+			return 0;
 		}
-		break;    
 		case WM_KEYUP:
 		{
-			bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
-			bool control = GetAsyncKeyState(VK_CONTROL) > 0;
-			bool alt = GetAsyncKeyState(VK_MENU) > 0;
-			Key key = (Key)wParam;
-			uint32 c = 0;
-			uint32 scanCode = (lParam & 0x00FF0000) >> 16;
+			if (m_Scene)
+			{
+				uint32 c = 0;
+				uint32 scanCode = (lParam & 0x00FF0000) >> 16;
 
-			// Determine which key was released by converting the key code and the scan code
-			// to a printable character (if possible).
-			// Inspired by the SDL implementation.
-			ubyte8 keyboardState[256];
-			GetKeyboardState(keyboardState);
-			wchar_t translatedCharacters[4];
-			if (int32 result = ToUnicodeEx((uint32)wParam, scanCode, keyboardState, translatedCharacters, 4, 0, NULL) > 0)
-			{
-				c = translatedCharacters[0];
+				// Determine which key was released by converting the key code and the scan code
+				// to a printable character (if possible).
+				// Inspired by the SDL implementation.
+				ubyte8 keyboardState[256];
+				GetKeyboardState(keyboardState);
+				wchar_t translatedCharacters[4];
+				if (int32 result = ToUnicodeEx((uint32)wParam, scanCode, keyboardState, translatedCharacters, 4, 0, NULL) > 0)
+				{
+					c = translatedCharacters[0];
+				}
+				bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
+				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
+				bool alt = GetAsyncKeyState(VK_MENU) > 0;
+				Key key = (Key)wParam;
+				m_Scene->OnKeyUp(key, c, KeyState::Released, shift, control, alt);
 			}
-			if (app.m_Scene)
-			{
-				app.m_Scene->OnKeyUp(key, c, KeyState::Released, shift, control, alt);
-			}
+			return 0;
 		}
-		break;
 		case WM_MOUSEMOVE:
 		{
 			int32 x = LOWORD(lParam);
 			int32 y = HIWORD(lParam);
-			if (app.m_Scene)
+			if (m_Scene)
 			{
-				app.m_Scene->OnMouseMove(x, y, (wParam & MK_LBUTTON) != 0, (wParam & MK_RBUTTON) != 0); 
+				m_Scene->OnMouseMove(x, y, (wParam & MK_LBUTTON) != 0, (wParam & MK_RBUTTON) != 0);
 			}
+			return 0;
 		}
-		break;
-		default:
-			return DefWindowProc(hwnd, message, wParam, lParam);
 		}
-		return 0;
+		return DefWindowProc(a_WindowHandle, a_Message, wParam, lParam);
 	}
 }

@@ -8,39 +8,26 @@
 #include "Application.h"
 #include "../../Panther_Core/src/Core.h"
 
-const Panther::Application::EGraphicsAPI rendertype = Panther::Application::EGraphicsAPI::DIRECTX12;
+using namespace Panther;
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int WINAPI wWinMain(HINSTANCE a_InstanceHandle, HINSTANCE a_Nothing, PWSTR a_CommandLineArguments, int a_ShowCmd)
 {
+	// Enable run-time memory check for debug builds.
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 	try
 	{
-		// Create and get the application
-		Panther::Application::Create(hInstance);
-		Panther::Application& app = Panther::Application::Get();
+		Application app(a_InstanceHandle);
+		if (!app.Initialize(Application::EGraphicsAPI::DIRECTX12))
+			return 1;
 
-		// Create a window
-		if (!app.CreateGameWindow(L"DX12 Demo", 800, 600, false, true))
-			return -1;
-
-		// Initialize the rendering system.
-		if (!app.CreateRenderer(rendertype))
-			return -1;
-
-		// Load the demo scene.
-		if (!app.LoadDemoScene())
-			return -1;
-
-		// Enter game loop.
-		Panther::int32 exitCode = app.Run();
-
-		// Cleanup resources.
-		Panther::Application::Destroy();
-
-		return exitCode;
+		return app.Run();
 	}
 	catch (const std::runtime_error& e)
 	{
-		MessageBoxA(NULL, e.what(), "Runtime Error", MB_OK | MB_ICONERROR);
-		return -1;
+		MessageBoxA(nullptr, e.what(), "Runtime Error", MB_OK | MB_ICONERROR);
+		return 1;
 	}
 }
