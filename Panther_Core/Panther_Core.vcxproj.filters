@@ -15,9 +15,15 @@
     <ClInclude Include="src\Vector.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="src\Exceptions.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exceptions.cpp">
       <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>

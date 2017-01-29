@@ -12,11 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\Exceptions.h" />
     <ClInclude Include="src\Keys.h" />
     <ClInclude Include="src\Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core.cpp" />
+    <ClCompile Include="src\Exceptions.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98144C83-3F06-474A-8566-015A098E7294}</ProjectGuid>
