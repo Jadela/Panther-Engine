@@ -11,6 +11,7 @@
 #include "DX12RenderTarget.h"
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
+#include "../../Panther_Core/src/Exceptions.h"
 // TODO: Move over to new Panther projects.
 #include "../../Panther_Demo/src/Window.h"
 
@@ -32,27 +33,22 @@ namespace Panther
 			ComPtr<IDXGIOutput> adapterOutput;
 
 			// Create a DirectX graphics interface factory.
-			HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&factory));
-			if (FAILED(hr)) throw new std::runtime_error("Could not create DXGIFactory instance.");
+			ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
 
 			// Get primary GPU.
-			hr = factory->EnumAdapters(0, &adapter);
-			if (FAILED(hr)) throw new std::runtime_error("Failed to get primary GPU.");
+			ThrowIfFailed(factory->EnumAdapters(0, &adapter));
 
 			// Get primary display.
-			hr = adapter->EnumOutputs(0, &adapterOutput);
-			if (FAILED(hr)) throw new std::runtime_error("Failed to get primary display.");
+			ThrowIfFailed(adapter->EnumOutputs(0, &adapterOutput));
 
 			// Get amount of display modes.
 			uint32 numDisplayModes;
-			hr = adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, nullptr);
-			if (FAILED(hr)) throw new std::runtime_error("Failed to query display mode list.");
+			ThrowIfFailed(adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, nullptr));
 			if (numDisplayModes <= 0) throw new std::runtime_error("No available display modes.");
 
 			// Get display modes.
 			std::unique_ptr<DXGI_MODE_DESC[]> displayModeList(new DXGI_MODE_DESC[numDisplayModes]);
-			hr = adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, displayModeList.get());
-			if (FAILED(hr)) throw new std::runtime_error("Failed to query display mode list.");
+			ThrowIfFailed(adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, displayModeList.get()));
 
 			// Now store the refresh rate of the monitor that matches the width and height of the requested screen.
 			for (uint32 i = 0; i < numDisplayModes; ++i)
@@ -87,8 +83,7 @@ namespace Panther
 		// Enable D3D12 debug layer.
 		{
 			ComPtr<ID3D12Debug> debugController;
-			if (FAILED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
-				throw std::runtime_error("Could not initialize D3D12 debug layer.");
+			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
 			debugController->EnableDebugLayer();
 		}
 #endif
@@ -107,7 +102,7 @@ namespace Panther
 			if (!m_D3DDevice)
 			{
 				ComPtr<IDXGIAdapter3> WARPAdapter;
-				if (FAILED(DXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&WARPAdapter)))) throw std::runtime_error("Could not enumerate WARP adapters.");
+				ThrowIfFailed(DXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&WARPAdapter)))
 				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*WARPAdapter.Get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 				if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
 			}
@@ -118,8 +113,7 @@ namespace Panther
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-		if (FAILED(m_D3DDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_D3DCommandQueue))))
-			throw std::runtime_error("Could not create command queue.");
+		ThrowIfFailed(m_D3DDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_D3DCommandQueue)))
 
 		// Swap chain
 		{
@@ -150,10 +144,8 @@ namespace Panther
 		m_DSVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), numDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 		// Create command allocators.
-		if (FAILED(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_D3DCommandAllocator))))
-			throw std::runtime_error("Could not create Direct3D command allocator.");
-		if (FAILED(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&m_D3DBundleAllocator))))
-			throw std::runtime_error("Could not create Direct3D bundle allocator.");
+		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_D3DCommandAllocator)))
+		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&m_D3DBundleAllocator)))
 
 		ZeroMemory(&m_PresentParameters, sizeof(DXGI_PRESENT_PARAMETERS));
 
@@ -161,8 +153,7 @@ namespace Panther
 
 		// Create synchronization objects.
 		{
-			if (FAILED(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence))))
-				throw std::runtime_error("Could not create synchronisation fence.");
+			ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)))
 			m_FenceValue = 1;
 
 			// Create an event handle to use for frame synchronization.
@@ -184,8 +175,7 @@ namespace Panther
 		// Command list allocators can only be reset when the associated
 		// command lists have finished execution on the GPU; apps should use
 		// fences to determine GPU execution progress.
-		HRESULT hr = m_D3DCommandAllocator->Reset();
-		if (FAILED(hr)) throw std::runtime_error("Failed to reset command allocator.");
+		ThrowIfFailed(m_D3DCommandAllocator->Reset())
 
 		if (m_CommandList)
 			m_CommandList->Reset();
@@ -292,18 +282,13 @@ namespace Panther
 
 	ComPtr<IDXGIFactory4> DX12Renderer::CreateDXGIFactory()
 	{
-		HRESULT result = S_OK;
 		ComPtr<IDXGIFactory4> DXGIFactory = nullptr;
 #if defined(_DEBUG)
 		// NOTE (JDL): Creating a debug version of the DXGI factory fails if the debug layer is not enabled.
 		// In this case, we're throwing an exception.
-		result = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&DXGIFactory));
-		if (FAILED(result))
-			throw std::runtime_error("Could not create DEBUG IDXGIFactory4.");
+		ThrowIfFailed(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&DXGIFactory)))
 #else
-		result = CreateDXGIFactory2(0, IID_PPV_ARGS(&DXGIFactory));
-		if (FAILED(result))
-			throw std::runtime_error("Could not create IDXGIFactory4.");
+		ThrowIfFailed(CreateDXGIFactory2(0, IID_PPV_ARGS(&DXGIFactory)))
 #endif
 		return DXGIFactory;
 	}
@@ -314,10 +299,8 @@ namespace Panther
 		ComPtr<IDXGISwapChain3> swapChainV3 = nullptr;
 		ComPtr<IDXGISwapChain1> swapChainV1 = nullptr;
 		// Swap chain needs the queue so that it can force a flush on it.
-		if (FAILED(a_DXGIFactory->CreateSwapChainForHwnd(a_CommandQueue.Get(), a_Window, &a_SwapChainDesc, a_SwapChainFullscreenDesc, nullptr, &swapChainV1)))
-			throw std::runtime_error("Could not create swap chain.");
-		if (FAILED(swapChainV1.As(&swapChainV3)))
-			throw std::runtime_error("Swap chain is of old type.");
+		ThrowIfFailed(a_DXGIFactory->CreateSwapChainForHwnd(a_CommandQueue.Get(), a_Window, &a_SwapChainDesc, a_SwapChainFullscreenDesc, nullptr, &swapChainV1))
+		ThrowIfFailed(swapChainV1.As(&swapChainV3))
 		return swapChainV3;
 	}
 
@@ -356,8 +339,7 @@ namespace Panther
 		m_depthStencil.Reset();
 
 		// Resize the swap chain buffers.
-		HRESULT hr = m_D3DSwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
-		if (FAILED(hr)) throw std::runtime_error("Could't resize swapchain buffers.");
+		ThrowIfFailed(m_D3DSwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0))
 
 		m_FrameIndex = m_D3DSwapChain->GetCurrentBackBufferIndex();
 
@@ -386,10 +368,10 @@ namespace Panther
 			depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
 			depthOptimizedClearValue.DepthStencil.Stencil = 0;
 
-			hr = m_D3DDevice->CreateCommittedResource(
+			ThrowIfFailed(m_D3DDevice->CreateCommittedResource(
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Tex2D(
 					DXGI_FORMAT_D32_FLOAT, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-				D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthOptimizedClearValue, IID_PPV_ARGS(&m_depthStencil));
+				D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthOptimizedClearValue, IID_PPV_ARGS(&m_depthStencil)))
 
 			m_DSVDescriptorHeap->RegisterDepthStencil(*m_depthStencil.Get(), depthStencilDesc);
 		}
@@ -409,12 +391,10 @@ namespace Panther
 
 	void DX12Renderer::Present()
 	{
-		HRESULT hr;
 		if (m_Window.GetVSync())
-			hr = m_D3DSwapChain->Present1(1, 0, &m_PresentParameters);
+			ThrowIfFailed(m_D3DSwapChain->Present1(1, 0, &m_PresentParameters))
 		else
-			hr = m_D3DSwapChain->Present1(0, 0, &m_PresentParameters);
-		if (FAILED(hr)) throw std::runtime_error("Swapchain present failed!");
+			ThrowIfFailed(m_D3DSwapChain->Present1(0, 0, &m_PresentParameters))
 	}
 
 	bool DX12Renderer::WaitForPreviousFrame()
@@ -425,13 +405,13 @@ namespace Panther
 
 		// Signal and increment the fence value.
 		const uint64 fence = m_FenceValue;
-		if (FAILED(m_D3DCommandQueue->Signal(m_D3DFence.Get(), fence))) throw std::runtime_error("Failed to signal command queue.");
+		ThrowIfFailed(m_D3DCommandQueue->Signal(m_D3DFence.Get(), fence))
 		m_FenceValue++;
 
 		// Wait until the previous frame is finished.
 		if (m_D3DFence->GetCompletedValue() < fence)
 		{
-			if (FAILED(m_D3DFence->SetEventOnCompletion(fence, m_FenceEvent))) throw std::runtime_error("Failed to set event on completion.");
+			ThrowIfFailed(m_D3DFence->SetEventOnCompletion(fence, m_FenceEvent))
 			WaitForSingleObject(m_FenceEvent, INFINITE);
 		}
 		m_FrameIndex = m_D3DSwapChain->GetCurrentBackBufferIndex();
