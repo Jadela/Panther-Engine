@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "../../Panther_Core/src/Keys.h"
 #include "../../Panther_Renderer/src/RendererFactory.h"
 #include "../resource.h"
 #include "Window.h"
@@ -11,37 +10,13 @@
 
 namespace Panther
 {
-	LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
-		// before CreateWindow returns, and thus before mhMainWnd is valid.
-		return Application::Get().WndProc(hwnd, msg, wParam, lParam);
-	}
-
 	Application* Application::m_App = nullptr;
 
 	Application::Application(HINSTANCE hInstance)
-		: m_hInstance(hInstance)
+		: m_InstanceHandle(hInstance)
 	{
 		assert(m_App == nullptr);
 		m_App = this;
-
-		WNDCLASSEX wndClass = { 0 };
-		wndClass.cbSize = sizeof(WNDCLASSEX);
-		wndClass.style = CS_HREDRAW | CS_VREDRAW;
-		wndClass.lpfnWndProc = MainWndProc;
-		wndClass.hInstance = m_hInstance;
-		wndClass.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
-		wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-		wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-		wndClass.lpszMenuName = nullptr;
-		wndClass.lpszClassName = L"DX12DemoWindow";
-
-		if (!RegisterClassEx(&wndClass))
-		{
-			MessageBox(NULL, L"Unable to register the window class.", L"Error", MB_OK | MB_ICONERROR);
-			throw std::runtime_error("Unable to register the window class.");
-		}
 	}
 
 	Application::~Application()
@@ -57,15 +32,9 @@ namespace Panther
 			delete m_Window;
 	}
 
-	Application& Application::Get()
-	{
-		return *m_App;
-	}
-
 	bool Application::Initialize(EGraphicsAPI a_GraphicsAPI)
 	{
-		if (!CreateGameWindow(L"DX12 Demo", 800, 600, false, true))
-			return false;
+		m_Window = new Window(*this, L"DX12 Demo", 800, 600, false, true);
 
 		if (!CreateRenderer(a_GraphicsAPI))
 			return false;
@@ -125,30 +94,36 @@ namespace Panther
 		Get().m_RequestQuit = true;
 	}
 
-	bool Application::CreateGameWindow(const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed)
+	void Application::OnResize(int32 a_Width, int32 a_Height)
 	{
-		RECT windowRect = { 0, 0, (int32)a_Width, (int32)a_Height };
-		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+		if (m_Renderer)
+			m_Renderer->OnResize(a_Width, a_Height);
+		if (m_Scene)
+			m_Scene->OnResize(a_Width, a_Height);
+	}
 
-		HWND hWnd = CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, L"DX12DemoWindow",
-			a_WindowName.c_str(), WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, CW_USEDEFAULT,
-			windowRect.right - windowRect.left,
-			windowRect.bottom - windowRect.top,
-			nullptr, nullptr, m_hInstance, nullptr);
-
-		if (!hWnd)
+	void Application::OnKeyDown(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt)
+	{
+		if (m_Scene)
 		{
-			MessageBox(NULL, L"Could not create the render window.", L"Windowing Error", MB_OK | MB_ICONERROR);
-			return false;
+			m_Scene->OnKeyDown(a_Key, a_Character, KeyState::Pressed, a_Ctrl, a_Shift, a_Alt);
 		}
+	}
 
-		m_Window = new Window(hWnd, a_WindowName, a_Width, a_Height, a_VSync, a_Windowed);
+	void Application::OnKeyUp(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt)
+	{
+		if (m_Scene)
+		{
+			m_Scene->OnKeyUp(a_Key, a_Character, KeyState::Released, a_Ctrl, a_Shift, a_Alt);
+		}
+	}
 
-		ShowWindow(hWnd, SW_SHOW);
-		UpdateWindow(hWnd);
-
-		return true;
+	void Application::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)
+	{
+		if (m_Scene)
+		{
+			m_Scene->OnMouseMove(a_DeltaX, a_DeltaY, a_LMBDown, a_RMBDown);
+		}
 	}
 
 	bool Application::CreateRenderer(EGraphicsAPI a_GraphicsAPI)
@@ -186,102 +161,5 @@ namespace Panther
 		m_Scene = new DemoScene(*m_Renderer);
 		m_Scene->Load();
 		return true;
-	}
-
-	LRESULT Application::WndProc(HWND a_WindowHandle, UINT a_Message, WPARAM wParam, LPARAM lParam)
-	{
-		switch (a_Message)
-		{
-		// WM_DESTROY is sent when the window is being destroyed.
-		case WM_DESTROY:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
-		// WM_SIZE is sent when the user resizes the window.  
-		case WM_SIZE:
-		{
-			uint32 width = (uint32)LOWORD(lParam);
-			uint32 height = (uint32)HIWORD(lParam);
-
-			m_Window->Resize(width, height);
-			if (m_Renderer)
-				m_Renderer->OnResize(width, height);
-			if (m_Scene)
-				m_Scene->OnResize(width, height);
-			return 0;
-		}
-		case WM_DPICHANGED:
-		{
-			const RECT* rect = (RECT*)lParam;
-			SetWindowPos(a_WindowHandle,
-				nullptr,
-				rect->left,
-				rect->top,
-				rect->right - rect->left,
-				rect->bottom - rect->top,
-				SWP_NOZORDER | SWP_NOACTIVATE);
-			return 0;
-		}
-		case WM_KEYDOWN:
-		{
-			if (m_Scene)
-			{
-				MSG charMsg;
-				// Get the unicode character (UTF-16)
-				uint32 c = 0;
-				// For printable characters, the next a_Message will be WM_CHAR.
-				// This message contains the character code we need to send the KeyPressed event.
-				// Inspired by the SDL implementation.
-				if (PeekMessage(&charMsg, a_WindowHandle, 0, 0, PM_NOREMOVE) && charMsg.message == WM_CHAR)
-				{
-					GetMessage(&charMsg, a_WindowHandle, 0, 0);
-					c = (uint32)charMsg.wParam;
-				}
-				bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
-				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
-				bool alt = GetAsyncKeyState(VK_MENU) > 0;
-				Key key = (Key)wParam;
-				m_Scene->OnKeyDown(key, c, KeyState::Pressed, control, shift, alt);
-			}
-			return 0;
-		}
-		case WM_KEYUP:
-		{
-			if (m_Scene)
-			{
-				uint32 c = 0;
-				uint32 scanCode = (lParam & 0x00FF0000) >> 16;
-
-				// Determine which key was released by converting the key code and the scan code
-				// to a printable character (if possible).
-				// Inspired by the SDL implementation.
-				ubyte8 keyboardState[256];
-				GetKeyboardState(keyboardState);
-				wchar_t translatedCharacters[4];
-				if (int32 result = ToUnicodeEx((uint32)wParam, scanCode, keyboardState, translatedCharacters, 4, 0, NULL) > 0)
-				{
-					c = translatedCharacters[0];
-				}
-				bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
-				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
-				bool alt = GetAsyncKeyState(VK_MENU) > 0;
-				Key key = (Key)wParam;
-				m_Scene->OnKeyUp(key, c, KeyState::Released, shift, control, alt);
-			}
-			return 0;
-		}
-		case WM_MOUSEMOVE:
-		{
-			int32 x = LOWORD(lParam);
-			int32 y = HIWORD(lParam);
-			if (m_Scene)
-			{
-				m_Scene->OnMouseMove(x, y, (wParam & MK_LBUTTON) != 0, (wParam & MK_RBUTTON) != 0);
-			}
-			return 0;
-		}
-		}
-		return DefWindowProc(a_WindowHandle, a_Message, wParam, lParam);
 	}
 }

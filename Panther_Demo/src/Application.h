@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../../Panther_Core/src/Core.h"
+#include "../../Panther_Core/src/Keys.h"
 
 namespace Panther
 {
@@ -22,23 +23,26 @@ namespace Panther
 		Application& operator=(const Application& rhs) = delete;
 		~Application();
 
-		static Application& Get();
+		static Application& Get() { return *m_App; }
 		bool Initialize(EGraphicsAPI a_GraphicsAPI);
 		int32 Run();
-
 		static void Quit();
 
-		LRESULT WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+		HINSTANCE& GetInstanceHandle() { return m_InstanceHandle; }
+
+		void OnResize(int32 a_Width, int32 a_Height);		
+		void OnKeyDown(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt);
+		void OnKeyUp(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt);
+		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown);
 
 	private:
-		bool CreateGameWindow(const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed);
 		bool CreateRenderer(EGraphicsAPI a_GraphicsAPI);
 		bool LoadDemoScene();
 
 	private:
 		static Application*	m_App;
 
-		HINSTANCE	m_hInstance = nullptr;
+		HINSTANCE	m_InstanceHandle = nullptr;
 		Window*		m_Window = nullptr;
 		Renderer*	m_Renderer = nullptr;
 		Scene*		m_Scene = nullptr;

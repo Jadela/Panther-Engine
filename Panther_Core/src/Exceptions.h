@@ -1,7 +1,6 @@
 #pragma once
 
-#include <WinNls.h>
-#include <winerror.h>
+#include <windows.h>
 #include <string>
 
 #include "Core.h"

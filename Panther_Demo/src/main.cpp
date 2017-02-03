@@ -7,6 +7,7 @@
 
 #include "Application.h"
 #include "../../Panther_Core/src/Core.h"
+#include "../../Panther_Core/src/Exceptions.h"
 
 using namespace Panther;
 
@@ -25,9 +26,9 @@ int WINAPI wWinMain(HINSTANCE a_InstanceHandle, HINSTANCE a_Nothing, PWSTR a_Com
 
 		return app.Run();
 	}
-	catch (const std::runtime_error& e)
+	catch (WinException& e)
 	{
-		MessageBoxA(nullptr, e.what(), "Runtime Error", MB_OK | MB_ICONERROR);
+		MessageBox(nullptr, e.ToString().c_str(), L"Panther::WinException", MB_OK | MB_ICONERROR);
 		return 1;
 	}
 }

@@ -1,30 +1,43 @@
 #pragma once
+
+#include <windows.h>
+#include <string>
+
 #include "../../Panther_Core/src/Core.h"
 
 namespace Panther
 {
+	class Application;
+
 	class Window
 	{
 	public:
-		Window();
-		Window(HWND a_hWnd, const std::wstring& a_WindowName, Panther::uint32 a_Width, Panther::uint32 a_Height, bool a_VSync, bool a_Windowed);
+		Window() = delete;
+		Window(Application& a_Application, const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed);
 		Window(const Window& src) = delete;
 		~Window();
 
-		bool			IsValid()		const;
-		HWND			GetHandle()		const;
-		Panther::uint32	GetWidth()		const;
-		Panther::uint32	GetHeight()		const;
-		bool			GetVSync()		const;
-		bool			GetWindowed()	const;
-		void			Resize(Panther::uint32 a_Width, Panther::uint32 a_Height);
+		static Window& Get() { return *m_Instance; }
+
+		bool IsValid() const;
+		HWND GetHandle() const;
+		uint32 GetWidth() const;
+		uint32 GetHeight() const;
+		bool GetVSync() const;
+		bool GetWindowed() const;
+		void Resize(uint32 a_Width, uint32 a_Height);
+
+		LRESULT WindowProc(HWND a_WindowHandle, UINT a_Message, WPARAM a_WParam, LPARAM a_LParam);
 
 	private:
-		HWND			m_hWnd;
-		std::wstring	m_WindowName;
-		Panther::uint32	m_Width;
-		Panther::uint32	m_Height;
-		bool			m_VSync;
-		bool			m_Windowed;
+		static Window* m_Instance;
+
+		Application& m_Application;
+		HWND m_hWnd = nullptr;
+		std::wstring m_WindowName = L"Default window";
+		uint32 m_Width = 800;
+		uint32 m_Height = 600;
+		bool m_VSync = false;
+		bool m_Windowed = true;
 	};
 }
