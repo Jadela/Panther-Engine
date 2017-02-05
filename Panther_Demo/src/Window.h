@@ -13,7 +13,7 @@ namespace Panther
 	{
 	public:
 		Window() = delete;
-		Window(Application& a_Application, const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed);
+		Window(const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed);
 		Window(const Window& src) = delete;
 		~Window();
 
@@ -32,7 +32,6 @@ namespace Panther
 	private:
 		static Window* m_Instance;
 
-		Application& m_Application;
 		HWND m_hWnd = nullptr;
 		std::wstring m_WindowName = L"Default window";
 		uint32 m_Width = 800;

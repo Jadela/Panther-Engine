@@ -18,8 +18,7 @@ namespace Panther
 
 	Window* Window::m_Instance = nullptr;
 
-	Window::Window(Application& a_Application, const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed) :
-		m_Application(a_Application),
+	Window::Window(const std::wstring& a_WindowName, uint32 a_Width, uint32 a_Height, bool a_VSync, bool a_Windowed) :
 		m_WindowName(a_WindowName), 
 		m_Width(a_Width), 
 		m_Height(a_Height), 
@@ -33,8 +32,8 @@ namespace Panther
 		wndClass.cbSize = sizeof(WNDCLASSEX);
 		wndClass.style = CS_HREDRAW | CS_VREDRAW;
 		wndClass.lpfnWndProc = MainWndProc;
-		wndClass.hInstance = m_Application.GetInstanceHandle();
-		wndClass.hIcon = LoadIcon(m_Application.GetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON1));
+		wndClass.hInstance = Application::Get().GetInstanceHandle();
+		wndClass.hIcon = LoadIcon(wndClass.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 		wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wndClass.lpszMenuName = nullptr;
@@ -51,7 +50,7 @@ namespace Panther
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			windowRect.right - windowRect.left,
 			windowRect.bottom - windowRect.top,
-			nullptr, nullptr, m_Application.GetInstanceHandle(), nullptr);
+			nullptr, nullptr, wndClass.hInstance, nullptr);
 		ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
 
 		ShowWindow(m_hWnd, SW_SHOW);
@@ -102,6 +101,8 @@ namespace Panther
 
 	LRESULT Window::WindowProc(HWND a_WindowHandle, UINT a_Message, WPARAM a_WParam, LPARAM a_LParam)
 	{
+		Application& app = Application::Get();
+
 		switch (a_Message)
 		{
 			// WM_DESTROY is sent when the window is being destroyed.
@@ -116,7 +117,7 @@ namespace Panther
 				uint32 width = (uint32)LOWORD(a_LParam);
 				uint32 height = (uint32)HIWORD(a_LParam);
 				Resize(width, height);
-				m_Application.OnResize(width, height);
+				app.OnResize(width, height);
 				return 0;
 			}
 			case WM_DPICHANGED:
@@ -148,7 +149,7 @@ namespace Panther
 				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
 				bool alt = GetAsyncKeyState(VK_MENU) > 0;
 				Key key = (Key)a_WParam;
-				m_Application.OnKeyDown(key, c, control, shift, alt);
+				app.OnKeyDown(key, c, control, shift, alt);
 				return 0;
 			}
 			case WM_KEYUP:
@@ -170,14 +171,14 @@ namespace Panther
 				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
 				bool alt = GetAsyncKeyState(VK_MENU) > 0;
 				Key key = (Key)a_WParam;
-				m_Application.OnKeyUp(key, c, control, shift, alt);
+				app.OnKeyUp(key, c, control, shift, alt);
 				return 0;
 			}
 			case WM_MOUSEMOVE:
 			{
 				int32 x = LOWORD(a_LParam);
 				int32 y = HIWORD(a_LParam);
-				m_Application.OnMouseMove(x, y, (a_WParam & MK_LBUTTON) != 0, (a_WParam & MK_RBUTTON) != 0);
+				app.OnMouseMove(x, y, (a_WParam & MK_LBUTTON) != 0, (a_WParam & MK_RBUTTON) != 0);
 				return 0;
 			}
 		}

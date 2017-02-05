@@ -79,7 +79,7 @@ namespace Panther
 		if (m_APIInitialized) return true; // Renderer is already initialized.
 		if (!XMVerifyCPUSupport()) throw std::runtime_error("CPU is not supporting SSE2 or NEON!");
 
-#if defined(_DEBUG)
+#if defined(DEBUG) || defined(_DEBUG)
 		// Enable D3D12 debug layer.
 		{
 			ComPtr<ID3D12Debug> debugController;
@@ -88,7 +88,6 @@ namespace Panther
 		}
 #endif
 
-		// Create DXGI Factory.
 		ComPtr<IDXGIFactory4> DXGIFactory = CreateDXGIFactory();
 
 		// Create hardware-based D3D12 device. If that fails, fallback to WARP/software.
@@ -98,7 +97,10 @@ namespace Panther
 			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 			D3D_FEATURE_LEVEL chosenFeatureLevel = (D3D_FEATURE_LEVEL)0;
 			if (SUCCEEDED(DXGIFactory->EnumAdapters1(0, &adapterHolder)) && SUCCEEDED(adapterHolder.As(&adapter)))
+			{
 				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*adapter.Get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
+			}
+
 			if (!m_D3DDevice)
 			{
 				ComPtr<IDXGIAdapter3> WARPAdapter;
@@ -314,10 +316,17 @@ namespace Panther
 			{
 				DXGI_ADAPTER_DESC2 adapterDesc = { 0 };
 				a_Adapter.GetDesc2(&adapterDesc);
-				std::wstringstream stream;
-				stream << ((a_FeatureLevels[i] >> 12) & 15) << "." << ((a_FeatureLevels[i] >> 8) & 15);
+				std::wstring featureLevelString = std::to_wstring((a_FeatureLevels[i] >> 12) & 15) + L"." + std::to_wstring((a_FeatureLevels[i] >> 8) & 15);
 
-				OutputDebugString((L"\tSuccessfully created D3D12 device:\n\tAdapter: " + std::wstring(adapterDesc.Description) + L"\n\tFeature Level: " + stream.str() + L"\n").c_str());
+				OutputDebugString((L"\tSuccessfully created D3D12 device:\n\tAdapter:\t\t\t\t\t" + std::wstring(adapterDesc.Description)
+					+ L"\n\tVendor ID:\t\t\t\t\t" + std::to_wstring(adapterDesc.VendorId)
+					+ L"\n\tDevice ID:\t\t\t\t\t" + std::to_wstring(adapterDesc.DeviceId)
+					+ L"\n\tSubsystem ID:\t\t\t\t" + std::to_wstring(adapterDesc.SubSysId)
+					+ L"\n\tRevision:\t\t\t\t\t" + std::to_wstring(adapterDesc.Revision)
+					+ L"\n\tDedicated Video Memory:\t\t" + std::to_wstring(adapterDesc.DedicatedVideoMemory / 1000000) + L" MB"
+					+ L"\n\tDedicated System Memory:\t" + std::to_wstring(adapterDesc.DedicatedSystemMemory / 1000000) + L" MB"
+					+ L"\n\tShared System Memory:\t\t" + std::to_wstring(adapterDesc.SharedSystemMemory / 1000000) + L" MB"
+					+ L"\n\tFeature Level:\t\t\t\t" + featureLevelString + L"\n").c_str());
 				*out_FeatureLevel = a_FeatureLevels[i];
 				break;
 			}
