@@ -75,8 +75,7 @@ namespace Panther
 		// Synchronization objects.
 		uint32 m_FrameIndex;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_D3DFence;
-		uint64 m_FenceValue;
-		HANDLE m_FenceEvent;
+		uint64 m_FenceValue = 0;
 
 		DX12Renderer(const DX12Renderer& other) = delete;
 	};

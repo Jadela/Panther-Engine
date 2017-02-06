@@ -69,6 +69,12 @@
     <ClInclude Include="src\RendererFactory.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="src\Adapter.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Output.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DX12Texture.cpp">
@@ -122,5 +128,7 @@
     <ClCompile Include="src\RendererFactory.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="src\Adapter.cpp" />
+    <ClCompile Include="src\Output.cpp" />
   </ItemGroup>
 </Project>

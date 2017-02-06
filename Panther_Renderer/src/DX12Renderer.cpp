@@ -70,7 +70,6 @@ namespace Panther
 	{
 		// Wait for the GPU to be done with all resources.
 		WaitForPreviousFrame();
-		CloseHandle(m_FenceEvent);
 	}
 
 	bool DX12Renderer::Initialize()
@@ -154,14 +153,7 @@ namespace Panther
 		if (!ResizeSwapChain(m_Window.GetWidth(), m_Window.GetHeight())) throw std::runtime_error("Failed to resize the swap chain.");
 
 		// Create synchronization objects.
-		{
-			ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)))
-			m_FenceValue = 1;
-
-			// Create an event handle to use for frame synchronization.
-			m_FenceEvent = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
-			if (m_FenceEvent == nullptr && FAILED(HRESULT_FROM_WIN32(GetLastError()))) throw std::runtime_error("Could not create synchronisation fence event.");
-		}
+		ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)))
 
 		m_APIInitialized = true;
 		return true;
@@ -412,17 +404,27 @@ namespace Panther
 		// This is code implemented as such for simplicity. More advanced samples 
 		// illustrate how to use fences for efficient resource usage.
 
-		// Signal and increment the fence value.
-		const uint64 fence = m_FenceValue;
-		ThrowIfFailed(m_D3DCommandQueue->Signal(m_D3DFence.Get(), fence))
+		// Advance the fence value to mark commands up to this fence point.
 		m_FenceValue++;
 
-		// Wait until the previous frame is finished.
-		if (m_D3DFence->GetCompletedValue() < fence)
+		// Add an instruction to the command queue to set a new fence point.  Because we 
+		// are on the GPU timeline, the new fence point won't be set until the GPU finishes
+		// processing all the commands prior to this Signal().
+		ThrowIfFailed(m_D3DCommandQueue->Signal(m_D3DFence.Get(), m_FenceValue));
+
+		// Wait until the GPU has completed commands up to this fence point.
+		if (m_D3DFence->GetCompletedValue() < m_FenceValue)
 		{
-			ThrowIfFailed(m_D3DFence->SetEventOnCompletion(fence, m_FenceEvent))
-			WaitForSingleObject(m_FenceEvent, INFINITE);
+			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+
+			// Fire event when GPU hits current fence.  
+			ThrowIfFailed(m_D3DFence->SetEventOnCompletion(m_FenceValue, eventHandle));
+
+			// Wait until the GPU hits current fence event is fired.
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
 		}
+
 		m_FrameIndex = m_D3DSwapChain->GetCurrentBackBufferIndex();
 		return true;
 	}

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Adapter.h" />
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\CommandList.h" />
     <ClInclude Include="src\DescriptorHeap.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="src\DX12Texture.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Output.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\RendererFactory.h" />
     <ClInclude Include="src\RenderTarget.h" />
@@ -33,6 +35,7 @@
     <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Adapter.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\CommandList.cpp" />
     <ClCompile Include="src\DX12Buffer.cpp" />
@@ -50,6 +53,7 @@
     <ClCompile Include="src\DX12Texture.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Output.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\RendererFactory.cpp" />
     <ClCompile Include="src\Texture.cpp" />
