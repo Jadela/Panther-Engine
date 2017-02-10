@@ -15,6 +15,7 @@
     <ClInclude Include="src\Buffer.h" />
     <ClInclude Include="src\CommandList.h" />
     <ClInclude Include="src\DescriptorHeap.h" />
+    <ClInclude Include="src\DisplayModeList.h" />
     <ClInclude Include="src\DX12Buffer.h" />
     <ClInclude Include="src\DX12CommandList.h" />
     <ClInclude Include="src\DX12DescriptorHeap.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="src\Adapter.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
     <ClCompile Include="src\CommandList.cpp" />
+    <ClCompile Include="src\DisplayModeList.cpp" />
     <ClCompile Include="src\DX12Buffer.cpp" />
     <ClCompile Include="src\DX12CommandList.cpp" />
     <ClCompile Include="src\DX12DescriptorHeap.cpp" />

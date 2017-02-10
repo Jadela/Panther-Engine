@@ -3,6 +3,10 @@
 
 #include <sstream>
 
+#include "Adapter.h"
+#include "Output.h"
+#include "DisplayModeList.h"
+
 #include "DX12Buffer.h"
 #include "DX12CommandList.h"
 #include "DX12DescriptorHeap.h"
@@ -20,44 +24,27 @@ using namespace Microsoft::WRL;
 
 namespace Panther
 {
-	// This function was inspired by:
-	// http://www.rastertek.com/dx11tut03.html
-	// and is a refreshed version of Jeremiah van Oosten.
-	DXGI_RATIONAL QueryRefreshRate(const Window& window)
+	DXGI_RATIONAL QueryRefreshRate(const Window& window, IDXGIFactory4& a_DXGIFactory)
 	{
 		DXGI_RATIONAL refreshRate = { 0, 1 };
 		if (window.GetVSync())
 		{
-			ComPtr<IDXGIFactory2> factory;
-			ComPtr<IDXGIAdapter> adapter;
-			ComPtr<IDXGIOutput> adapterOutput;
+			std::unique_ptr<Adapter> adapter(Adapter::GetAdapter(a_DXGIFactory, 0)); // Get primary adapter.
+			Output& output(adapter->GetOutput(0)); // Get primary output.
 
-			// Create a DirectX graphics interface factory.
-			ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
-
-			// Get primary GPU.
-			ThrowIfFailed(factory->EnumAdapters(0, &adapter));
-
-			// Get primary display.
-			ThrowIfFailed(adapter->EnumOutputs(0, &adapterOutput));
-
-			// Get amount of display modes.
-			uint32 numDisplayModes;
-			ThrowIfFailed(adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, nullptr));
-			if (numDisplayModes <= 0) throw new std::runtime_error("No available display modes.");
-
-			// Get display modes.
-			std::unique_ptr<DXGI_MODE_DESC[]> displayModeList(new DXGI_MODE_DESC[numDisplayModes]);
-			ThrowIfFailed(adapterOutput->GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, displayModeList.get()));
-
-			// Now store the refresh rate of the monitor that matches the width and height of the requested screen.
-			for (uint32 i = 0; i < numDisplayModes; ++i)
+			DisplayModeList* modeList(output.GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM));
+			if (modeList == nullptr)
 			{
-				if (displayModeList[i].Width == window.GetWidth() && displayModeList[i].Height == window.GetHeight())
-				{
-					refreshRate = displayModeList[i].RefreshRate;
-				}
+				throw new std::runtime_error("Primary display does not support DXGI_FORMAT_B8G8R8A8_UNORM.");
 			}
+
+			DXGI_MODE_DESC1* displayMode(modeList->GetBestMatchingDisplayMode(1920, 1080));
+			if (displayMode == nullptr)
+			{
+				throw new std::runtime_error("Display has no 1920x1080 support.");
+			}
+
+			refreshRate = displayMode->RefreshRate;
 		}
 		return refreshRate;
 	}
@@ -87,7 +74,7 @@ namespace Panther
 		}
 #endif
 
-		ComPtr<IDXGIFactory4> DXGIFactory = CreateDXGIFactory();
+		m_DXGIFactory = CreateDXGIFactory();
 
 		// Create hardware-based D3D12 device. If that fails, fallback to WARP/software.
 		{
@@ -95,7 +82,7 @@ namespace Panther
 			ComPtr<IDXGIAdapter3> adapter;
 			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 			D3D_FEATURE_LEVEL chosenFeatureLevel = (D3D_FEATURE_LEVEL)0;
-			if (SUCCEEDED(DXGIFactory->EnumAdapters1(0, &adapterHolder)) && SUCCEEDED(adapterHolder.As(&adapter)))
+			if (SUCCEEDED(m_DXGIFactory->EnumAdapters1(0, &adapterHolder)) && SUCCEEDED(adapterHolder.As(&adapter)))
 			{
 				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*adapter.Get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 			}
@@ -103,7 +90,7 @@ namespace Panther
 			if (!m_D3DDevice)
 			{
 				ComPtr<IDXGIAdapter3> WARPAdapter;
-				ThrowIfFailed(DXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&WARPAdapter)))
+				ThrowIfFailed(m_DXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&WARPAdapter)))
 				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*WARPAdapter.Get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 				if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
 			}
@@ -130,10 +117,10 @@ namespace Panther
 			swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; // Use Alt-Enter to switch between full screen and windowed mode.
 
 			DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullScreenDesc = {};
-			swapChainFullScreenDesc.RefreshRate = QueryRefreshRate(m_Window);
+			swapChainFullScreenDesc.RefreshRate = QueryRefreshRate(m_Window, *m_DXGIFactory.Get());
 			swapChainFullScreenDesc.Windowed = m_Window.GetWindowed();
 
-			m_D3DSwapChain = CreateSwapChain(DXGIFactory, m_D3DCommandQueue, m_Window.GetHandle(), swapChainDesc, &swapChainFullScreenDesc);
+			m_D3DSwapChain = CreateSwapChain(m_DXGIFactory, m_D3DCommandQueue, m_Window.GetHandle(), swapChainDesc, &swapChainFullScreenDesc);
 		}
 
 		// Render target view (RTV) heap.

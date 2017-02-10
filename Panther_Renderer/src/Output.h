@@ -1,12 +1,17 @@
 #pragma once
 
+#include "../../Panther_Core/src/Core.h"
+
 namespace Panther
 {
+	class DisplayModeList;
+
 	class Output
 	{
 	public:
 		Output(IDXGIOutput4* a_Output);
-		~Output() {};
+
+		DisplayModeList* GetDisplayModeList(DXGI_FORMAT a_Format);
 
 	private:
 		Output(const Output&) = delete;

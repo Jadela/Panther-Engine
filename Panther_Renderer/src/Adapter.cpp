@@ -2,6 +2,7 @@
 #include "Adapter.h"
 
 #include "../../Panther_Core/src/Exceptions.h"
+#include "Output.h"
 
 using namespace Microsoft::WRL;
 
