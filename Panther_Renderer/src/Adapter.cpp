@@ -8,12 +8,19 @@ using namespace Microsoft::WRL;
 
 namespace Panther
 {
-	std::unique_ptr<Adapter> Adapter::GetAdapter(IDXGIFactory4& a_Factory, int32 a_Index)
+	std::unique_ptr<Adapter> Adapter::GetAdapter(IDXGIFactory4& a_Factory, int32 a_Index, bool a_WarpAdapter)
 	{
 		IDXGIAdapter* adapter1;
 		IDXGIAdapter3* adapter;
-		ThrowIfFailed(a_Factory.EnumAdapters(a_Index, &adapter1));
-		ThrowIfFailed(adapter1->QueryInterface(&adapter));
+		if (a_WarpAdapter)
+		{
+			ThrowIfFailed(a_Factory.EnumWarpAdapter(IID_PPV_ARGS(&adapter)))
+		}
+		else
+		{
+			ThrowIfFailed(a_Factory.EnumAdapters(a_Index, &adapter1));
+			ThrowIfFailed(adapter1->QueryInterface(&adapter));
+		}
 		return std::unique_ptr<Adapter>(new Adapter(adapter));
 	}
 

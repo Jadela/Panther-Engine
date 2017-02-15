@@ -2,6 +2,7 @@
 
 namespace Panther
 {
+	class Adapter;
 	class DX12CommandList;
 	class DX12DescriptorHeap;
 
@@ -56,7 +57,7 @@ namespace Panther
 		void Present();
 		bool WaitForPreviousFrame();
 
-		Microsoft::WRL::ComPtr<IDXGIFactory4> m_DXGIFactory = nullptr;
+		std::unique_ptr<Adapter> m_Adapter = nullptr;
 
 		// Pipeline objects.
 		std::unique_ptr<Panther::DX12DescriptorHeap> m_RTVDescriptorHeap = nullptr;

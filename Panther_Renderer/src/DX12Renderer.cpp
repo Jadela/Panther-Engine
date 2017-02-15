@@ -24,13 +24,12 @@ using namespace Microsoft::WRL;
 
 namespace Panther
 {
-	DXGI_RATIONAL QueryRefreshRate(const Window& window, IDXGIFactory4& a_DXGIFactory)
+	DXGI_RATIONAL QueryRefreshRate(bool a_VSync, Adapter& a_Adapter)
 	{
 		DXGI_RATIONAL refreshRate = { 0, 1 };
-		if (window.GetVSync())
+		if (a_VSync)
 		{
-			std::unique_ptr<Adapter> adapter(Adapter::GetAdapter(a_DXGIFactory, 0)); // Get primary adapter.
-			Output& output(adapter->GetOutput(0)); // Get primary output.
+			Output& output(a_Adapter.GetOutput(0)); // Get primary output.
 
 			DisplayModeList* modeList(output.GetDisplayModeList(DXGI_FORMAT_B8G8R8A8_UNORM));
 			if (modeList == nullptr)
@@ -74,24 +73,19 @@ namespace Panther
 		}
 #endif
 
-		m_DXGIFactory = CreateDXGIFactory();
+		ComPtr<IDXGIFactory4> DXGIFactory = CreateDXGIFactory();
+		m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0); // Get primary adapter.
 
 		// Create hardware-based D3D12 device. If that fails, fallback to WARP/software.
 		{
-			ComPtr<IDXGIAdapter1> adapterHolder;
-			ComPtr<IDXGIAdapter3> adapter;
 			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 			D3D_FEATURE_LEVEL chosenFeatureLevel = (D3D_FEATURE_LEVEL)0;
-			if (SUCCEEDED(m_DXGIFactory->EnumAdapters1(0, &adapterHolder)) && SUCCEEDED(adapterHolder.As(&adapter)))
-			{
-				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*adapter.Get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
-			}
+			m_D3DDevice = TryCreateD3D12DeviceForAdapter(m_Adapter->GetAdapter(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 
 			if (!m_D3DDevice)
 			{
-				ComPtr<IDXGIAdapter3> WARPAdapter;
-				ThrowIfFailed(m_DXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&WARPAdapter)))
-				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*WARPAdapter.Get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
+				m_Adapter.reset(Adapter::GetAdapter(*DXGIFactory.Get(), 0, true).release());
+				m_D3DDevice = TryCreateD3D12DeviceForAdapter(m_Adapter->GetAdapter(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 				if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
 			}
 		}
@@ -117,10 +111,10 @@ namespace Panther
 			swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; // Use Alt-Enter to switch between full screen and windowed mode.
 
 			DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapChainFullScreenDesc = {};
-			swapChainFullScreenDesc.RefreshRate = QueryRefreshRate(m_Window, *m_DXGIFactory.Get());
+			swapChainFullScreenDesc.RefreshRate = QueryRefreshRate(m_Window.GetVSync(), *m_Adapter.get());
 			swapChainFullScreenDesc.Windowed = m_Window.GetWindowed();
 
-			m_D3DSwapChain = CreateSwapChain(m_DXGIFactory, m_D3DCommandQueue, m_Window.GetHandle(), swapChainDesc, &swapChainFullScreenDesc);
+			m_D3DSwapChain = CreateSwapChain(DXGIFactory, m_D3DCommandQueue, m_Window.GetHandle(), swapChainDesc, &swapChainFullScreenDesc);
 		}
 
 		// Render target view (RTV) heap.
@@ -264,13 +258,11 @@ namespace Panther
 	ComPtr<IDXGIFactory4> DX12Renderer::CreateDXGIFactory()
 	{
 		ComPtr<IDXGIFactory4> DXGIFactory = nullptr;
+		UINT flags = 0;
 #if defined(_DEBUG)
-		// NOTE (JDL): Creating a debug version of the DXGI factory fails if the debug layer is not enabled.
-		// In this case, we're throwing an exception.
-		ThrowIfFailed(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&DXGIFactory)))
-#else
-		ThrowIfFailed(CreateDXGIFactory2(0, IID_PPV_ARGS(&DXGIFactory)))
+		flags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
+		ThrowIfFailed(CreateDXGIFactory2(flags, IID_PPV_ARGS(&DXGIFactory)));
 		return DXGIFactory;
 	}
 
