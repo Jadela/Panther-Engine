@@ -34,7 +34,7 @@ namespace Panther
 
 	bool Application::Initialize(EGraphicsAPI a_GraphicsAPI)
 	{
-		m_Window = new Window(L"DX12 Demo", 800, 600, true, true);
+		m_Window = new Window(L"DX12 Demo", 640, 480, true, true);
 
 		if (!CreateRenderer(a_GraphicsAPI))
 			return false;

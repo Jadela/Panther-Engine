@@ -6,6 +6,7 @@
 #include "Adapter.h"
 #include "Output.h"
 #include "DisplayModeList.h"
+#include "SwapChain.h"
 
 #include "DX12Buffer.h"
 #include "DX12CommandList.h"
@@ -37,10 +38,10 @@ namespace Panther
 				throw new std::runtime_error("Primary display does not support DXGI_FORMAT_B8G8R8A8_UNORM.");
 			}
 
-			DXGI_MODE_DESC1* displayMode(modeList->GetBestMatchingDisplayMode(1920, 1080));
+			DXGI_MODE_DESC1* displayMode(modeList->GetBestMatchingDisplayMode(640, 480));
 			if (displayMode == nullptr)
 			{
-				throw new std::runtime_error("Display has no 1920x1080 support.");
+				throw new std::runtime_error("Display has no 640x480 support.");
 			}
 
 			refreshRate = displayMode->RefreshRate;
@@ -114,7 +115,8 @@ namespace Panther
 			swapChainFullScreenDesc.RefreshRate = QueryRefreshRate(m_Window.GetVSync(), *m_Adapter.get());
 			swapChainFullScreenDesc.Windowed = m_Window.GetWindowed();
 
-			m_D3DSwapChain = CreateSwapChain(DXGIFactory, m_D3DCommandQueue, m_Window.GetHandle(), swapChainDesc, &swapChainFullScreenDesc);
+			m_SwapChain = SwapChain::CreateSwapchain(*DXGIFactory.Get(), *m_D3DCommandQueue.Get(), m_Window.GetHandle(), swapChainDesc, 
+				&swapChainFullScreenDesc);
 		}
 
 		// Render target view (RTV) heap.
@@ -128,8 +130,6 @@ namespace Panther
 		// Create command allocators.
 		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_D3DCommandAllocator)))
 		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&m_D3DBundleAllocator)))
-
-		ZeroMemory(&m_PresentParameters, sizeof(DXGI_PRESENT_PARAMETERS));
 
 		if (!ResizeSwapChain(m_Window.GetWidth(), m_Window.GetHeight())) throw std::runtime_error("Failed to resize the swap chain.");
 
@@ -245,13 +245,12 @@ namespace Panther
 
 	void DX12Renderer::EndRender()
 	{
-		Present();
+		m_SwapChain->Present(m_Window.GetVSync());
 		Synchronize();
 	}
 
 	void DX12Renderer::OnResize(uint32 a_Width, uint32 a_Height)
 	{
-		assert(m_D3DSwapChain);
 		ResizeSwapChain(a_Width, a_Height);
 	}
 
@@ -264,17 +263,6 @@ namespace Panther
 #endif
 		ThrowIfFailed(CreateDXGIFactory2(flags, IID_PPV_ARGS(&DXGIFactory)));
 		return DXGIFactory;
-	}
-
-	ComPtr<IDXGISwapChain3> DX12Renderer::CreateSwapChain(ComPtr<IDXGIFactory4>& a_DXGIFactory, ComPtr<ID3D12CommandQueue>& a_CommandQueue,
-		HWND a_Window, const DXGI_SWAP_CHAIN_DESC1& a_SwapChainDesc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_SwapChainFullscreenDesc)
-	{
-		ComPtr<IDXGISwapChain3> swapChainV3 = nullptr;
-		ComPtr<IDXGISwapChain1> swapChainV1 = nullptr;
-		// Swap chain needs the queue so that it can force a flush on it.
-		ThrowIfFailed(a_DXGIFactory->CreateSwapChainForHwnd(a_CommandQueue.Get(), a_Window, &a_SwapChainDesc, a_SwapChainFullscreenDesc, nullptr, &swapChainV1))
-		ThrowIfFailed(swapChainV1.As(&swapChainV3))
-		return swapChainV3;
 	}
 
 	ComPtr<ID3D12Device> DX12Renderer::TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels,
@@ -307,6 +295,7 @@ namespace Panther
 
 	inline bool DX12Renderer::ResizeSwapChain(uint32 width, uint32 height)
 	{
+		assert(m_SwapChain);
 		// Don't allow for 0 size swap chain buffers.
 		if (width <= 0) width = 1;
 		if (height <= 0) height = 1;
@@ -319,9 +308,9 @@ namespace Panther
 		m_depthStencil.Reset();
 
 		// Resize the swap chain buffers.
-		ThrowIfFailed(m_D3DSwapChain->ResizeBuffers(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0))
+		m_SwapChain->Resize(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
 
-		m_FrameIndex = m_D3DSwapChain->GetCurrentBackBufferIndex();
+		m_FrameIndex = m_SwapChain->GetSwapChain().GetCurrentBackBufferIndex();
 
 		// Initialize new render target views.
 		{
@@ -329,7 +318,7 @@ namespace Panther
 			// Create a RTV for each frame.
 			for (uint32 n = 0; n < 2; n++)
 			{
-				m_RenderTargets[n] = std::make_unique<DX12RenderTarget>(*m_D3DSwapChain.Get(), n);
+				m_RenderTargets[n] = std::make_unique<DX12RenderTarget>(m_SwapChain->GetSwapChain(), n);
 				m_RTVDescriptorHeap->RegisterRenderTarget(*m_RenderTargets[n].get());
 			}
 		}
@@ -369,14 +358,6 @@ namespace Panther
 		return true;
 	}
 
-	void DX12Renderer::Present()
-	{
-		if (m_Window.GetVSync())
-			ThrowIfFailed(m_D3DSwapChain->Present1(1, 0, &m_PresentParameters))
-		else
-			ThrowIfFailed(m_D3DSwapChain->Present1(0, 0, &m_PresentParameters))
-	}
-
 	bool DX12Renderer::WaitForPreviousFrame()
 	{
 		// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
@@ -404,7 +385,7 @@ namespace Panther
 			CloseHandle(eventHandle);
 		}
 
-		m_FrameIndex = m_D3DSwapChain->GetCurrentBackBufferIndex();
+		m_FrameIndex = m_SwapChain->GetSwapChain().GetCurrentBackBufferIndex();
 		return true;
 	}
 }

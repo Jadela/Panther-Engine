@@ -3,6 +3,7 @@
 namespace Panther
 {
 	class Adapter;
+	class SwapChain;
 	class DX12CommandList;
 	class DX12DescriptorHeap;
 
@@ -45,16 +46,12 @@ namespace Panther
 		// Factory methods
 		// DXGI
 		Microsoft::WRL::ComPtr<IDXGIFactory4> CreateDXGIFactory();
-		Microsoft::WRL::ComPtr<IDXGISwapChain3> CreateSwapChain(Microsoft::WRL::ComPtr<IDXGIFactory4>& a_DXGIFactory, 
-			Microsoft::WRL::ComPtr<ID3D12CommandQueue>& a_CommandQueue, HWND a_Window, const DXGI_SWAP_CHAIN_DESC1& a_SwapChainDesc,
-			const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_SwapChainFullscreenDesc);
 		// D3D12
 		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
 			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
 
 		// Other private methods
 		bool ResizeSwapChain(uint32 width, uint32 height);
-		void Present();
 		bool WaitForPreviousFrame();
 
 		std::unique_ptr<Adapter> m_Adapter = nullptr;
@@ -65,14 +62,13 @@ namespace Panther
 
 		Microsoft::WRL::ComPtr<ID3D12Device> m_D3DDevice = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3DCommandQueue = nullptr;
-		Microsoft::WRL::ComPtr<IDXGISwapChain3> m_D3DSwapChain = nullptr;
+		std::unique_ptr<SwapChain> m_SwapChain = nullptr;
 		std::unique_ptr<DX12RenderTarget> m_RenderTargets[2] = { nullptr, nullptr };
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_depthStencil = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DCommandAllocator = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DBundleAllocator = nullptr;
 		D3D12_VIEWPORT m_D3DViewport;
 		D3D12_RECT m_D3DRectScissor;
-		DXGI_PRESENT_PARAMETERS m_PresentParameters;
 		std::unique_ptr<DX12CommandList> m_CommandList = nullptr;
 
 		// Synchronization objects.
