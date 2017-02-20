@@ -6,6 +6,7 @@ namespace Panther
 	class SwapChain;
 	class DX12CommandList;
 	class DX12DescriptorHeap;
+	class DX12RenderTarget;
 
 	class DX12Renderer final : public Renderer
 	{
@@ -31,36 +32,30 @@ namespace Panther
 		void EndRender() final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
+		DX12DescriptorHeap& GetRTVDescriptorHeap() { return *m_RTVDescriptorHeap.get(); }
+		DX12DescriptorHeap& GetDSVDescriptorHeap() { return *m_DSVDescriptorHeap.get(); }
+		ID3D12Device& GetDevice() { return *m_D3DDevice.Get(); }
 		SwapChain& GetSwapChain() { return *m_SwapChain.get(); }
+		std::unique_ptr<DX12RenderTarget>* GetRenderTargets() { return m_RenderTargets; }
+		ID3D12CommandAllocator* GetCommandAllocatorDirect() { return m_D3DCommandAllocator.Get(); }
+		ID3D12CommandAllocator* GetCommandAllocatorBundle() { return m_D3DBundleAllocator.Get(); }
+		DX12CommandList& GetCommandList() { return *m_CommandList.get(); }
+		D3D12_VIEWPORT& GetViewport() { return m_D3DViewport; }
+		D3D12_RECT& GetScissorRect() { return m_D3DRectScissor; }
 
 	private:
-		friend class Scene;
-		friend class DemoScene;
+		DX12Renderer(const DX12Renderer& other) = delete;
 
-		friend class DX12Texture;
-		friend class DX12Sampler;
-		friend class DX12Buffer;
-		friend class DX12Material;
-		friend class DX12CommandList;
-		friend class DX12RenderTarget;
-
-		// Factory methods
-		// DXGI
 		Microsoft::WRL::ComPtr<IDXGIFactory5> CreateDXGIFactory();
-		// D3D12
 		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
 			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
-
-		// Other private methods
 		bool ResizeSwapChain(uint32 width, uint32 height);
 		bool WaitForPreviousFrame();
 
+	private:
 		std::unique_ptr<Adapter> m_Adapter = nullptr;
-
-		// Pipeline objects.
-		std::unique_ptr<Panther::DX12DescriptorHeap> m_RTVDescriptorHeap = nullptr;
-		std::unique_ptr<Panther::DX12DescriptorHeap> m_DSVDescriptorHeap = nullptr;
-
+		std::unique_ptr<DX12DescriptorHeap> m_RTVDescriptorHeap = nullptr;
+		std::unique_ptr<DX12DescriptorHeap> m_DSVDescriptorHeap = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Device> m_D3DDevice = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3DCommandQueue = nullptr;
 		std::unique_ptr<SwapChain> m_SwapChain = nullptr;
@@ -71,11 +66,7 @@ namespace Panther
 		D3D12_VIEWPORT m_D3DViewport;
 		D3D12_RECT m_D3DRectScissor;
 		std::unique_ptr<DX12CommandList> m_CommandList = nullptr;
-
-		// Synchronization objects.
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_D3DFence;
 		uint64 m_FenceValue = 0;
-
-		DX12Renderer(const DX12Renderer& other) = delete;
 	};
 }

@@ -5,7 +5,6 @@
 
 namespace Panther
 {
-
 	class Transform
 	{
 	public:
@@ -23,13 +22,12 @@ namespace Panther
 		void Rotate(DirectX::XMVECTOR a_Rotation);
 		void Scale(DirectX::XMVECTOR a_Scale);
 
+		DirectX::XMVECTOR GetPosition() { return m_Position; }
+		DirectX::XMVECTOR GetRotation() { return m_Rotation; }
+		DirectX::XMVECTOR GetScale() { return m_Scale; }
 		DirectX::XMMATRIX GetTransformMatrix();
 
-	protected:
-
 	private:
-		friend class Camera;
-
 		DirectX::XMVECTOR m_Position;
 		DirectX::XMVECTOR m_Rotation;
 		DirectX::XMVECTOR m_Scale;

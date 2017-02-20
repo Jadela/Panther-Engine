@@ -36,12 +36,11 @@ namespace Panther
 		virtual void EndRender() = 0;
 		virtual void OnResize(uint32 a_Width, uint32 a_Height) = 0;
 
-	protected:
-		friend class Scene;
-		friend class DemoScene;
+		Window& GetWindow() { return m_Window; }
 
+	protected:
 		bool m_APIInitialized = false;
-		Window &m_Window;
+		Window& m_Window;
 
 	private:
 		Renderer() = delete;

@@ -18,10 +18,10 @@ namespace Panther
 			throw std::runtime_error("Panther DX12 ERROR: Trying to create a command list of unsupported type!");
 
 		ID3D12CommandAllocator* allocator = (m_CommandListType == D3D12_COMMAND_LIST_TYPE_DIRECT) 
-			? m_Renderer.m_D3DCommandAllocator.Get() : m_Renderer.m_D3DBundleAllocator.Get();
+			? m_Renderer.GetCommandAllocatorDirect() : m_Renderer.GetCommandAllocatorBundle();
 		ID3D12PipelineState* PSO = a_Material ? a_Material->GetPSO() : nullptr;
 
-		HRESULT hr = m_Renderer.m_D3DDevice->CreateCommandList(0, m_CommandListType, allocator, PSO, IID_PPV_ARGS(&m_CommandList));
+		HRESULT hr = m_Renderer.GetDevice().CreateCommandList(0, m_CommandListType, allocator, PSO, IID_PPV_ARGS(&m_CommandList));
 		if (FAILED(hr))
 			throw std::runtime_error("Panther DX12 ERROR: Creation of command list failed!");
 	}
@@ -32,11 +32,11 @@ namespace Panther
 
 	void DX12CommandList::SetAndClearRenderTarget(const float a_Color[4])
 	{
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.m_RTVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-			m_Renderer.GetSwapChain().GetCurrentBackBufferIndex(), m_Renderer.m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.m_DSVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.GetRTVDescriptorHeap().m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+			m_Renderer.GetSwapChain().GetCurrentBackBufferIndex(), m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.GetDSVDescriptorHeap().m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-		m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+		m_CommandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 		m_CommandList->ClearRenderTargetView(rtvHandle, a_Color, 0, nullptr);
 		m_CommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	}
@@ -63,7 +63,7 @@ namespace Panther
 	{
 		DX12DescriptorHeap* descriptorHeap = static_cast<DX12DescriptorHeap*>(&a_DescriptorHeap);
 		CD3DX12_GPU_DESCRIPTOR_HANDLE descriptorHeapGPUHandle(descriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), 
-			a_HeapElementOffset, m_Renderer.m_D3DDevice->GetDescriptorHandleIncrementSize(descriptorHeap->m_Type));
+			a_HeapElementOffset, m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(descriptorHeap->m_Type));
 
 		m_CommandList->SetGraphicsRootDescriptorTable(a_Slot.m_Slot, descriptorHeapGPUHandle);
 	}
@@ -80,8 +80,8 @@ namespace Panther
 
 	void DX12CommandList::UseDefaultViewport()
 	{
-		m_CommandList->RSSetViewports(1, &m_Renderer.m_D3DViewport);
-		m_CommandList->RSSetScissorRects(1, &m_Renderer.m_D3DRectScissor);
+		m_CommandList->RSSetViewports(1, &m_Renderer.GetViewport());
+		m_CommandList->RSSetScissorRects(1, &m_Renderer.GetScissorRect());
 	}
 
 	void DX12CommandList::ExecuteBundle(CommandList& a_Bundle)
@@ -100,7 +100,7 @@ namespace Panther
 
 	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
 	{
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.m_RenderTargets[m_Renderer.GetSwapChain().GetCurrentBackBufferIndex()]->m_TargetBuffer.Get(), a_OldState, a_NewState));
+		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.GetRenderTargets()[m_Renderer.GetSwapChain().GetCurrentBackBufferIndex()]->m_TargetBuffer.Get(), a_OldState, a_NewState));
 	}
 
 	void DX12CommandList::Close()
@@ -113,7 +113,7 @@ namespace Panther
 	void DX12CommandList::Reset(DX12Material* a_Material)
 	{
 		ID3D12CommandAllocator* allocator = (m_CommandListType == D3D12_COMMAND_LIST_TYPE_DIRECT)
-			? m_Renderer.m_D3DCommandAllocator.Get() : m_Renderer.m_D3DBundleAllocator.Get();
+			? m_Renderer.GetCommandAllocatorDirect() : m_Renderer.GetCommandAllocatorBundle();
 		ID3D12PipelineState* PSO = a_Material ? a_Material->GetPSO() : nullptr;
 		
 		// However, when ExecuteCommandList() is called on a particular command

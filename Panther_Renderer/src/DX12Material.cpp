@@ -166,7 +166,7 @@ namespace Panther
 			std::string errorString = static_cast<char*>(error->GetBufferPointer());
 			throw std::runtime_error("Could not serialize root signature: " + errorString);
 		}
-		hr = m_Renderer.m_D3DDevice->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
+		hr = m_Renderer.GetDevice().CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
 		if (FAILED(hr)) throw std::runtime_error("Could not create root signature.");
 
 		D3D12_DEPTH_STENCIL_DESC DSDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
@@ -187,7 +187,7 @@ namespace Panther
 		PSDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		PSDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		PSDesc.SampleDesc.Count = 1;
-		hr = m_Renderer.m_D3DDevice->CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineState));
+		hr = m_Renderer.GetDevice().CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineState));
 		if (FAILED(hr)) throw std::runtime_error("Could not create graphics pipeline state.");
 	}
 

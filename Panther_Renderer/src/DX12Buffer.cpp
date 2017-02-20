@@ -9,7 +9,7 @@ namespace Panther
 	Panther::DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, size_t a_BufferSize)
 		: Buffer(a_BufferSize, BufferType::ConstantBuffer), m_Renderer(a_Renderer)
 	{
-		HRESULT hr = m_Renderer.m_D3DDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		HRESULT hr = m_Renderer.GetDevice().CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(1024 * a_BufferSize), D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr, IID_PPV_ARGS(&m_ConstantBuffer));
 		if (FAILED(hr))
@@ -28,7 +28,7 @@ namespace Panther
 	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, DX12CommandList& a_CommandList, const void* a_Data, size_t a_Size, size_t a_ElementSize)
 		: Buffer(a_Size, BufferType::UploadBuffer), m_Renderer(a_Renderer)
 	{
-		HRESULT hr = m_Renderer.m_D3DDevice->CreateCommittedResource(
+		HRESULT hr = m_Renderer.GetDevice().CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(a_Size),
@@ -38,7 +38,7 @@ namespace Panther
 		if (FAILED(hr))
 			throw std::runtime_error("Panther DX12 ERROR: Creating GPU buffer failed!");
 
-		hr = m_Renderer.m_D3DDevice->CreateCommittedResource(
+		hr = m_Renderer.GetDevice().CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(a_Size),
