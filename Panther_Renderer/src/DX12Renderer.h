@@ -13,7 +13,6 @@ namespace Panther
 		DX12Renderer(Window& window);
 		virtual ~DX12Renderer() final override;
 
-		// Public methods
 		bool Initialize() final override;
 		CommandList& StartRecording() final override;
 		void SubmitCommandLists(CommandList** a_CommandLists, uint32 a_NumCommandLists) final override;
@@ -32,6 +31,8 @@ namespace Panther
 		void EndRender() final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
+		SwapChain& GetSwapChain() { return *m_SwapChain.get(); }
+
 	private:
 		friend class Scene;
 		friend class DemoScene;
@@ -45,7 +46,7 @@ namespace Panther
 
 		// Factory methods
 		// DXGI
-		Microsoft::WRL::ComPtr<IDXGIFactory4> CreateDXGIFactory();
+		Microsoft::WRL::ComPtr<IDXGIFactory5> CreateDXGIFactory();
 		// D3D12
 		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
 			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
@@ -72,7 +73,6 @@ namespace Panther
 		std::unique_ptr<DX12CommandList> m_CommandList = nullptr;
 
 		// Synchronization objects.
-		uint32 m_FrameIndex;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_D3DFence;
 		uint64 m_FenceValue = 0;
 

@@ -6,6 +6,7 @@
 #include "DX12Material.h"
 #include "DX12Mesh.h"
 #include "DX12RenderTarget.h"
+#include "SwapChain.h"
 
 namespace Panther
 {
@@ -32,7 +33,7 @@ namespace Panther
 	void DX12CommandList::SetAndClearRenderTarget(const float a_Color[4])
 	{
 		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.m_RTVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-			m_Renderer.m_FrameIndex, m_Renderer.m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+			m_Renderer.GetSwapChain().GetCurrentBackBufferIndex(), m_Renderer.m_D3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.m_DSVDescriptorHeap->m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 		m_CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
@@ -99,7 +100,7 @@ namespace Panther
 
 	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
 	{
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.m_RenderTargets[m_Renderer.m_FrameIndex]->m_TargetBuffer.Get(), a_OldState, a_NewState));
+		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.m_RenderTargets[m_Renderer.GetSwapChain().GetCurrentBackBufferIndex()]->m_TargetBuffer.Get(), a_OldState, a_NewState));
 	}
 
 	void DX12CommandList::Close()

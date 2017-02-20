@@ -74,7 +74,7 @@ namespace Panther
 		}
 #endif
 
-		ComPtr<IDXGIFactory4> DXGIFactory = CreateDXGIFactory();
+		ComPtr<IDXGIFactory5> DXGIFactory = CreateDXGIFactory();
 		m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0); // Get primary adapter.
 
 		// Create hardware-based D3D12 device. If that fails, fallback to WARP/software.
@@ -254,9 +254,9 @@ namespace Panther
 		ResizeSwapChain(a_Width, a_Height);
 	}
 
-	ComPtr<IDXGIFactory4> DX12Renderer::CreateDXGIFactory()
+	ComPtr<IDXGIFactory5> DX12Renderer::CreateDXGIFactory()
 	{
-		ComPtr<IDXGIFactory4> DXGIFactory = nullptr;
+		ComPtr<IDXGIFactory5> DXGIFactory = nullptr;
 		UINT flags = 0;
 #if defined(_DEBUG)
 		flags |= DXGI_CREATE_FACTORY_DEBUG;
@@ -309,8 +309,6 @@ namespace Panther
 
 		// Resize the swap chain buffers.
 		m_SwapChain->Resize(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
-
-		m_FrameIndex = m_SwapChain->GetSwapChain().GetCurrentBackBufferIndex();
 
 		// Initialize new render target views.
 		{
@@ -384,8 +382,6 @@ namespace Panther
 			WaitForSingleObject(eventHandle, INFINITE);
 			CloseHandle(eventHandle);
 		}
-
-		m_FrameIndex = m_SwapChain->GetSwapChain().GetCurrentBackBufferIndex();
 		return true;
 	}
 }

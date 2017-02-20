@@ -14,6 +14,7 @@ namespace Panther
 
 		void Present(bool a_Vsync);
 		void Resize(uint32 a_NumBuffers, uint32 a_Width, uint32 a_Height, DXGI_FORMAT a_NewFormat);
+		uint32 GetCurrentBackBufferIndex() { return m_SwapChain->GetCurrentBackBufferIndex(); }
 
 	private:
 		SwapChain() = delete;
