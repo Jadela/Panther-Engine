@@ -14,14 +14,14 @@ namespace Panther
 		DX12Buffer(const DX12Buffer&) = delete;
 		virtual ~DX12Buffer() final override {}
 
-	private:
-		friend class DX12DescriptorHeap;
-		friend class DX12Mesh;
+		const D3D12_CONSTANT_BUFFER_VIEW_DESC& GetDescription() { return m_CBufferViewDescription; }
+		ID3D12Resource& GetGPUBuffer() { return *m_GPUBuffer.Get(); }
 
+	private:
 		DX12Renderer& m_Renderer;
 
 		// Constant buffer
-		D3D12_CONSTANT_BUFFER_VIEW_DESC m_CBufferViewDescriptor = {};
+		D3D12_CONSTANT_BUFFER_VIEW_DESC m_CBufferViewDescription = {};
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_ConstantBuffer = nullptr;
 
 		// Upload buffer

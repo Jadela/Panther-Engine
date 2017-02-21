@@ -25,12 +25,12 @@ namespace Panther
 		m_IndexBuffer = m_Renderer.CreateBuffer(a_CommandList, &m_Indices[0], indicesSize, sizeof(Index));
 		
 		// Initialize the vertex buffer view.
-		m_VertexBufferView.BufferLocation = static_cast<DX12Buffer*>(m_VertexBuffer.get())->m_GPUBuffer->GetGPUVirtualAddress();
+		m_VertexBufferView.BufferLocation = static_cast<DX12Buffer*>(m_VertexBuffer.get())->GetGPUBuffer().GetGPUVirtualAddress();
 		m_VertexBufferView.StrideInBytes = sizeof(Vertex);
 		m_VertexBufferView.SizeInBytes = (UINT)verticesSize;
 		
 		// Describe the index buffer view.
-		m_IndexBufferView.BufferLocation = static_cast<DX12Buffer*>(m_IndexBuffer.get())->m_GPUBuffer->GetGPUVirtualAddress();
+		m_IndexBufferView.BufferLocation = static_cast<DX12Buffer*>(m_IndexBuffer.get())->GetGPUBuffer().GetGPUVirtualAddress();
 		m_IndexBufferView.Format = DXGI_FORMAT_R16_UINT;
 		m_IndexBufferView.SizeInBytes = (UINT)indicesSize;
 	}

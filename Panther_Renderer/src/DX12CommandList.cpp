@@ -55,8 +55,8 @@ namespace Panther
 		DX12Mesh* mesh = static_cast<DX12Mesh*>(&a_Mesh);
 
 		m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_CommandList->IASetVertexBuffers(0, 1, &mesh->m_VertexBufferView);
-		m_CommandList->IASetIndexBuffer(&mesh->m_IndexBufferView);
+		m_CommandList->IASetVertexBuffers(0, 1, &mesh->GetVertexBufferView());
+		m_CommandList->IASetIndexBuffer(&mesh->GetIndexBufferView());
 	}
 
 	void DX12CommandList::SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset)

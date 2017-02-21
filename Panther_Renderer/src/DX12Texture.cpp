@@ -52,9 +52,9 @@ namespace Panther
 		textureData.RowPitch = m_Width * 4;
 		textureData.SlicePitch = m_Width * m_Height * 4;
 
-		UpdateSubresources(m_Renderer.GetCommandList().m_CommandList.Get(), m_GPUResource.Get(), m_UploadResource.Get(), 0, 0, subresourceCount,
+		UpdateSubresources(&m_Renderer.GetCommandList().GetCommandList(), m_GPUResource.Get(), m_UploadResource.Get(), 0, 0, subresourceCount,
 			&textureData);
-		m_Renderer.GetCommandList().m_CommandList.Get()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GPUResource.Get(),
+		m_Renderer.GetCommandList().GetCommandList().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GPUResource.Get(),
 			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 	}
 }

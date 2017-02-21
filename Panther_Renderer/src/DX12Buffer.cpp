@@ -15,8 +15,8 @@ namespace Panther
 		if (FAILED(hr))
 			throw std::runtime_error("Panther DX12 ERROR: Creating resource for Buffer failed!");
 
-		m_CBufferViewDescriptor.BufferLocation = m_ConstantBuffer->GetGPUVirtualAddress();
-		m_CBufferViewDescriptor.SizeInBytes = (a_BufferSize + 255) & ~255;	// CB size is required to be 256-byte aligned.
+		m_CBufferViewDescription.BufferLocation = m_ConstantBuffer->GetGPUVirtualAddress();
+		m_CBufferViewDescription.SizeInBytes = (a_BufferSize + 255) & ~255;	// CB size is required to be 256-byte aligned.
 
 		// Map the constant buffers. We don't unmap this until the
 		// app closes. Keeping things mapped for the lifetime of the resource is okay.
@@ -55,9 +55,9 @@ namespace Panther
 		subRscData.RowPitch = a_ElementSize;
 		subRscData.SlicePitch = a_ElementSize;
 
-		UpdateSubresources(a_CommandList.m_CommandList.Get(), m_GPUBuffer.Get(), m_UploadBuffer.Get(), 0, 0, 1,
+		UpdateSubresources(&a_CommandList.GetCommandList(), m_GPUBuffer.Get(), m_UploadBuffer.Get(), 0, 0, 1,
 			&subRscData);
-		a_CommandList.m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GPUBuffer.Get(),
+		a_CommandList.GetCommandList().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GPUBuffer.Get(),
 			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
 	}
 }

@@ -36,7 +36,7 @@ namespace Panther
 		DX12Buffer& constantBuffer(*static_cast<DX12Buffer*>(&a_ConstantBuffer));
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
-			m_D3DDevice.CreateConstantBufferView(&constantBuffer.m_CBufferViewDescriptor, m_DescriptorHandle);
+			m_D3DDevice.CreateConstantBufferView(&constantBuffer.GetDescription(), m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 			return m_Offset++;
 		}

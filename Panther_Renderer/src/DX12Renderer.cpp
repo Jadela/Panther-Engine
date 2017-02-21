@@ -164,7 +164,7 @@ namespace Panther
 	{
 		ID3D12CommandList** commandLists = new ID3D12CommandList*[a_NumCommandLists];
 		for (uint32 i = 0; i < a_NumCommandLists; ++i)
-			commandLists[i] = static_cast<DX12CommandList*>(a_CommandLists[i])->m_CommandList.Get();
+			commandLists[i] = &static_cast<DX12CommandList*>(a_CommandLists[i])->GetCommandList();
 
 		m_D3DCommandQueue->ExecuteCommandLists(a_NumCommandLists, commandLists);
 		delete[] commandLists;

@@ -25,13 +25,10 @@ namespace Panther
 		void Close() final override;
 
 		void Reset(DX12Material* a_Material = nullptr);
-	private:
-		// TODO (JDL): Get rid of this.
-		friend class DemoScene;
-		friend class DX12Buffer;
-		friend class DX12Renderer;
-		friend class DX12Texture;
 
+		ID3D12GraphicsCommandList& GetCommandList() { return *m_CommandList.Get(); }
+
+	private:
 		DX12Renderer& m_Renderer;
 		D3D12_COMMAND_LIST_TYPE m_CommandListType;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_CommandList = nullptr;
