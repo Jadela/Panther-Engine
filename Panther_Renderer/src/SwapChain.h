@@ -4,23 +4,36 @@
 
 namespace Panther
 {
+	class DX12DescriptorHeap;
+	class DX12RenderTarget;
+
 	class SwapChain
 	{
 	public:
-		static std::unique_ptr<SwapChain> CreateSwapchain(IDXGIFactory4& a_DXGIFactory, IUnknown& a_DeviceOrCommandQueue, 
-			HWND a_WindowHandle, const DXGI_SWAP_CHAIN_DESC1& a_Desc, const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_FullscreenDesc);
+		static std::unique_ptr<SwapChain> CreateSwapchain(IDXGIFactory4& a_DXGIFactory, ID3D12Device& a_Device, 
+			ID3D12CommandQueue& a_CommandQueue, HWND a_WindowHandle, const DXGI_SWAP_CHAIN_DESC1& a_Desc, 
+			const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_FullscreenDesc, DX12DescriptorHeap& a_RTVDescHeap, 
+			DX12DescriptorHeap& a_DSVDescHeap);
 
 		IDXGISwapChain3& GetSwapChain() { return *m_SwapChain.Get(); }
 
 		void Present(bool a_Vsync);
 		void Resize(uint32 a_NumBuffers, uint32 a_Width, uint32 a_Height, DXGI_FORMAT a_NewFormat);
 		uint32 GetCurrentBackBufferIndex() { return m_SwapChain->GetCurrentBackBufferIndex(); }
+		DX12RenderTarget& GetCurrentBackBuffer() { return *m_RenderTargets[GetCurrentBackBufferIndex()].get(); }
 
 	private:
 		SwapChain() = delete;
-		SwapChain(IDXGISwapChain3& a_SwapChain);
+		SwapChain(IDXGISwapChain3& a_SwapChain, ID3D12Device& a_Device, DX12DescriptorHeap& a_RTVDescHeap, DX12DescriptorHeap& a_DSVDescHeap);
+
+		static const int NumBackBuffers = 2;
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain3> m_SwapChain;
-		DXGI_PRESENT_PARAMETERS m_PresentParameters;
+		DXGI_PRESENT_PARAMETERS m_PresentParameters; 
+		std::unique_ptr<DX12RenderTarget> m_RenderTargets[NumBackBuffers] = { nullptr, nullptr };
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_DepthStencil = nullptr;
+		ID3D12Device& m_Device;
+		DX12DescriptorHeap& m_RTVDescHeap;
+		DX12DescriptorHeap& m_DSVDescHeap;
 	};
 }

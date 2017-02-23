@@ -100,7 +100,7 @@ namespace Panther
 
 	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
 	{
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.GetRenderTargets()[m_Renderer.GetSwapChain().GetCurrentBackBufferIndex()]->GetTargetBuffer(), a_OldState, a_NewState));
+		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.GetSwapChain().GetCurrentBackBuffer().GetTargetBuffer(), a_OldState, a_NewState));
 	}
 
 	void DX12CommandList::Close()

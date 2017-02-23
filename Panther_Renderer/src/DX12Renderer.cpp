@@ -98,6 +98,9 @@ namespace Panther
 
 		ThrowIfFailed(m_D3DDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_D3DCommandQueue)))
 
+		m_RTVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), 2, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		m_DSVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
 		// Swap chain
 		{
 			DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
@@ -115,23 +118,15 @@ namespace Panther
 			swapChainFullScreenDesc.RefreshRate = QueryRefreshRate(m_Window.GetVSync(), *m_Adapter.get());
 			swapChainFullScreenDesc.Windowed = m_Window.GetWindowed();
 
-			m_SwapChain = SwapChain::CreateSwapchain(*DXGIFactory.Get(), *m_D3DCommandQueue.Get(), m_Window.GetHandle(), swapChainDesc, 
-				&swapChainFullScreenDesc);
+			m_SwapChain = SwapChain::CreateSwapchain(*DXGIFactory.Get(), *m_D3DDevice.Get(), *m_D3DCommandQueue.Get(), m_Window.GetHandle(), swapChainDesc, 
+				&swapChainFullScreenDesc, *m_RTVDescriptorHeap.get(), *m_DSVDescriptorHeap.get());
 		}
 
-		// Render target view (RTV) heap.
-		uint32 numDescriptors = 2;
-		m_RTVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), numDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-		// Depth stencil view (DSV) heap.
-		numDescriptors = 1;
-		m_DSVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), numDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		ResizeSwapChain(m_Window.GetWidth(), m_Window.GetHeight());
 
 		// Create command allocators.
 		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_D3DCommandAllocator)))
 		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&m_D3DBundleAllocator)))
-
-		if (!ResizeSwapChain(m_Window.GetWidth(), m_Window.GetHeight())) throw std::runtime_error("Failed to resize the swap chain.");
 
 		// Create synchronization objects.
 		ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)))
@@ -293,55 +288,15 @@ namespace Panther
 		return D3D12Device;
 	}
 
-	inline bool DX12Renderer::ResizeSwapChain(uint32 width, uint32 height)
+	void DX12Renderer::ResizeSwapChain(uint32 width, uint32 height)
 	{
 		assert(m_SwapChain);
 		// Don't allow for 0 size swap chain buffers.
 		if (width <= 0) width = 1;
 		if (height <= 0) height = 1;
 
-		// Release the render target views.
-		for (int32 i = 0; i < 2; i++)
-		{
-			m_RenderTargets[i].reset();
-		}
-		m_depthStencil.Reset();
-
 		// Resize the swap chain buffers.
 		m_SwapChain->Resize(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
-
-		// Initialize new render target views.
-		{
-			m_RTVDescriptorHeap->SetCPUHandleIndex(0);
-			// Create a RTV for each frame.
-			for (uint32 n = 0; n < 2; n++)
-			{
-				m_RenderTargets[n] = std::make_unique<DX12RenderTarget>(m_SwapChain->GetSwapChain(), n);
-				m_RTVDescriptorHeap->RegisterRenderTarget(*m_RenderTargets[n].get());
-			}
-		}
-
-		// Create the depth stencil view.
-		{
-			m_DSVDescriptorHeap->SetCPUHandleIndex(0);
-
-			D3D12_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
-			depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
-			depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-			depthStencilDesc.Flags = D3D12_DSV_FLAG_NONE;
-
-			D3D12_CLEAR_VALUE depthOptimizedClearValue = {};
-			depthOptimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-			depthOptimizedClearValue.DepthStencil.Depth = 1.0f;
-			depthOptimizedClearValue.DepthStencil.Stencil = 0;
-
-			ThrowIfFailed(m_D3DDevice->CreateCommittedResource(
-				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Tex2D(
-					DXGI_FORMAT_D32_FLOAT, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-				D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthOptimizedClearValue, IID_PPV_ARGS(&m_depthStencil)))
-
-			m_DSVDescriptorHeap->RegisterDepthStencil(*m_depthStencil.Get(), depthStencilDesc);
-		}
 
 		// Initialize viewport and scissor rect.
 		ZeroMemory(&m_D3DViewport, sizeof(m_D3DViewport));
@@ -352,8 +307,6 @@ namespace Panther
 		ZeroMemory(&m_D3DRectScissor, sizeof(m_D3DRectScissor));
 		m_D3DRectScissor.right = static_cast<LONG>(m_Window.GetWidth());
 		m_D3DRectScissor.bottom = static_cast<LONG>(m_Window.GetHeight());
-
-		return true;
 	}
 
 	bool DX12Renderer::WaitForPreviousFrame()

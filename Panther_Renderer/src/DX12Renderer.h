@@ -36,7 +36,6 @@ namespace Panther
 		DX12DescriptorHeap& GetDSVDescriptorHeap() { return *m_DSVDescriptorHeap.get(); }
 		ID3D12Device& GetDevice() { return *m_D3DDevice.Get(); }
 		SwapChain& GetSwapChain() { return *m_SwapChain.get(); }
-		std::unique_ptr<DX12RenderTarget>* GetRenderTargets() { return m_RenderTargets; }
 		ID3D12CommandAllocator* GetCommandAllocatorDirect() { return m_D3DCommandAllocator.Get(); }
 		ID3D12CommandAllocator* GetCommandAllocatorBundle() { return m_D3DBundleAllocator.Get(); }
 		DX12CommandList& GetCommandList() { return *m_CommandList.get(); }
@@ -49,7 +48,7 @@ namespace Panther
 		Microsoft::WRL::ComPtr<IDXGIFactory5> CreateDXGIFactory();
 		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
 			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
-		bool ResizeSwapChain(uint32 width, uint32 height);
+		void ResizeSwapChain(uint32 width, uint32 height);
 		bool WaitForPreviousFrame();
 
 	private:
@@ -59,8 +58,6 @@ namespace Panther
 		Microsoft::WRL::ComPtr<ID3D12Device> m_D3DDevice = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_D3DCommandQueue = nullptr;
 		std::unique_ptr<SwapChain> m_SwapChain = nullptr;
-		std::unique_ptr<DX12RenderTarget> m_RenderTargets[2] = { nullptr, nullptr };
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_depthStencil = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DCommandAllocator = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DBundleAllocator = nullptr;
 		D3D12_VIEWPORT m_D3DViewport;
