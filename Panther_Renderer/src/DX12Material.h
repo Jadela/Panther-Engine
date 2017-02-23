@@ -19,12 +19,9 @@ namespace Panther
 
 		ID3D12PipelineState* GetPSO();
 		ID3D12RootSignature* GetRootSig();
-	protected:
 
 	private:
 		DX12Material(const DX12Material&) = delete;
-
-		friend class DX12CommandList;
 
 		// Renderer reference
 		DX12Renderer& m_Renderer;

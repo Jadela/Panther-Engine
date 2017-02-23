@@ -12,9 +12,9 @@ namespace Panther
 		DX12RenderTarget(IDXGISwapChain3& a_SwapChain, uint32 a_BufferIndex);
 		~DX12RenderTarget();
 
+		ID3D12Resource* GetTargetBuffer() { return m_TargetBuffer.Get(); }
+
 	protected:
-		friend class DX12CommandList;
-		friend class DX12DescriptorHeap;
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_TargetBuffer = nullptr;
 	};
 }

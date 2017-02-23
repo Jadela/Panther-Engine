@@ -15,9 +15,9 @@ namespace Panther
 
 		virtual void Upload() final override;
 
+		ID3D12Resource* GetGPUResource() { return m_GPUResource.Get(); }
+		D3D12_SHADER_RESOURCE_VIEW_DESC& GetSRVDesc() { return m_ShaderResourceViewDescriptor; }
 	private:
-		friend class DX12DescriptorHeap;
-
 		DX12Renderer& m_Renderer;
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_GPUResource = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_UploadResource = nullptr;

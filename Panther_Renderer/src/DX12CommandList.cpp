@@ -32,9 +32,9 @@ namespace Panther
 
 	void DX12CommandList::SetAndClearRenderTarget(const float a_Color[4])
 	{
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.GetRTVDescriptorHeap().m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.GetRTVDescriptorHeap().GetDescriptorHeap().GetCPUDescriptorHandleForHeapStart(),
 			m_Renderer.GetSwapChain().GetCurrentBackBufferIndex(), m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.GetDSVDescriptorHeap().m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.GetDSVDescriptorHeap().GetDescriptorHeap().GetCPUDescriptorHandleForHeapStart());
 
 		m_CommandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 		m_CommandList->ClearRenderTargetView(rtvHandle, a_Color, 0, nullptr);
@@ -62,8 +62,8 @@ namespace Panther
 	void DX12CommandList::SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset)
 	{
 		DX12DescriptorHeap* descriptorHeap = static_cast<DX12DescriptorHeap*>(&a_DescriptorHeap);
-		CD3DX12_GPU_DESCRIPTOR_HANDLE descriptorHeapGPUHandle(descriptorHeap->m_D3DDescriptorHeap->GetGPUDescriptorHandleForHeapStart(), 
-			a_HeapElementOffset, m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(descriptorHeap->m_Type));
+		CD3DX12_GPU_DESCRIPTOR_HANDLE descriptorHeapGPUHandle(descriptorHeap->GetDescriptorHeap().GetGPUDescriptorHandleForHeapStart(),
+			a_HeapElementOffset, m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(descriptorHeap->GetType()));
 
 		m_CommandList->SetGraphicsRootDescriptorTable(a_Slot.m_Slot, descriptorHeapGPUHandle);
 	}
@@ -72,7 +72,7 @@ namespace Panther
 	{
 		ID3D12DescriptorHeap** D3DDescriptorHeaps = new ID3D12DescriptorHeap*[a_NumDescriptorHeaps];
 		for (uint32 i = 0; i < a_NumDescriptorHeaps; ++i)
-			D3DDescriptorHeaps[i] = static_cast<DX12DescriptorHeap*>(a_DescriptorHeaps[i])->m_D3DDescriptorHeap.Get();
+			D3DDescriptorHeaps[i] = &static_cast<DX12DescriptorHeap*>(a_DescriptorHeaps[i])->GetDescriptorHeap();
 
 		m_CommandList->SetDescriptorHeaps(a_NumDescriptorHeaps, D3DDescriptorHeaps);
 		delete[] D3DDescriptorHeaps;
@@ -100,7 +100,7 @@ namespace Panther
 
 	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
 	{
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.GetRenderTargets()[m_Renderer.GetSwapChain().GetCurrentBackBufferIndex()]->m_TargetBuffer.Get(), a_OldState, a_NewState));
+		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.GetRenderTargets()[m_Renderer.GetSwapChain().GetCurrentBackBufferIndex()]->GetTargetBuffer(), a_OldState, a_NewState));
 	}
 
 	void DX12CommandList::Close()
