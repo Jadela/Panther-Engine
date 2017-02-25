@@ -9,11 +9,18 @@ using namespace Microsoft::WRL;
 
 namespace Panther
 {
+	uint32 SwapChain::s_RTVDescriptorSize = -1;
+
 	std::unique_ptr<SwapChain> SwapChain::CreateSwapchain(IDXGIFactory4& a_DXGIFactory, ID3D12Device& a_Device,
 		ID3D12CommandQueue& a_CommandQueue, HWND a_WindowHandle, const DXGI_SWAP_CHAIN_DESC1& a_Desc, 
 		const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_FullscreenDesc, DX12DescriptorHeap& a_RTVDescHeap, 
 		DX12DescriptorHeap& a_DSVDescHeap)
 	{
+		if (s_RTVDescriptorSize == -1)
+		{
+			s_RTVDescriptorSize = a_Device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		}
+
 		IDXGISwapChain3* swapChain = nullptr;
 		IDXGISwapChain1* swapChain1 = nullptr;
 		// Swap chain needs the queue so that it can force a flush on it.
@@ -71,6 +78,17 @@ namespace Panther
 
 			m_DSVDescHeap.RegisterDepthStencil(*m_DepthStencil.Get(), depthStencilDesc);
 		}
+	}
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE SwapChain::GetRTVDescriptorHandle()
+	{
+		return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_RTVDescHeap.GetDescriptorHeap().GetCPUDescriptorHandleForHeapStart(),
+			m_SwapChain->GetCurrentBackBufferIndex(), s_RTVDescriptorSize);
+	}
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE SwapChain::GetDSVDescriptorHandle()
+	{
+		return CD3DX12_CPU_DESCRIPTOR_HANDLE(m_DSVDescHeap.GetDescriptorHeap().GetCPUDescriptorHandleForHeapStart());
 	}
 
 	SwapChain::SwapChain(IDXGISwapChain3& a_SwapChain, ID3D12Device& a_Device, DX12DescriptorHeap& a_RTVDescHeap, DX12DescriptorHeap& a_DSVDescHeap) :

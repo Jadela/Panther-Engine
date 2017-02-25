@@ -13,7 +13,7 @@ namespace Panther
 		DX12CommandList(DX12Renderer& a_Renderer, D3D12_COMMAND_LIST_TYPE a_CommandListType, DX12Material* a_Material = nullptr);
 		virtual ~DX12CommandList() final override;
 
-		void SetAndClearRenderTarget(const float a_Color[4]) final override;
+		void SetAndClearRenderTarget(SwapChain& a_SwapChain, const float a_Color[4]) final override;
 		void SetMaterial(Material& a_Material, bool a_ResetState) final override;
 		void SetMesh(Mesh& a_Mesh) final override;
 		void SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset) final override;

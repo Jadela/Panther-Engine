@@ -85,7 +85,7 @@ namespace Panther
 
 			if (!m_D3DDevice)
 			{
-				m_Adapter.reset(Adapter::GetAdapter(*DXGIFactory.Get(), 0, true).release());
+				m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0, true);
 				m_D3DDevice = TryCreateD3D12DeviceForAdapter(m_Adapter->GetAdapter(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 				if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
 			}
@@ -234,8 +234,14 @@ namespace Panther
 		return std::make_unique<DX12CommandList>(*this, a_Type, static_cast<DX12Material*>(a_Material));
 	}
 
-	void DX12Renderer::StartRender()
+	CommandList& DX12Renderer::StartRender()
 	{
+		CommandList& commandList(StartRecording());
+
+		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		commandList.SetAndClearRenderTarget(*m_SwapChain.get(), DirectX::Colors::CornflowerBlue);
+
+		return commandList;
 	}
 
 	void DX12Renderer::EndRender()
@@ -290,12 +296,6 @@ namespace Panther
 
 	void DX12Renderer::ResizeSwapChain(uint32 width, uint32 height)
 	{
-		assert(m_SwapChain);
-		// Don't allow for 0 size swap chain buffers.
-		if (width <= 0) width = 1;
-		if (height <= 0) height = 1;
-
-		// Resize the swap chain buffers.
 		m_SwapChain->Resize(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 		// Initialize viewport and scissor rect.

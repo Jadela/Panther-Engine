@@ -6,13 +6,14 @@ namespace Panther
 {
 	class DescriptorHeap;
 	class Mesh;
+	class SwapChain;
 
 	class CommandList
 	{
 	public:
 		virtual ~CommandList();
 
-		virtual void SetAndClearRenderTarget(const float a_Color[4]) = 0;
+		virtual void SetAndClearRenderTarget(SwapChain& a_SwapChain, const float a_Color[4]) = 0;
 		virtual void SetMaterial(Material& a_Material, bool a_ResetState) = 0;
 		virtual void SetMesh(Mesh& a_Mesh) = 0;
 		virtual void SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset) = 0;

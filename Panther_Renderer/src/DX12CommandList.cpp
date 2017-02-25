@@ -30,11 +30,10 @@ namespace Panther
 	{
 	}
 
-	void DX12CommandList::SetAndClearRenderTarget(const float a_Color[4])
+	void DX12CommandList::SetAndClearRenderTarget(SwapChain& a_SwapChain, const float a_Color[4])
 	{
-		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_Renderer.GetRTVDescriptorHeap().GetDescriptorHeap().GetCPUDescriptorHandleForHeapStart(),
-			m_Renderer.GetSwapChain().GetCurrentBackBufferIndex(), m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_Renderer.GetDSVDescriptorHeap().GetDescriptorHeap().GetCPUDescriptorHandleForHeapStart());
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(a_SwapChain.GetRTVDescriptorHandle());
+		CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(a_SwapChain.GetDSVDescriptorHandle());
 
 		m_CommandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 		m_CommandList->ClearRenderTargetView(rtvHandle, a_Color, 0, nullptr);

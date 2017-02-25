@@ -270,20 +270,17 @@ namespace Panther
 		m_WaterOffset = fmodf(m_WaterOffset + 0.05f * a_DT, 1.0f);
 	}
 
-	void DemoScene::Render()
+	void DemoScene::Render(CommandList& a_CommandList)
 	{
-		CommandList& commandList(m_Renderer.StartRecording());
-		commandList.UseDefaultViewport();
-		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-		commandList.SetAndClearRenderTarget(DirectX::Colors::CornflowerBlue);
+		a_CommandList.UseDefaultViewport();
 
 		DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-		commandList.UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
+		a_CommandList.UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 
 		XMMATRIX vpMatrix = m_Camera->GetViewProjectionMatrix();
 
 		// Use skydome shader
-		commandList.SetMaterial(*m_SkyDomeMaterial, true);
+		a_CommandList.SetMaterial(*m_SkyDomeMaterial, true);
 
 		struct SkydomeVertexCB
 		{
@@ -297,19 +294,19 @@ namespace Panther
 		};
 	
 		// Skydome	
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, m_SkydomeVertexCBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, m_SkydomeVertexCBufferSlot);
 		SkydomeVertexCB skydomeCB;
 		skydomeCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
 		skydomeCB.m_SunPos = XMVectorSet(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
 		m_SkydomeVertexCBuffer->CopyTo(&skydomeCB, sizeof(SkydomeVertexCB));
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, m_SkydomePixelCBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, m_SkydomePixelCBufferSlot);
 		SkydomePixelCB skydomeCB2;
 		skydomeCB2.m_ScreenResolution = XMVectorSet((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight(), 0, 0);
 		m_SkydomePixelCBuffer->CopyTo(&skydomeCB2, sizeof(SkydomePixelCB));
-		commandList.ExecuteBundle(*m_SkySphereBundle.get());
+		a_CommandList.ExecuteBundle(*m_SkySphereBundle.get());
 
 		// Use water shader
-		commandList.SetMaterial(*m_WaterMaterial, true);
+		a_CommandList.SetMaterial(*m_WaterMaterial, true);
 
 		struct WaterVertexCB
 		{
@@ -327,23 +324,23 @@ namespace Panther
 		};
 
 		// Water
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBSlot, m_WaterVertexCBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBSlot, m_WaterVertexCBufferSlot);
 		WaterVertexCB waterVertexCB;
 		waterVertexCB.m_WorldMatrix = m_WaterTransform->GetTransformMatrix();
 		waterVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
 		waterVertexCB.m_MVP = m_WaterTransform->GetTransformMatrix() * vpMatrix;
 		m_WaterVertexCBuffer->CopyTo(&waterVertexCB, sizeof(WaterVertexCB));
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBSlot, m_WaterPixelCBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBSlot, m_WaterPixelCBufferSlot);
 		WaterPixelCB waterPixelCB;
 		waterPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		waterPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		waterPixelCB.m_M = m_WaterTransform->GetTransformMatrix();
 		waterPixelCB.m_WaterOffset = m_WaterOffset;
 		m_WaterPixelCBuffer->CopyTo(&waterPixelCB, sizeof(WaterPixelCB));
-		commandList.ExecuteBundle(*m_WaterBundle.get());
+		a_CommandList.ExecuteBundle(*m_WaterBundle.get());
 
 		// Use default shader
-		commandList.SetMaterial(*m_DefaultMaterial, true);
+		a_CommandList.SetMaterial(*m_DefaultMaterial, true);
 
 		struct DefaultVertexCB
 		{
@@ -358,42 +355,42 @@ namespace Panther
 			XMVECTOR m_CameraPosition;
 		};
 
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultPixelCBSlot, m_LightPositionBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultPixelCBSlot, m_LightPositionBufferSlot);
 		DefaultPixelCB defaultPixelCB;
 		defaultPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		defaultPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		m_LightPositionBuffer->CopyTo(&defaultPixelCB, sizeof(DefaultPixelCB));
 
 		// Cube
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_CubeMatrixBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_CubeMatrixBufferSlot);
 		DefaultVertexCB defaultVertexCB;
 		defaultVertexCB.m_WorldMatrix = m_CubeTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_CubeTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_CubeTransform->GetTransformMatrix() * vpMatrix;
 		m_CubeMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
-		commandList.ExecuteBundle(*m_CubeBundle.get());
+		a_CommandList.ExecuteBundle(*m_CubeBundle.get());
 
 		// Sphere
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_SphereMatrixBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_SphereMatrixBufferSlot);
 		defaultVertexCB.m_WorldMatrix = m_SphereTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_SphereTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
 		m_SphereMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
-		commandList.ExecuteBundle(*m_SphereBundle.get());
+		a_CommandList.ExecuteBundle(*m_SphereBundle.get());
 
 		// Duck
-		commandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_DuckMatrixBufferSlot);
+		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_DuckMatrixBufferSlot);
 		defaultVertexCB.m_WorldMatrix = m_DuckTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_DuckTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
 		m_DuckMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
-		commandList.ExecuteBundle(*m_DuckBundle.get());
+		a_CommandList.ExecuteBundle(*m_DuckBundle.get());
 
 		// Indicate that the back buffer will now be used to present.
-		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		a_CommandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
-		commandList.Close();
-		CommandList* commandLists[] = { &commandList };
+		a_CommandList.Close();
+		CommandList* commandLists[] = { &a_CommandList };
 		m_Renderer.SubmitCommandLists(commandLists, 1);
 	}
 

@@ -23,7 +23,7 @@ namespace Panther
 		void Load() final override;
 		void Unload() final override;
 		void Update(float a_DT) final override;
-		void Render() final override;
+		void Render(CommandList& a_CommandList) final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 		void OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) final override;
 		void OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) final override;

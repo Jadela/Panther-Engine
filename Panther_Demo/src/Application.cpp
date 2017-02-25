@@ -77,12 +77,10 @@ namespace Panther
 				deltaTime = std::min<float>(deltaTime, maxTimeStep);
 				totalTime += deltaTime;
 
-				// Update
 				m_Scene->Update(deltaTime);
 
-				// Render
-				m_Renderer->StartRender();
-				m_Scene->Render();
+				CommandList& commandList(m_Renderer->StartRender());
+				m_Scene->Render(commandList);
 				m_Renderer->EndRender();
 			}
 		}

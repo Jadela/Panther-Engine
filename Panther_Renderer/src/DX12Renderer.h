@@ -28,12 +28,10 @@ namespace Panther
 		std::unique_ptr<Sampler> CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode = Sampler::TextureCoordinateMode::Wrap) final override;
 		std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) final override;
 
-		void StartRender() final override;
+		CommandList& StartRender() final override;
 		void EndRender() final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
-		DX12DescriptorHeap& GetRTVDescriptorHeap() { return *m_RTVDescriptorHeap.get(); }
-		DX12DescriptorHeap& GetDSVDescriptorHeap() { return *m_DSVDescriptorHeap.get(); }
 		ID3D12Device& GetDevice() { return *m_D3DDevice.Get(); }
 		SwapChain& GetSwapChain() { return *m_SwapChain.get(); }
 		ID3D12CommandAllocator* GetCommandAllocatorDirect() { return m_D3DCommandAllocator.Get(); }

@@ -19,14 +19,16 @@ namespace Panther
 
 		void Present(bool a_Vsync);
 		void Resize(uint32 a_NumBuffers, uint32 a_Width, uint32 a_Height, DXGI_FORMAT a_NewFormat);
-		uint32 GetCurrentBackBufferIndex() { return m_SwapChain->GetCurrentBackBufferIndex(); }
-		DX12RenderTarget& GetCurrentBackBuffer() { return *m_RenderTargets[GetCurrentBackBufferIndex()].get(); }
+		DX12RenderTarget& GetCurrentBackBuffer() { return *m_RenderTargets[m_SwapChain->GetCurrentBackBufferIndex()].get(); }
+		CD3DX12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandle();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE GetDSVDescriptorHandle();
 
 	private:
 		SwapChain() = delete;
 		SwapChain(IDXGISwapChain3& a_SwapChain, ID3D12Device& a_Device, DX12DescriptorHeap& a_RTVDescHeap, DX12DescriptorHeap& a_DSVDescHeap);
 
 		static const int NumBackBuffers = 2;
+		static uint32 s_RTVDescriptorSize;
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain3> m_SwapChain;
 		DXGI_PRESENT_PARAMETERS m_PresentParameters; 

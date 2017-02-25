@@ -20,7 +20,7 @@ namespace Panther
 		virtual void Load() = 0;
 		virtual void Unload() = 0;
 		virtual void Update(float a_DT) = 0;
-		virtual void Render() = 0;
+		virtual void Render(CommandList& a_CommandList) = 0;
 		virtual void OnResize(uint32 a_Width, uint32 a_Height) = 0;
 		virtual void OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) = 0;
 		virtual void OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) = 0;
