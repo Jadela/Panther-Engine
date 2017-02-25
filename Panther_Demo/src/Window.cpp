@@ -120,6 +120,13 @@ namespace Panther
 				app.OnResize(width, height);
 				return 0;
 			}
+			// Catch this message so to prevent the window from becoming too small.
+			case WM_GETMINMAXINFO:
+			{
+				((MINMAXINFO*)a_LParam)->ptMinTrackSize.x = 200;
+				((MINMAXINFO*)a_LParam)->ptMinTrackSize.y = 200;
+				return 0;
+			}
 			case WM_DPICHANGED:
 			{
 				const RECT* rect = (RECT*)a_LParam;
