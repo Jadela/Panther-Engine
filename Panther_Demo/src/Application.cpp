@@ -81,7 +81,7 @@ namespace Panther
 
 				CommandList& commandList(m_Renderer->StartRender());
 				m_Scene->Render(commandList);
-				m_Renderer->EndRender();
+				m_Renderer->EndRender(commandList);
 			}
 		}
 		return static_cast<int32>(msg.wParam);

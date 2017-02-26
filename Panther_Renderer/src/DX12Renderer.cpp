@@ -244,8 +244,14 @@ namespace Panther
 		return commandList;
 	}
 
-	void DX12Renderer::EndRender()
+	void DX12Renderer::EndRender(CommandList& a_CommandList)
 	{
+		a_CommandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+		a_CommandList.Close();
+		CommandList* commandLists[] = { &a_CommandList };
+		SubmitCommandLists(commandLists, 1);
+
 		m_SwapChain->Present(m_Window.GetVSync());
 		Synchronize();
 	}

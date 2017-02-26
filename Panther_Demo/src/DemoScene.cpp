@@ -385,13 +385,6 @@ namespace Panther
 		defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
 		m_DuckMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
 		a_CommandList.ExecuteBundle(*m_DuckBundle.get());
-
-		// Indicate that the back buffer will now be used to present.
-		a_CommandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-
-		a_CommandList.Close();
-		CommandList* commandLists[] = { &a_CommandList };
-		m_Renderer.SubmitCommandLists(commandLists, 1);
 	}
 
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)

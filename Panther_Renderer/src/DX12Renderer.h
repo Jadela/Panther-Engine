@@ -29,7 +29,7 @@ namespace Panther
 		std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) final override;
 
 		CommandList& StartRender() final override;
-		void EndRender() final override;
+		void EndRender(CommandList& a_CommandList) final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
 		ID3D12Device& GetDevice() { return *m_D3DDevice.Get(); }

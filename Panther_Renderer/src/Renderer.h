@@ -33,7 +33,7 @@ namespace Panther
 		virtual std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) = 0;
 
 		virtual CommandList& StartRender() = 0;
-		virtual void EndRender() = 0;
+		virtual void EndRender(CommandList& a_CommandList) = 0;
 		virtual void OnResize(uint32 a_Width, uint32 a_Height) = 0;
 
 		Window& GetWindow() { return m_Window; }
