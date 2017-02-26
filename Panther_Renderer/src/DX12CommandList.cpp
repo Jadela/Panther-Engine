@@ -97,9 +97,9 @@ namespace Panther
 		m_CommandList->DrawIndexedInstanced(a_NumIndices, 1, 0, 0, 0);
 	}
 
-	void DX12CommandList::SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState)
+	void DX12CommandList::SetTransitionBarrier(SwapChain& a_SwapChain, D3D12_RESOURCE_STATES a_NewState)
 	{
-		m_CommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_Renderer.GetSwapChain().GetCurrentBackBuffer().GetTargetBuffer(), a_OldState, a_NewState));
+		m_CommandList->ResourceBarrier(1, &a_SwapChain.SetResourceState(a_NewState));
 	}
 
 	void DX12CommandList::Close()

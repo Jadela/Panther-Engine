@@ -14,12 +14,10 @@ namespace Panther
 			ID3D12CommandQueue& a_CommandQueue, HWND a_WindowHandle, const DXGI_SWAP_CHAIN_DESC1& a_Desc, 
 			const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_FullscreenDesc, DX12DescriptorHeap& a_RTVDescHeap, 
 			DX12DescriptorHeap& a_DSVDescHeap);
-
-		IDXGISwapChain3& GetSwapChain() { return *m_SwapChain.Get(); }
-
+		
 		void Present(bool a_Vsync);
 		void Resize(uint32 a_NumBuffers, uint32 a_Width, uint32 a_Height, DXGI_FORMAT a_NewFormat);
-		DX12RenderTarget& GetCurrentBackBuffer() { return *m_RenderTargets[m_SwapChain->GetCurrentBackBufferIndex()].get(); }
+		D3D12_RESOURCE_BARRIER SetResourceState(D3D12_RESOURCE_STATES a_NewState);
 		CD3DX12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandle();
 		CD3DX12_CPU_DESCRIPTOR_HANDLE GetDSVDescriptorHandle();
 
@@ -31,9 +29,10 @@ namespace Panther
 		static uint32 s_RTVDescriptorSize;
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain3> m_SwapChain;
-		DXGI_PRESENT_PARAMETERS m_PresentParameters; 
+		DXGI_PRESENT_PARAMETERS m_PresentParameters;
 		std::unique_ptr<DX12RenderTarget> m_RenderTargets[NumBackBuffers] = { nullptr, nullptr };
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_DepthStencil = nullptr;
+		D3D12_RESOURCE_STATES m_ResourceState = D3D12_RESOURCE_STATE_COMMON;
 		ID3D12Device& m_Device;
 		DX12DescriptorHeap& m_RTVDescHeap;
 		DX12DescriptorHeap& m_DSVDescHeap;

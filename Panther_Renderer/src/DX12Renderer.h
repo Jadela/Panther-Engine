@@ -33,7 +33,6 @@ namespace Panther
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
 		ID3D12Device& GetDevice() { return *m_D3DDevice.Get(); }
-		SwapChain& GetSwapChain() { return *m_SwapChain.get(); }
 		ID3D12CommandAllocator* GetCommandAllocatorDirect() { return m_D3DCommandAllocator.Get(); }
 		ID3D12CommandAllocator* GetCommandAllocatorBundle() { return m_D3DBundleAllocator.Get(); }
 		DX12CommandList& GetCommandList() { return *m_CommandList.get(); }

@@ -21,7 +21,7 @@ namespace Panther
 		void UseDefaultViewport() final override;
 		void ExecuteBundle(CommandList& a_Bundle) final override;
 		void Draw(uint32 a_NumIndices) final override;
-		void SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState) final override;
+		void SetTransitionBarrier(SwapChain& a_SwapChain, D3D12_RESOURCE_STATES a_NewState) final override;
 		void Close() final override;
 
 		void Reset(DX12Material* a_Material = nullptr);

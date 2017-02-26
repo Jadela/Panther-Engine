@@ -238,7 +238,7 @@ namespace Panther
 	{
 		CommandList& commandList(StartRecording());
 
-		commandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		commandList.SetTransitionBarrier(*m_SwapChain.get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 		commandList.SetAndClearRenderTarget(*m_SwapChain.get(), DirectX::Colors::CornflowerBlue);
 
 		return commandList;
@@ -246,7 +246,7 @@ namespace Panther
 
 	void DX12Renderer::EndRender(CommandList& a_CommandList)
 	{
-		a_CommandList.SetTransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		a_CommandList.SetTransitionBarrier(*m_SwapChain.get(), D3D12_RESOURCE_STATE_PRESENT);
 
 		a_CommandList.Close();
 		CommandList* commandLists[] = { &a_CommandList };

@@ -21,7 +21,7 @@ namespace Panther
 		virtual void UseDefaultViewport() = 0;
 		virtual void ExecuteBundle(CommandList& a_Bundle) = 0;
 		virtual void Draw(uint32 a_NumIndices) = 0;
-		virtual void SetTransitionBarrier(D3D12_RESOURCE_STATES a_OldState, D3D12_RESOURCE_STATES a_NewState) = 0;
+		virtual void SetTransitionBarrier(SwapChain& a_SwapChain, D3D12_RESOURCE_STATES a_NewState) = 0;
 		virtual void Close() = 0;
 
 	protected:

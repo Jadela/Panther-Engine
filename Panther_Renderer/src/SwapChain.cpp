@@ -52,7 +52,7 @@ namespace Panther
 			// Create a RTV for each frame.
 			for (uint32 n = 0; n < 2; n++)
 			{
-				m_RenderTargets[n] = std::make_unique<DX12RenderTarget>(*m_SwapChain.Get(), n);
+				m_RenderTargets[n] = std::unique_ptr<DX12RenderTarget>(new DX12RenderTarget(*m_SwapChain.Get(), n));
 				m_RTVDescHeap.RegisterRenderTarget(*m_RenderTargets[n].get());
 			}
 		}
@@ -78,6 +78,14 @@ namespace Panther
 
 			m_DSVDescHeap.RegisterDepthStencil(*m_DepthStencil.Get(), depthStencilDesc);
 		}
+	}
+
+	D3D12_RESOURCE_BARRIER SwapChain::SetResourceState(D3D12_RESOURCE_STATES a_NewState)
+	{
+		D3D12_RESOURCE_STATES prevState = m_ResourceState;
+		m_ResourceState = a_NewState;
+		return CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTargets[m_SwapChain->GetCurrentBackBufferIndex()]->GetTargetBuffer(), 
+			prevState, m_ResourceState);
 	}
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE SwapChain::GetRTVDescriptorHandle()
