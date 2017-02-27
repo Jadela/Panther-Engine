@@ -16,6 +16,7 @@ namespace Panther
 		int32 GetNumOutputs() { return (int32)m_Outputs.size(); }
 		Output& GetOutput(int32 a_Index) { return *m_Outputs[a_Index]; }
 		IDXGIAdapter3& GetAdapter() { return *m_Adapter.Get(); }
+		void LogProperties();
 
 	private:
 		Adapter() = delete;

@@ -55,8 +55,7 @@ namespace Panther
 
 	DX12Renderer::~DX12Renderer()
 	{
-		// Wait for the GPU to be done with all resources.
-		WaitForPreviousFrame();
+		Synchronize();
 	}
 
 	bool DX12Renderer::Initialize()
@@ -66,12 +65,9 @@ namespace Panther
 		if (!XMVerifyCPUSupport()) throw std::runtime_error("CPU is not supporting SSE2 or NEON!");
 
 #if defined(DEBUG) || defined(_DEBUG)
-		// Enable D3D12 debug layer.
-		{
-			ComPtr<ID3D12Debug> debugController;
-			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
-			debugController->EnableDebugLayer();
-		}
+		ComPtr<ID3D12Debug> debugController;
+		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
+		debugController->EnableDebugLayer();
 #endif
 
 		ComPtr<IDXGIFactory5> DXGIFactory = CreateDXGIFactory();
@@ -81,12 +77,12 @@ namespace Panther
 		{
 			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 			D3D_FEATURE_LEVEL chosenFeatureLevel = (D3D_FEATURE_LEVEL)0;
-			m_D3DDevice = TryCreateD3D12DeviceForAdapter(m_Adapter->GetAdapter(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
+			m_D3DDevice = TryCreateD3D12DeviceForAdapter(*m_Adapter.get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 
 			if (!m_D3DDevice)
 			{
 				m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0, true);
-				m_D3DDevice = TryCreateD3D12DeviceForAdapter(m_Adapter->GetAdapter(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
+				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*m_Adapter.get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 				if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
 			}
 		}
@@ -142,15 +138,13 @@ namespace Panther
 		assert(m_D3DDevice);
 		assert(m_APIInitialized);
 
-		// Command list allocators can only be reset when the associated
-		// command lists have finished execution on the GPU; apps should use
-		// fences to determine GPU execution progress.
+		// NOTE: Allocators can only be reset when the associated command lists have finished execution on the GPU.
 		ThrowIfFailed(m_D3DCommandAllocator->Reset())
 
-		if (m_CommandList)
-			m_CommandList->Reset();
-		else
+		if (m_CommandList == nullptr)
 			m_CommandList = std::make_unique<DX12CommandList>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+		else
+			m_CommandList->Reset();
 
 		return *m_CommandList.get();
 	}
@@ -165,17 +159,25 @@ namespace Panther
 		delete[] commandLists;
 	}
 
-	bool DX12Renderer::Synchronize()
+	void DX12Renderer::Synchronize()
 	{
-		return WaitForPreviousFrame();
+		// TODO: Use frame resources instead of flushing the render queue every frame.
+		m_FenceValue++;
+		ThrowIfFailed(m_D3DCommandQueue->Signal(m_D3DFence.Get(), m_FenceValue));
+
+		if (m_D3DFence->GetCompletedValue() < m_FenceValue)
+		{
+			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+			ThrowIfFailed(m_D3DFence->SetEventOnCompletion(m_FenceValue, eventHandle));
+			WaitForSingleObject(eventHandle, INFINITE);
+			CloseHandle(eventHandle);
+		}
 	}
 
 	std::unique_ptr<Buffer> DX12Renderer::CreateBuffer(const size_t a_Capacity)
 	{
 		assert(a_Capacity > 0);
 		std::unique_ptr<Buffer> buffer = std::make_unique<DX12Buffer>(*this, a_Capacity);
-		// TODO (JDL): Implement descriptor heaps in DX12Renderer.
-		//m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*buffer.get());
 		return std::move(buffer);
 	}
 
@@ -207,7 +209,6 @@ namespace Panther
 
 	std::unique_ptr<Texture> DX12Renderer::CreateTexture(const std::wstring & a_Path)
 	{
-		// Load texture from disk and upload to GPU.
 		std::unique_ptr<Texture> texture = std::make_unique<DX12Texture>(*this);
 		texture->LoadFromDisk(a_Path);
 		texture->Upload();
@@ -272,28 +273,19 @@ namespace Panther
 		return DXGIFactory;
 	}
 
-	ComPtr<ID3D12Device> DX12Renderer::TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels,
+	ComPtr<ID3D12Device> DX12Renderer::TryCreateD3D12DeviceForAdapter(Adapter& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels,
 		uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel)
 	{
 		ComPtr<ID3D12Device> D3D12Device = nullptr;
 		for (uint32 i = 0; i < a_FeatureLevelCount; ++i)
 		{
-			if (SUCCEEDED(D3D12CreateDevice(&a_Adapter, a_FeatureLevels[i], IID_PPV_ARGS(&D3D12Device))))
+			if (SUCCEEDED(D3D12CreateDevice(&a_Adapter.GetAdapter(), a_FeatureLevels[i], IID_PPV_ARGS(&D3D12Device))))
 			{
-				DXGI_ADAPTER_DESC2 adapterDesc = { 0 };
-				a_Adapter.GetDesc2(&adapterDesc);
-				std::wstring featureLevelString = std::to_wstring((a_FeatureLevels[i] >> 12) & 15) + L"." + std::to_wstring((a_FeatureLevels[i] >> 8) & 15);
-
-				OutputDebugString((L"\tSuccessfully created D3D12 device:\n\tAdapter:\t\t\t\t\t" + std::wstring(adapterDesc.Description)
-					+ L"\n\tVendor ID:\t\t\t\t\t" + std::to_wstring(adapterDesc.VendorId)
-					+ L"\n\tDevice ID:\t\t\t\t\t" + std::to_wstring(adapterDesc.DeviceId)
-					+ L"\n\tSubsystem ID:\t\t\t\t" + std::to_wstring(adapterDesc.SubSysId)
-					+ L"\n\tRevision:\t\t\t\t\t" + std::to_wstring(adapterDesc.Revision)
-					+ L"\n\tDedicated Video Memory:\t\t" + std::to_wstring(adapterDesc.DedicatedVideoMemory / 1000000) + L" MB"
-					+ L"\n\tDedicated System Memory:\t" + std::to_wstring(adapterDesc.DedicatedSystemMemory / 1000000) + L" MB"
-					+ L"\n\tShared System Memory:\t\t" + std::to_wstring(adapterDesc.SharedSystemMemory / 1000000) + L" MB"
-					+ L"\n\tFeature Level:\t\t\t\t" + featureLevelString + L"\n").c_str());
 				*out_FeatureLevel = a_FeatureLevels[i];
+
+				a_Adapter.LogProperties();
+				std::wstring featureLevelString = std::to_wstring((a_FeatureLevels[i] >> 12) & 15) + L"." + std::to_wstring((a_FeatureLevels[i] >> 8) & 15);
+				OutputDebugString((std::wstring(L"\n\tSuccessfully created a device with feature level:\t") + featureLevelString + L"\n").c_str());
 				break;
 			}
 		}
@@ -313,34 +305,5 @@ namespace Panther
 		ZeroMemory(&m_D3DRectScissor, sizeof(m_D3DRectScissor));
 		m_D3DRectScissor.right = static_cast<LONG>(m_Window.GetWidth());
 		m_D3DRectScissor.bottom = static_cast<LONG>(m_Window.GetHeight());
-	}
-
-	bool DX12Renderer::WaitForPreviousFrame()
-	{
-		// WAITING FOR THE FRAME TO COMPLETE BEFORE CONTINUING IS NOT BEST PRACTICE.
-		// This is code implemented as such for simplicity. More advanced samples 
-		// illustrate how to use fences for efficient resource usage.
-
-		// Advance the fence value to mark commands up to this fence point.
-		m_FenceValue++;
-
-		// Add an instruction to the command queue to set a new fence point.  Because we 
-		// are on the GPU timeline, the new fence point won't be set until the GPU finishes
-		// processing all the commands prior to this Signal().
-		ThrowIfFailed(m_D3DCommandQueue->Signal(m_D3DFence.Get(), m_FenceValue));
-
-		// Wait until the GPU has completed commands up to this fence point.
-		if (m_D3DFence->GetCompletedValue() < m_FenceValue)
-		{
-			HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-
-			// Fire event when GPU hits current fence.  
-			ThrowIfFailed(m_D3DFence->SetEventOnCompletion(m_FenceValue, eventHandle));
-
-			// Wait until the GPU hits current fence event is fired.
-			WaitForSingleObject(eventHandle, INFINITE);
-			CloseHandle(eventHandle);
-		}
-		return true;
 	}
 }

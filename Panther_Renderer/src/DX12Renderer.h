@@ -17,7 +17,7 @@ namespace Panther
 		bool Initialize() final override;
 		CommandList& StartRecording() final override;
 		void SubmitCommandLists(CommandList** a_CommandLists, uint32 a_NumCommandLists) final override;
-		bool Synchronize() final override;
+		void Synchronize() final override;
 
 		std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) final override;
 		std::unique_ptr<Buffer> CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) final override;
@@ -43,10 +43,9 @@ namespace Panther
 		DX12Renderer(const DX12Renderer& other) = delete;
 
 		Microsoft::WRL::ComPtr<IDXGIFactory5> CreateDXGIFactory();
-		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(IDXGIAdapter3& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
+		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(Adapter& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
 			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
 		void ResizeSwapChain(uint32 width, uint32 height);
-		bool WaitForPreviousFrame();
 
 	private:
 		std::unique_ptr<Adapter> m_Adapter = nullptr;

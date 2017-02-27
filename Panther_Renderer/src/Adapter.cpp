@@ -24,6 +24,22 @@ namespace Panther
 		return std::unique_ptr<Adapter>(new Adapter(adapter));
 	}
 
+	void Adapter::LogProperties()
+	{
+		DXGI_ADAPTER_DESC2 adapterDesc = { 0 };
+		m_Adapter->GetDesc2(&adapterDesc);
+
+		OutputDebugString((std::wstring(L"\tAdapter info:")
+			+ L"\n\tAdapter:\t\t\t\t\t" + std::wstring(adapterDesc.Description)
+			+ L"\n\tVendor ID:\t\t\t\t\t" + std::to_wstring(adapterDesc.VendorId)
+			+ L"\n\tDevice ID:\t\t\t\t\t" + std::to_wstring(adapterDesc.DeviceId)
+			+ L"\n\tSubsystem ID:\t\t\t\t" + std::to_wstring(adapterDesc.SubSysId)
+			+ L"\n\tRevision:\t\t\t\t\t" + std::to_wstring(adapterDesc.Revision)
+			+ L"\n\tDedicated Video Memory:\t\t" + std::to_wstring(adapterDesc.DedicatedVideoMemory / 1000000) + L" MB"
+			+ L"\n\tDedicated System Memory:\t" + std::to_wstring(adapterDesc.DedicatedSystemMemory / 1000000) + L" MB"
+			+ L"\n\tShared System Memory:\t\t" + std::to_wstring(adapterDesc.SharedSystemMemory / 1000000) + L" MB \n").c_str());
+	}
+
 	Adapter::Adapter(IDXGIAdapter3* a_Adapter) : m_Adapter(a_Adapter)
 	{
 		UINT i = 0;
