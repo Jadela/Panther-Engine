@@ -38,10 +38,10 @@ namespace Panther
 				throw new std::runtime_error("Primary display does not support DXGI_FORMAT_B8G8R8A8_UNORM.");
 			}
 
-			DXGI_MODE_DESC1* displayMode(modeList->GetBestMatchingDisplayMode(640, 480));
+			DXGI_MODE_DESC1* displayMode(modeList->GetHighestDisplayMode());
 			if (displayMode == nullptr)
 			{
-				throw new std::runtime_error("Display has no 640x480 support.");
+				throw new std::runtime_error("Unable to get highest display mode.");
 			}
 
 			refreshRate = displayMode->RefreshRate;

@@ -11,6 +11,7 @@ namespace Panther
 		~DisplayModeList() {}
 
 		DXGI_MODE_DESC1* GetBestMatchingDisplayMode(uint32 a_Width, uint32 a_Height);
+		DXGI_MODE_DESC1* GetHighestDisplayMode();
 
 	private:
 		DisplayModeList() = delete;
