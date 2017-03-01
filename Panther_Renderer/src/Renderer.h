@@ -38,6 +38,7 @@ namespace Panther
 
 		Window& GetWindow() { return m_Window; }
 
+		static const int32 NumBackBuffers = 2;
 	protected:
 		bool m_APIInitialized = false;
 		Window& m_Window;

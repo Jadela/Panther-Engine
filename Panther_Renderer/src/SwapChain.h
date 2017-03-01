@@ -10,6 +10,8 @@ namespace Panther
 	class SwapChain
 	{
 	public:
+		~SwapChain();
+
 		static std::unique_ptr<SwapChain> CreateSwapchain(IDXGIFactory4& a_DXGIFactory, ID3D12Device& a_Device, 
 			ID3D12CommandQueue& a_CommandQueue, HWND a_WindowHandle, const DXGI_SWAP_CHAIN_DESC1& a_Desc, 
 			const DXGI_SWAP_CHAIN_FULLSCREEN_DESC* a_FullscreenDesc, DX12DescriptorHeap& a_RTVDescHeap, 
@@ -25,12 +27,11 @@ namespace Panther
 		SwapChain() = delete;
 		SwapChain(IDXGISwapChain3& a_SwapChain, ID3D12Device& a_Device, DX12DescriptorHeap& a_RTVDescHeap, DX12DescriptorHeap& a_DSVDescHeap);
 
-		static const int NumBackBuffers = 2;
 		static uint32 s_RTVDescriptorSize;
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain3> m_SwapChain;
 		DXGI_PRESENT_PARAMETERS m_PresentParameters;
-		std::unique_ptr<DX12RenderTarget> m_RenderTargets[NumBackBuffers] = { nullptr, nullptr };
+		std::unique_ptr<DX12RenderTarget>* m_RenderTargets = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Resource> m_DepthStencil = nullptr;
 		D3D12_RESOURCE_STATES m_ResourceState = D3D12_RESOURCE_STATE_COMMON;
 		ID3D12Device& m_Device;

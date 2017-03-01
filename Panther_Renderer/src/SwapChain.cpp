@@ -4,6 +4,7 @@
 #include "../../Panther_Core/src/Exceptions.h"
 #include "DX12DescriptorHeap.h"
 #include "DX12RenderTarget.h"
+#include "Renderer.h"
 
 using namespace Microsoft::WRL;
 
@@ -38,7 +39,7 @@ namespace Panther
 	void SwapChain::Resize(uint32 a_NumBuffers, uint32 a_Width, uint32 a_Height, DXGI_FORMAT a_NewFormat)
 	{
 		// Release the render target views.
-		for (int32 i = 0; i < NumBackBuffers; i++)
+		for (int32 i = 0; i < Renderer::NumBackBuffers; i++)
 		{
 			m_RenderTargets[i].reset();
 		}
@@ -50,10 +51,10 @@ namespace Panther
 		{
 			m_RTVDescHeap.SetCPUHandleIndex(0);
 			// Create a RTV for each frame.
-			for (uint32 n = 0; n < 2; n++)
+			for (uint32 n = 0; n < Renderer::NumBackBuffers; n++)
 			{
 				m_RenderTargets[n] = std::unique_ptr<DX12RenderTarget>(new DX12RenderTarget(*m_SwapChain.Get(), n));
-				m_RTVDescHeap.RegisterRenderTarget(*m_RenderTargets[n].get());
+				m_RTVDescHeap.RegisterRenderTarget(*m_RenderTargets[n]);
 			}
 		}
 
@@ -102,6 +103,12 @@ namespace Panther
 	SwapChain::SwapChain(IDXGISwapChain3& a_SwapChain, ID3D12Device& a_Device, DX12DescriptorHeap& a_RTVDescHeap, DX12DescriptorHeap& a_DSVDescHeap) :
 		m_SwapChain(&a_SwapChain), m_Device(a_Device), m_RTVDescHeap(a_RTVDescHeap), m_DSVDescHeap(a_DSVDescHeap)
 	{
+		m_RenderTargets = new std::unique_ptr<DX12RenderTarget>[Renderer::NumBackBuffers];
 		ZeroMemory(&m_PresentParameters, sizeof(DXGI_PRESENT_PARAMETERS));
+	}
+
+	SwapChain::~SwapChain()
+	{
+		delete[] m_RenderTargets;
 	}
 }

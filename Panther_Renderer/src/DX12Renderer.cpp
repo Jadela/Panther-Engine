@@ -66,35 +66,47 @@ namespace Panther
 
 #if defined(DEBUG) || defined(_DEBUG)
 		ComPtr<ID3D12Debug> debugController;
-		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))
+		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
 		debugController->EnableDebugLayer();
 #endif
 
+		// Core objects (Adapter, Device, Fence)
 		ComPtr<IDXGIFactory5> DXGIFactory = CreateDXGIFactory();
 		m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0); // Get primary adapter.
 
-		// Create hardware-based D3D12 device. If that fails, fallback to WARP/software.
-		{
-			D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
-			D3D_FEATURE_LEVEL chosenFeatureLevel = (D3D_FEATURE_LEVEL)0;
-			m_D3DDevice = TryCreateD3D12DeviceForAdapter(*m_Adapter.get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
+		D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+		D3D_FEATURE_LEVEL chosenFeatureLevel = (D3D_FEATURE_LEVEL)0;
+		m_D3DDevice = TryCreateD3D12DeviceForAdapter(*m_Adapter.get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
 
-			if (!m_D3DDevice)
-			{
-				m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0, true);
-				m_D3DDevice = TryCreateD3D12DeviceForAdapter(*m_Adapter.get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
-				if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
-			}
+		if (!m_D3DDevice)
+		{
+			m_Adapter = Adapter::GetAdapter(*DXGIFactory.Get(), 0, true);
+			m_D3DDevice = TryCreateD3D12DeviceForAdapter(*m_Adapter.get(), featureLevels, (uint32)Countof(featureLevels), &chosenFeatureLevel);
+			if (!m_D3DDevice) throw std::runtime_error("Could not create Direct3D Device.");
 		}
 
-		// Create a command queue for handling command lists.
+		ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)));
+
+#ifdef _DEBUG
+		m_Adapter->LogProperties();
+		std::wstring featureLevelString = std::to_wstring((chosenFeatureLevel >> 12) & 15) + L"." + std::to_wstring((chosenFeatureLevel >> 8) & 15);
+		OutputDebugString((L"\n\tSuccessfully created a device with feature level:\t" + featureLevelString + L"\n").c_str());
+#endif
+
+		// Command objects (queue, allocators, lists)
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		ThrowIfFailed(m_D3DDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_D3DCommandQueue)));
 
-		ThrowIfFailed(m_D3DDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_D3DCommandQueue)))
+		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_D3DCommandAllocator)));
+		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&m_D3DBundleAllocator)));
 
-		m_RTVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), 2, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		m_CommandList = std::make_unique<DX12CommandList>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
+		m_CommandList->Close(); // Lists are open by default and need to be closed first.
+		
+		// Descriptor heaps
+		m_RTVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), NumBackBuffers, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		m_DSVDescriptorHeap = std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 		// Swap chain
@@ -106,7 +118,7 @@ namespace Panther
 			swapChainDesc.SampleDesc.Count = 1;
 			swapChainDesc.SampleDesc.Quality = 0;
 			swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swapChainDesc.BufferCount = 2;
+			swapChainDesc.BufferCount = NumBackBuffers;
 			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 			swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; // Use Alt-Enter to switch between full screen and windowed mode.
 
@@ -119,14 +131,7 @@ namespace Panther
 		}
 
 		ResizeSwapChain(m_Window.GetWidth(), m_Window.GetHeight());
-
-		// Create command allocators.
-		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_D3DCommandAllocator)))
-		ThrowIfFailed(m_D3DDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(&m_D3DBundleAllocator)))
-
-		// Create synchronization objects.
-		ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)))
-
+		
 		m_APIInitialized = true;
 		return true;
 	}
@@ -141,10 +146,7 @@ namespace Panther
 		// NOTE: Allocators can only be reset when the associated command lists have finished execution on the GPU.
 		ThrowIfFailed(m_D3DCommandAllocator->Reset())
 
-		if (m_CommandList == nullptr)
-			m_CommandList = std::make_unique<DX12CommandList>(*this, D3D12_COMMAND_LIST_TYPE_DIRECT);
-		else
-			m_CommandList->Reset();
+		m_CommandList->Reset();
 
 		return *m_CommandList.get();
 	}
@@ -282,10 +284,6 @@ namespace Panther
 			if (SUCCEEDED(D3D12CreateDevice(&a_Adapter.GetAdapter(), a_FeatureLevels[i], IID_PPV_ARGS(&D3D12Device))))
 			{
 				*out_FeatureLevel = a_FeatureLevels[i];
-
-				a_Adapter.LogProperties();
-				std::wstring featureLevelString = std::to_wstring((a_FeatureLevels[i] >> 12) & 15) + L"." + std::to_wstring((a_FeatureLevels[i] >> 8) & 15);
-				OutputDebugString((std::wstring(L"\n\tSuccessfully created a device with feature level:\t") + featureLevelString + L"\n").c_str());
 				break;
 			}
 		}
@@ -294,7 +292,7 @@ namespace Panther
 
 	void DX12Renderer::ResizeSwapChain(uint32 width, uint32 height)
 	{
-		m_SwapChain->Resize(2, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
+		m_SwapChain->Resize(NumBackBuffers, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 		// Initialize viewport and scissor rect.
 		ZeroMemory(&m_D3DViewport, sizeof(m_D3DViewport));
