@@ -176,20 +176,19 @@ namespace Panther
 		}
 	}
 
-	std::unique_ptr<Buffer> DX12Renderer::CreateBuffer(const size_t a_Capacity)
+	Buffer* DX12Renderer::CreateBuffer(const size_t a_Capacity)
 	{
 		assert(a_Capacity > 0);
-		std::unique_ptr<Buffer> buffer = std::make_unique<DX12Buffer>(*this, a_Capacity);
-		return std::move(buffer);
+		return new DX12Buffer(*this, a_Capacity);
 	}
 
-	std::unique_ptr<Buffer> DX12Renderer::CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize)
+	Buffer* DX12Renderer::CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize)
 	{
 		assert(a_Data != 0 && a_Size > 0 && a_ElementSize > 0);
-		return std::make_unique<DX12Buffer>(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_Size, a_ElementSize);
+		return new DX12Buffer(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_Size, a_ElementSize);
 	}
 
-	std::unique_ptr<DescriptorHeap> DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type)
+	DescriptorHeap* DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type)
 	{
 		D3D12_DESCRIPTOR_HEAP_TYPE type = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
 		switch (a_Type)
@@ -206,35 +205,35 @@ namespace Panther
 			break;
 		}
 
-		return std::make_unique<DX12DescriptorHeap>(*m_D3DDevice.Get(), a_Capacity, type);
+		return new DX12DescriptorHeap(*m_D3DDevice.Get(), a_Capacity, type);
 	}
 
-	std::unique_ptr<Texture> DX12Renderer::CreateTexture(const std::wstring & a_Path)
+	Texture* DX12Renderer::CreateTexture(const std::wstring & a_Path)
 	{
-		std::unique_ptr<Texture> texture = std::make_unique<DX12Texture>(*this);
+		Texture* texture = new DX12Texture(*this);
 		texture->LoadFromDisk(a_Path);
 		texture->Upload();
-		return std::move(texture);
+		return texture;
 	}
 
-	std::unique_ptr<Material> DX12Renderer::CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity)
+	Material* DX12Renderer::CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity)
 	{
-		return std::make_unique<DX12Material>(*this, a_ConstantsCapacity, a_InputParameterCapacity);
+		return new DX12Material(*this, a_ConstantsCapacity, a_InputParameterCapacity);
 	}
 
-	std::unique_ptr<Mesh> DX12Renderer::CreateMesh()
+	Mesh* DX12Renderer::CreateMesh()
 	{
-		return std::make_unique<DX12Mesh>(*this);
+		return new DX12Mesh(*this);
 	}
 
-	std::unique_ptr<Sampler> DX12Renderer::CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode)
+	Sampler* DX12Renderer::CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode)
 	{
-		return std::make_unique<DX12Sampler>((D3D12_TEXTURE_ADDRESS_MODE)((int)a_TextureCoordinateMode + 1));
+		return new DX12Sampler((D3D12_TEXTURE_ADDRESS_MODE)((int)a_TextureCoordinateMode + 1));
 	}
 
-	std::unique_ptr<CommandList> DX12Renderer::CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material)
+	CommandList* DX12Renderer::CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material)
 	{
-		return std::make_unique<DX12CommandList>(*this, a_Type, static_cast<DX12Material*>(a_Material));
+		return new DX12CommandList(*this, a_Type, static_cast<DX12Material*>(a_Material));
 	}
 
 	CommandList& DX12Renderer::StartRender()

@@ -58,7 +58,7 @@ namespace Panther
 
 		// Create and record the bundles.
 		{
-			m_SkySphereBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_SkyDomeMaterial.get());
+			m_SkySphereBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_SkyDomeMaterial.get()));
 
 			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 			m_SkySphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
@@ -72,7 +72,7 @@ namespace Panther
 		}
 
 		{
-			m_WaterBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_WaterMaterial.get());
+			m_WaterBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_WaterMaterial.get()));
 
 			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 			m_WaterBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
@@ -86,7 +86,7 @@ namespace Panther
 		}
 
 		{
-			m_CubeBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get());
+			m_CubeBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get()));
 
 			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 			m_CubeBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
@@ -100,7 +100,7 @@ namespace Panther
 		}
 
 		{
-			m_SphereBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get());
+			m_SphereBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get()));
 
 			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 			m_SphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
@@ -114,7 +114,7 @@ namespace Panther
 		}
 
 		{
-			m_DuckBundle = m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get());
+			m_DuckBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get()));
 
 			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
 			m_DuckBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
@@ -142,7 +142,7 @@ namespace Panther
 	{
 		// Create skysphere material.
 		{
-			m_SkyDomeMaterial = m_Renderer.CreateMaterial(7, 2);
+			m_SkyDomeMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(7, 2));
 			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "VSMain", Material::ShaderType::Vertex);
 			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "PSMain", Material::ShaderType::Pixel);
 
@@ -159,7 +159,7 @@ namespace Panther
 
 		// Create water material
 		{
-			m_WaterMaterial = m_Renderer.CreateMaterial(4, 3);
+			m_WaterMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(4, 3));
 			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "VSMain", Material::ShaderType::Vertex);
 			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "PSMain", Material::ShaderType::Pixel);
 
@@ -177,7 +177,7 @@ namespace Panther
 
 		// Create diffuse material.
 		{
-			m_DefaultMaterial = m_Renderer.CreateMaterial(4, 4);
+			m_DefaultMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(4, 4));
 			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
 			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
 
@@ -197,38 +197,38 @@ namespace Panther
 
 	void DemoScene::CreateGeometry(CommandList& a_CommandList)
 	{
-		m_PlaneMesh = m_Renderer.CreateMesh();
+		m_PlaneMesh = std::unique_ptr<Mesh>(m_Renderer.CreateMesh());
 		m_PlaneMesh->InitAsPlane(a_CommandList);
 
-		m_CubeMesh = m_Renderer.CreateMesh();
+		m_CubeMesh = std::unique_ptr<Mesh>(m_Renderer.CreateMesh());
 		m_CubeMesh->InitAsCube(a_CommandList);
 
-		m_SphereMesh = m_Renderer.CreateMesh();
+		m_SphereMesh = std::unique_ptr<Mesh>(m_Renderer.CreateMesh());
 		m_SphereMesh->InitAsSphere(a_CommandList);
 
-		m_DuckMesh = m_Renderer.CreateMesh();
+		m_DuckMesh = std::unique_ptr<Mesh>(m_Renderer.CreateMesh());
 		m_DuckMesh->InitViaASSIMP(a_CommandList, "../rsc/models/duck.fbx");
 	}
 
 	void DemoScene::CreateConstantBuffers()
 	{
-		m_WaterVertexCBuffer = m_Renderer.CreateBuffer(192);
-		m_WaterPixelCBuffer = m_Renderer.CreateBuffer(112);
-		m_CubeMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_SphereMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_DuckMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_SkydomeVertexCBuffer = m_Renderer.CreateBuffer(64 + 16);
-		m_LightPositionBuffer = m_Renderer.CreateBuffer(32);
-		m_SkydomePixelCBuffer = m_Renderer.CreateBuffer(16);
+		m_WaterVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
+		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(112));
+		m_CubeMatrixBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
+		m_SphereMatrixBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
+		m_DuckMatrixBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
+		m_SkydomeVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(64 + 16));
+		m_LightPositionBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(32));
+		m_SkydomePixelCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(16));
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
 	{		
 		uint32 CBVSRVUAVHeapSize = 8 + (uint32)Countof(g_Textures);
-		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView); 
+		m_CBVSRVUAVDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView));
 
 		uint32 samplerHeapSize = 2;
-		m_SamplerDescriptorHeap = m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeap::DescriptorHeapType::Sampler);
+		m_SamplerDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeap::DescriptorHeapType::Sampler));
 	}
 
 	void DemoScene::CreateDescriptors()
@@ -244,8 +244,8 @@ namespace Panther
 
 		LoadTextures();
 
-		m_DefaultSampler = m_Renderer.CreateSampler();
-		m_SkyboxSampler = m_Renderer.CreateSampler(Sampler::TextureCoordinateMode::Clamp);
+		m_DefaultSampler = std::unique_ptr<Sampler>(m_Renderer.CreateSampler());
+		m_SkyboxSampler = std::unique_ptr<Sampler>(m_Renderer.CreateSampler(Sampler::TextureCoordinateMode::Clamp));
 
 		m_DefaultSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_DefaultSampler.get());
 		m_SkyboxSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_SkyboxSampler.get());

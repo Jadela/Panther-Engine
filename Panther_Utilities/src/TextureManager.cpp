@@ -18,7 +18,7 @@ namespace Panther
 		ManagedTexture*& managedTexture = m_Textures[m_NextFreeSlot];
 		managedTexture = new ManagedTexture();
 		managedTexture->m_ID = m_NextTextureID++;
-		managedTexture->m_Texture = m_Renderer.CreateTexture(a_File);
+		managedTexture->m_Texture = std::unique_ptr<Texture>(m_Renderer.CreateTexture(a_File));
 		return managedTexture->m_ID;
 	}
 

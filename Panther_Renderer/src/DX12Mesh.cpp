@@ -21,8 +21,8 @@ namespace Panther
 		size_t indicesSize = m_Indices.size() * sizeof(Index);
 
 		// Create the buffers.
-		m_VertexBuffer = m_Renderer.CreateBuffer(a_CommandList, &m_Vertices[0], verticesSize, sizeof(Vertex));
-		m_IndexBuffer = m_Renderer.CreateBuffer(a_CommandList, &m_Indices[0], indicesSize, sizeof(Index));
+		m_VertexBuffer = std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(a_CommandList, &m_Vertices[0], verticesSize, sizeof(Vertex)));
+		m_IndexBuffer = std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(a_CommandList, &m_Indices[0], indicesSize, sizeof(Index)));
 		
 		// Initialize the vertex buffer view.
 		m_VertexBufferView.BufferLocation = static_cast<DX12Buffer*>(m_VertexBuffer.get())->GetGPUBuffer().GetGPUVirtualAddress();

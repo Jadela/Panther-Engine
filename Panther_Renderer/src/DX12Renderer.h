@@ -19,14 +19,14 @@ namespace Panther
 		void SubmitCommandLists(CommandList** a_CommandLists, uint32 a_NumCommandLists) final override;
 		void Synchronize() final override;
 
-		std::unique_ptr<Buffer> CreateBuffer(const size_t a_Capacity) final override;
-		std::unique_ptr<Buffer> CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) final override;
-		std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type) final override;
-		std::unique_ptr<Texture> CreateTexture(const std::wstring& a_Path) final override;
-		std::unique_ptr<Material> CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) final override;
-		std::unique_ptr<Mesh> CreateMesh() final override;
-		std::unique_ptr<Sampler> CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode = Sampler::TextureCoordinateMode::Wrap) final override;
-		std::unique_ptr<CommandList> CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) final override;
+		Buffer* CreateBuffer(const size_t a_Capacity) final override;
+		Buffer* CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) final override;
+		DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type) final override;
+		Texture* CreateTexture(const std::wstring& a_Path) final override;
+		Material* CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) final override;
+		Mesh* CreateMesh() final override;
+		Sampler* CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode = Sampler::TextureCoordinateMode::Wrap) final override;
+		CommandList* CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) final override;
 
 		CommandList& StartRender() final override;
 		void EndRender(CommandList& a_CommandList) final override;
