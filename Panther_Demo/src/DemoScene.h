@@ -30,6 +30,11 @@ namespace Panther
 		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) final override;
 
 	private:
+		void CreateMaterials();
+		void CreateGeometry(CommandList& a_CommandList);
+		void CreateConstantBuffers();
+		void CreateDescriptorHeaps();
+		void CreateDescriptors();
 		void LoadTextures();
 
 		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;

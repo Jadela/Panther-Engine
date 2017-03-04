@@ -43,110 +43,13 @@ namespace Panther
 
 	void DemoScene::Load()
 	{
-		// Create skysphere material.
-		{
-			m_SkyDomeMaterial = m_Renderer.CreateMaterial(7, 2);
-			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "PSMain", Material::ShaderType::Pixel);
-
-			m_SkyDomeVertexCBSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
-			m_SkyDomePixelCBSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
-			m_SkyDomeTexturesSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 4, 0, Material::ShaderType::Pixel);
-			m_SkyDomeClampedSamplerSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
-
-			m_SkyDomeMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_SkyDomeMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
-
-			m_SkyDomeMaterial->Compile(Material::DepthWrite::Off);
-		}
-
-		// Create water material
-		{
-			m_WaterMaterial = m_Renderer.CreateMaterial(4, 3);
-			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "PSMain", Material::ShaderType::Pixel);
-
-			m_WaterVertexCBSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
-			m_WaterPixelCBSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
-			m_WaterTexture0Slot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
-			m_WaterSamplerSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
-
-			m_WaterMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_WaterMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
-			m_WaterMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
-
-			m_WaterMaterial->Compile();
-		}
-
-		// Create diffuse material.
-		{
-			m_DefaultMaterial = m_Renderer.CreateMaterial(4, 4);
-			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
-
-			m_DefaultVertexCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
-			m_DefaultPixelCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
-			m_DefaultTextureSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
-			m_DefaultSamplerDescriptorSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
-
-			m_DefaultMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_DefaultMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
-			m_DefaultMaterial->DeclareInputParameter("COLOR", Material::InputType::Float, 4);
-			m_DefaultMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
-
-			m_DefaultMaterial->Compile();
-		}
-
-		// Constant buffer + Shader resource heap.
-		uint32 CBVSRVUAVHeapSize = 8 + (uint32)Countof(g_Textures);
-		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView); // Using type constant buffer view but shouldn't really matter.
-
-		// Sampler heap.
-		uint32 samplerHeapSize = 2;
-		m_SamplerDescriptorHeap = m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeap::DescriptorHeapType::Sampler);
-
 		CommandList& commandList(m_Renderer.StartRecording());
 
-		m_PlaneMesh = m_Renderer.CreateMesh();
-		m_PlaneMesh->InitAsPlane(commandList);
-
-		m_CubeMesh = m_Renderer.CreateMesh();
-		m_CubeMesh->InitAsCube(commandList);
-
-		m_SphereMesh = m_Renderer.CreateMesh();
-		m_SphereMesh->InitAsSphere(commandList);
-
-		m_DuckMesh = m_Renderer.CreateMesh();
-		m_DuckMesh->InitViaASSIMP(commandList, "../rsc/models/duck.fbx");
-
-		// Create the constant buffers.
-		m_WaterVertexCBuffer = m_Renderer.CreateBuffer(192);
-		m_WaterPixelCBuffer = m_Renderer.CreateBuffer(112);
-		m_CubeMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_SphereMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_DuckMatrixBuffer = m_Renderer.CreateBuffer(192);
-		m_SkydomeVertexCBuffer = m_Renderer.CreateBuffer(64 + 16);
-		m_LightPositionBuffer = m_Renderer.CreateBuffer(32);
-		m_SkydomePixelCBuffer = m_Renderer.CreateBuffer(16);
-		
-		m_WaterVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get());
-		m_WaterPixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get());
-		m_CubeMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
-		m_SphereMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
-		m_DuckMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
-		m_SkydomeVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get());
-		m_SkydomePixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get());
-		m_LightPositionBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get());
-
-		// Create the textures
-		LoadTextures();
-
-		// Create sampler
-		m_DefaultSampler = m_Renderer.CreateSampler();
-		m_SkyboxSampler = m_Renderer.CreateSampler(Sampler::TextureCoordinateMode::Clamp);
-
-		m_DefaultSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_DefaultSampler.get());
-		m_SkyboxSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_SkyboxSampler.get());
+		CreateMaterials();
+		CreateGeometry(commandList);	
+		CreateConstantBuffers();
+		CreateDescriptorHeaps();
+		CreateDescriptors();
 
 		commandList.Close();
 
@@ -233,6 +136,119 @@ namespace Panther
 		m_CubeTransform = std::make_unique<Transform>(XMFLOAT3(-3, 0, 0));
 		m_SphereTransform = std::make_unique<Transform>(XMFLOAT3(0, 0, 0));
 		m_DuckTransform = std::make_unique<Transform>(XMFLOAT3(3, 0, 0));
+	}
+
+	void DemoScene::CreateMaterials()
+	{
+		// Create skysphere material.
+		{
+			m_SkyDomeMaterial = m_Renderer.CreateMaterial(7, 2);
+			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "VSMain", Material::ShaderType::Vertex);
+			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "PSMain", Material::ShaderType::Pixel);
+
+			m_SkyDomeVertexCBSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
+			m_SkyDomePixelCBSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
+			m_SkyDomeTexturesSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 4, 0, Material::ShaderType::Pixel);
+			m_SkyDomeClampedSamplerSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
+
+			m_SkyDomeMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
+			m_SkyDomeMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
+
+			m_SkyDomeMaterial->Compile(Material::DepthWrite::Off);
+		}
+
+		// Create water material
+		{
+			m_WaterMaterial = m_Renderer.CreateMaterial(4, 3);
+			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "VSMain", Material::ShaderType::Vertex);
+			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "PSMain", Material::ShaderType::Pixel);
+
+			m_WaterVertexCBSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
+			m_WaterPixelCBSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
+			m_WaterTexture0Slot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
+			m_WaterSamplerSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
+
+			m_WaterMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
+			m_WaterMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
+			m_WaterMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
+
+			m_WaterMaterial->Compile();
+		}
+
+		// Create diffuse material.
+		{
+			m_DefaultMaterial = m_Renderer.CreateMaterial(4, 4);
+			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
+			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
+
+			m_DefaultVertexCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
+			m_DefaultPixelCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
+			m_DefaultTextureSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
+			m_DefaultSamplerDescriptorSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
+
+			m_DefaultMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
+			m_DefaultMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
+			m_DefaultMaterial->DeclareInputParameter("COLOR", Material::InputType::Float, 4);
+			m_DefaultMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
+
+			m_DefaultMaterial->Compile();
+		}
+	}
+
+	void DemoScene::CreateGeometry(CommandList& a_CommandList)
+	{
+		m_PlaneMesh = m_Renderer.CreateMesh();
+		m_PlaneMesh->InitAsPlane(a_CommandList);
+
+		m_CubeMesh = m_Renderer.CreateMesh();
+		m_CubeMesh->InitAsCube(a_CommandList);
+
+		m_SphereMesh = m_Renderer.CreateMesh();
+		m_SphereMesh->InitAsSphere(a_CommandList);
+
+		m_DuckMesh = m_Renderer.CreateMesh();
+		m_DuckMesh->InitViaASSIMP(a_CommandList, "../rsc/models/duck.fbx");
+	}
+
+	void DemoScene::CreateConstantBuffers()
+	{
+		m_WaterVertexCBuffer = m_Renderer.CreateBuffer(192);
+		m_WaterPixelCBuffer = m_Renderer.CreateBuffer(112);
+		m_CubeMatrixBuffer = m_Renderer.CreateBuffer(192);
+		m_SphereMatrixBuffer = m_Renderer.CreateBuffer(192);
+		m_DuckMatrixBuffer = m_Renderer.CreateBuffer(192);
+		m_SkydomeVertexCBuffer = m_Renderer.CreateBuffer(64 + 16);
+		m_LightPositionBuffer = m_Renderer.CreateBuffer(32);
+		m_SkydomePixelCBuffer = m_Renderer.CreateBuffer(16);
+	}
+
+	void DemoScene::CreateDescriptorHeaps()
+	{		
+		uint32 CBVSRVUAVHeapSize = 8 + (uint32)Countof(g_Textures);
+		m_CBVSRVUAVDescriptorHeap = m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView); 
+
+		uint32 samplerHeapSize = 2;
+		m_SamplerDescriptorHeap = m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeap::DescriptorHeapType::Sampler);
+	}
+
+	void DemoScene::CreateDescriptors()
+	{
+		m_WaterVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get());
+		m_WaterPixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get());
+		m_CubeMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
+		m_SphereMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
+		m_DuckMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
+		m_SkydomeVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get());
+		m_SkydomePixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get());
+		m_LightPositionBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get());
+
+		LoadTextures();
+
+		m_DefaultSampler = m_Renderer.CreateSampler();
+		m_SkyboxSampler = m_Renderer.CreateSampler(Sampler::TextureCoordinateMode::Clamp);
+
+		m_DefaultSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_DefaultSampler.get());
+		m_SkyboxSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_SkyboxSampler.get());
 	}
 
 	void DemoScene::LoadTextures()
