@@ -22,7 +22,7 @@ namespace Panther
 		DescriptorHeap(const DescriptorHeap&) = delete;
 		~DescriptorHeap() {};
 
-		virtual uint32 RegisterConstantBuffer(Buffer& a_ConstantBuffer) = 0;
+		virtual uint32 RegisterConstantBuffer(Buffer& a_ConstantBuffer, const uint32 a_OffsetInElements) = 0;
 		virtual uint32 RegisterTexture(Texture& a_Texture) = 0;
 		virtual uint32 RegisterSampler(Sampler& a_Sampler) = 0;
 		virtual uint32 RegisterRenderTarget(RenderTarget& a_RenderTarget) = 0;

@@ -1,32 +1,28 @@
 #include "DX12RendererPCH.h"
 #include "DX12Buffer.h"
 
+#include "../../Panther_Core/src/Exceptions.h"
+
 #include "DX12CommandList.h"
 #include "DX12Renderer.h"
 
 namespace Panther
 {
-	Panther::DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, size_t a_BufferSize)
-		: Buffer(a_BufferSize, BufferType::ConstantBuffer), m_Renderer(a_Renderer)
+	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, uint32 a_NumElements, size_t a_BufferSize)
+		: Buffer(CalculateConstantBufferSize(a_BufferSize), BufferType::ConstantBuffer), m_Renderer(a_Renderer)
 	{
-		HRESULT hr = m_Renderer.GetDevice().CreateCommittedResource(
+		ThrowIfFailed(m_Renderer.GetDevice().CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE, 
-			&CD3DX12_RESOURCE_DESC::Buffer(1024 * a_BufferSize), 
+			&CD3DX12_RESOURCE_DESC::Buffer(m_BufferSize * a_NumElements),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr, 
-			IID_PPV_ARGS(&m_ConstantBuffer));
-		if (FAILED(hr))
-			throw std::runtime_error("Panther DX12 ERROR: Creating resource for Buffer failed!");
+			IID_PPV_ARGS(&m_ConstantBuffer)));
+
+		ThrowIfFailed(m_ConstantBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_CPUBuffer)));
 
 		m_CBufferViewDescription.BufferLocation = m_ConstantBuffer->GetGPUVirtualAddress();
-		m_CBufferViewDescription.SizeInBytes = (a_BufferSize + 255) & ~255;	// CB size is required to be 256-byte aligned.
-
-		// Map the constant buffers. We don't unmap this until the
-		// app closes. Keeping things mapped for the lifetime of the resource is okay.
-		hr = m_ConstantBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_CPUBuffer));
-		if (FAILED(hr))
-			throw std::runtime_error("Panther DX12 ERROR: Mapping of constant buffer failed!");
+		m_CBufferViewDescription.SizeInBytes = (UINT)m_BufferSize;
 	}
 
 	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, DX12CommandList& a_CommandList, const void* a_Data, size_t a_Size, size_t a_ElementSize)
@@ -63,5 +59,14 @@ namespace Panther
 			&subRscData);
 		a_CommandList.GetCommandList().ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_GPUBuffer.Get(),
 			D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+	}
+
+	DX12Buffer::~DX12Buffer()
+	{
+		if (m_ConstantBuffer != nullptr)
+		{
+			m_ConstantBuffer->Unmap(0, nullptr);
+		}
+		m_CPUBuffer = nullptr;
 	}
 }

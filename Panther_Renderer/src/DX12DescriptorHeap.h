@@ -11,7 +11,7 @@ namespace Panther
 		DX12DescriptorHeap(const DX12DescriptorHeap&) = delete;
 		~DX12DescriptorHeap();
 
-		uint32 RegisterConstantBuffer(Buffer& a_ConstantBuffer) final override;
+		uint32 RegisterConstantBuffer(Buffer& a_ConstantBuffer, const uint32 a_OffsetInElements) final override;
 		uint32 RegisterTexture(Texture& a_Texture) final override;
 		uint32 RegisterSampler(Sampler& a_Sampler) final override;
 		uint32 RegisterRenderTarget(RenderTarget& a_RenderTarget) final override;

@@ -3,7 +3,7 @@
 
 namespace Panther
 {
-	void Buffer::CopyTo(const void* a_SourceStart, size_t a_SizeInBytes)
+	void Buffer::CopyTo(int32 a_ElementIndex, const void* a_SourceStart, size_t a_SizeInBytes)
 	{
 		if (m_BufferType != BufferType::ConstantBuffer)
 			throw std::runtime_error("Panther Buffer ERROR: Tried CopyTo on buffer that is not of type ConstantBuffer!");
@@ -14,7 +14,7 @@ namespace Panther
 		if (a_SizeInBytes > m_BufferSize)
 			throw std::runtime_error("Panther Buffer ERROR: Source size is larger than buffer size, will cause buffer overrun!");
 
-		memcpy(m_CPUBuffer, a_SourceStart, a_SizeInBytes);
+		memcpy(&m_CPUBuffer[a_ElementIndex * m_BufferSize], a_SourceStart, a_SizeInBytes);
 	}
 
 	Buffer::Buffer() {}

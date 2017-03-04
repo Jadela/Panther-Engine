@@ -53,9 +53,7 @@ namespace Panther
 
 		std::unique_ptr<Buffer> m_WaterVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_WaterPixelCBuffer = nullptr;
-		std::unique_ptr<Buffer> m_CubeMatrixBuffer = nullptr;
-		std::unique_ptr<Buffer> m_SphereMatrixBuffer = nullptr;
-		std::unique_ptr<Buffer> m_DuckMatrixBuffer = nullptr;
+		std::unique_ptr<Buffer> m_DefaultVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomeVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_LightPositionBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomePixelCBuffer = nullptr;

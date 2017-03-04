@@ -8,7 +8,6 @@
 
 namespace Panther
 {
-
 	DX12DescriptorHeap::DX12DescriptorHeap(ID3D12Device& a_D3DDevice, uint32 a_Capacity, D3D12_DESCRIPTOR_HEAP_TYPE a_Type) :
 		m_D3DDevice(a_D3DDevice), m_Type(a_Type), m_Capacity(a_Capacity), m_Offset(0)
 	{
@@ -31,12 +30,15 @@ namespace Panther
 	{
 	}
 
-	uint32 DX12DescriptorHeap::RegisterConstantBuffer(Buffer& a_ConstantBuffer)
+	uint32 DX12DescriptorHeap::RegisterConstantBuffer(Buffer& a_ConstantBuffer, const uint32 a_OffsetInElements)
 	{
 		DX12Buffer& constantBuffer(*static_cast<DX12Buffer*>(&a_ConstantBuffer));
 		if (m_Type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
 		{
-			m_D3DDevice.CreateConstantBufferView(&constantBuffer.GetDescription(), m_DescriptorHandle);
+			D3D12_CONSTANT_BUFFER_VIEW_DESC description = constantBuffer.GetDescription();
+			description.BufferLocation += a_OffsetInElements * description.SizeInBytes;
+
+			m_D3DDevice.CreateConstantBufferView(&description, m_DescriptorHandle);
 			m_DescriptorHandle.Offset(1, m_D3DDevice.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 			return m_Offset++;
 		}

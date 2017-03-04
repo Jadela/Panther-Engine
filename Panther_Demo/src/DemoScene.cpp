@@ -29,6 +29,45 @@ namespace Panther
 		L"../rsc/textures/WaterNormal.tga"
 	};
 
+	struct SkydomeVertexCB
+	{
+		XMMATRIX m_MVP;
+		XMVECTOR m_SunPos;
+	};
+
+	struct SkydomePixelCB
+	{
+		XMVECTOR m_ScreenResolution;
+	};
+
+	struct WaterVertexCB
+	{
+		XMMATRIX m_WorldMatrix;
+		XMMATRIX m_InverseTransposeMatrix;
+		XMMATRIX m_MVP;
+	};
+
+	struct WaterPixelCB
+	{
+		XMVECTOR m_LightDirection;
+		XMVECTOR m_CameraPosition;
+		XMMATRIX m_M;
+		float m_WaterOffset;
+	};
+
+	struct DefaultVertexCB
+	{
+		XMMATRIX m_WorldMatrix;
+		XMMATRIX m_InverseTransposeMatrix;
+		XMMATRIX m_MVP;
+	};
+
+	struct DefaultPixelCB
+	{
+		XMVECTOR m_LightDirection;
+		XMVECTOR m_CameraPosition;
+	};
+
 	DemoScene::DemoScene(Renderer& a_Renderer) 
 		: Scene(a_Renderer) 
 	{
@@ -212,14 +251,12 @@ namespace Panther
 
 	void DemoScene::CreateConstantBuffers()
 	{
-		m_WaterVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
-		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(112));
-		m_CubeMatrixBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
-		m_SphereMatrixBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
-		m_DuckMatrixBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(192));
-		m_SkydomeVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(64 + 16));
-		m_LightPositionBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(32));
-		m_SkydomePixelCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(16));
+		m_WaterVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(WaterVertexCB)));
+		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(WaterPixelCB)));
+		m_DefaultVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(3, sizeof(DefaultVertexCB)));
+		m_SkydomeVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(SkydomeVertexCB)));
+		m_LightPositionBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(DefaultPixelCB)));
+		m_SkydomePixelCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(SkydomePixelCB)));
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
@@ -233,14 +270,14 @@ namespace Panther
 
 	void DemoScene::CreateDescriptors()
 	{
-		m_WaterVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get());
-		m_WaterPixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get());
-		m_CubeMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_CubeMatrixBuffer.get());
-		m_SphereMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SphereMatrixBuffer.get());
-		m_DuckMatrixBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DuckMatrixBuffer.get());
-		m_SkydomeVertexCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get());
-		m_SkydomePixelCBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get());
-		m_LightPositionBufferSlot = m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get());
+		m_WaterVertexCBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterVertexCBuffer.get(), 0);
+		m_WaterPixelCBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get(), 0);
+		m_CubeMatrixBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DefaultVertexCBuffer.get(), 0);
+		m_SphereMatrixBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DefaultVertexCBuffer.get(), 1);
+		m_DuckMatrixBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_DefaultVertexCBuffer.get(), 2);
+		m_SkydomeVertexCBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get(), 0);
+		m_SkydomePixelCBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get(), 0);
+		m_LightPositionBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get(), 0);
 
 		LoadTextures();
 
@@ -298,46 +335,20 @@ namespace Panther
 		// Use skydome shader
 		a_CommandList.SetMaterial(*m_SkyDomeMaterial, true);
 
-		struct SkydomeVertexCB
-		{
-			XMMATRIX m_MVP;
-			XMVECTOR m_SunPos;
-		};
-
-		struct SkydomePixelCB
-		{
-			XMVECTOR m_ScreenResolution;
-		};
-	
 		// Skydome	
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, m_SkydomeVertexCBufferSlot);
 		SkydomeVertexCB skydomeCB;
 		skydomeCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
 		skydomeCB.m_SunPos = XMVectorSet(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
-		m_SkydomeVertexCBuffer->CopyTo(&skydomeCB, sizeof(SkydomeVertexCB));
+		m_SkydomeVertexCBuffer->CopyTo(0, &skydomeCB, sizeof(SkydomeVertexCB));
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, m_SkydomePixelCBufferSlot);
 		SkydomePixelCB skydomeCB2;
 		skydomeCB2.m_ScreenResolution = XMVectorSet((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight(), 0, 0);
-		m_SkydomePixelCBuffer->CopyTo(&skydomeCB2, sizeof(SkydomePixelCB));
+		m_SkydomePixelCBuffer->CopyTo(0, &skydomeCB2, sizeof(SkydomePixelCB));
 		a_CommandList.ExecuteBundle(*m_SkySphereBundle.get());
 
 		// Use water shader
 		a_CommandList.SetMaterial(*m_WaterMaterial, true);
-
-		struct WaterVertexCB
-		{
-			XMMATRIX m_WorldMatrix;
-			XMMATRIX m_InverseTransposeMatrix;
-			XMMATRIX m_MVP;
-		};
-
-		struct WaterPixelCB
-		{
-			XMVECTOR m_LightDirection;
-			XMVECTOR m_CameraPosition;
-			XMMATRIX m_M;
-			float m_WaterOffset;
-		};
 
 		// Water
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBSlot, m_WaterVertexCBufferSlot);
@@ -345,37 +356,24 @@ namespace Panther
 		waterVertexCB.m_WorldMatrix = m_WaterTransform->GetTransformMatrix();
 		waterVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
 		waterVertexCB.m_MVP = m_WaterTransform->GetTransformMatrix() * vpMatrix;
-		m_WaterVertexCBuffer->CopyTo(&waterVertexCB, sizeof(WaterVertexCB));
+		m_WaterVertexCBuffer->CopyTo(0, &waterVertexCB, sizeof(WaterVertexCB));
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBSlot, m_WaterPixelCBufferSlot);
 		WaterPixelCB waterPixelCB;
 		waterPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		waterPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		waterPixelCB.m_M = m_WaterTransform->GetTransformMatrix();
 		waterPixelCB.m_WaterOffset = m_WaterOffset;
-		m_WaterPixelCBuffer->CopyTo(&waterPixelCB, sizeof(WaterPixelCB));
+		m_WaterPixelCBuffer->CopyTo(0, &waterPixelCB, sizeof(WaterPixelCB));
 		a_CommandList.ExecuteBundle(*m_WaterBundle.get());
 
 		// Use default shader
 		a_CommandList.SetMaterial(*m_DefaultMaterial, true);
 
-		struct DefaultVertexCB
-		{
-			XMMATRIX m_WorldMatrix;
-			XMMATRIX m_InverseTransposeMatrix;
-			XMMATRIX m_MVP;
-		};
-
-		struct DefaultPixelCB
-		{
-			XMVECTOR m_LightDirection;
-			XMVECTOR m_CameraPosition;
-		};
-
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultPixelCBSlot, m_LightPositionBufferSlot);
 		DefaultPixelCB defaultPixelCB;
 		defaultPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		defaultPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
-		m_LightPositionBuffer->CopyTo(&defaultPixelCB, sizeof(DefaultPixelCB));
+		m_LightPositionBuffer->CopyTo(0, &defaultPixelCB, sizeof(DefaultPixelCB));
 
 		// Cube
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_CubeMatrixBufferSlot);
@@ -383,7 +381,7 @@ namespace Panther
 		defaultVertexCB.m_WorldMatrix = m_CubeTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_CubeTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_CubeTransform->GetTransformMatrix() * vpMatrix;
-		m_CubeMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
+		m_DefaultVertexCBuffer->CopyTo(0, &defaultVertexCB, sizeof(DefaultVertexCB));
 		a_CommandList.ExecuteBundle(*m_CubeBundle.get());
 
 		// Sphere
@@ -391,7 +389,7 @@ namespace Panther
 		defaultVertexCB.m_WorldMatrix = m_SphereTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_SphereTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
-		m_SphereMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
+		m_DefaultVertexCBuffer->CopyTo(1, &defaultVertexCB, sizeof(DefaultVertexCB));
 		a_CommandList.ExecuteBundle(*m_SphereBundle.get());
 
 		// Duck
@@ -399,7 +397,7 @@ namespace Panther
 		defaultVertexCB.m_WorldMatrix = m_DuckTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_DuckTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
-		m_DuckMatrixBuffer->CopyTo(&defaultVertexCB, sizeof(DefaultVertexCB));
+		m_DefaultVertexCBuffer->CopyTo(2, &defaultVertexCB, sizeof(DefaultVertexCB));
 		a_CommandList.ExecuteBundle(*m_DuckBundle.get());
 	}
 

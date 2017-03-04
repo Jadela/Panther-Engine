@@ -9,7 +9,7 @@ namespace Panther
 	public:
 		virtual ~Buffer() {};
 
-		void CopyTo(const void* a_SourceStart, size_t a_SizeInBytes);
+		void CopyTo(int32 a_ElementIndex, const void* a_SourceStart, size_t a_SizeInBytes);
 
 	protected:
 		enum class BufferType : ubyte8 { ConstantBuffer, UploadBuffer, Undefined };

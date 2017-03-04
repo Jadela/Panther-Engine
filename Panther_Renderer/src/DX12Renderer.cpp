@@ -176,10 +176,10 @@ namespace Panther
 		}
 	}
 
-	Buffer* DX12Renderer::CreateBuffer(const size_t a_Capacity)
+	Buffer* DX12Renderer::CreateBuffer(const uint32 a_NumElements, const size_t a_ElementSize)
 	{
-		assert(a_Capacity > 0);
-		return new DX12Buffer(*this, a_Capacity);
+		assert(a_ElementSize > 0 && a_NumElements > 0);
+		return new DX12Buffer(*this, a_NumElements, a_ElementSize);
 	}
 
 	Buffer* DX12Renderer::CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize)
