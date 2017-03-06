@@ -51,7 +51,6 @@ namespace Panther
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
 		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
 
-		std::unique_ptr<Buffer> m_WaterVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_WaterPixelCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_DefaultVertexCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_SkydomeVertexCBuffer = nullptr;
