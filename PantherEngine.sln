@@ -1,60 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{1E892989-8A4E-4812-9521-9012BBC7D7F6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Renderer", "Panther_Renderer\Panther_Renderer.vcxproj", "{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{98144C83-3F06-474A-8566-015A098E7294} = {98144C83-3F06-474A-8566-015A098E7294}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Core", "Panther_Core\Panther_Core.vcxproj", "{98144C83-3F06-474A-8566-015A098E7294}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Utilities", "Panther_Utilities\Panther_Utilities.vcxproj", "{23248A7B-A205-424B-B44C-06BB66F4FC71}"
-	ProjectSection(ProjectDependencies) = postProject
-		{98144C83-3F06-474A-8566-015A098E7294} = {98144C83-3F06-474A-8566-015A098E7294}
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7} = {92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Panther_Demo", "Panther_Demo\Panther_Demo.vcxproj", "{142FE21A-AF2B-409B-AAB4-D0E922A51E93}"
-	ProjectSection(ProjectDependencies) = postProject
-		{23248A7B-A205-424B-B44C-06BB66F4FC71} = {23248A7B-A205-424B-B44C-06BB66F4FC71}
-		{98144C83-3F06-474A-8566-015A098E7294} = {98144C83-3F06-474A-8566-015A098E7294}
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7} = {92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PantherEngine", "PantherEngine\PantherEngine.vcxproj", "{142FE21A-AF2B-409B-AAB4-D0E922A51E93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug DX12|Win64 = Debug DX12|Win64
+		Debug DX12|x64 = Debug DX12|x64
 		Release DX12|Win64 = Release DX12|Win64
+		Release DX12|x64 = Release DX12|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}.Debug DX12|Win64.ActiveCfg = Debug DX12|x64
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}.Debug DX12|Win64.Build.0 = Debug DX12|x64
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}.Release DX12|Win64.ActiveCfg = Release DX12|x64
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7}.Release DX12|Win64.Build.0 = Release DX12|x64
-		{98144C83-3F06-474A-8566-015A098E7294}.Debug DX12|Win64.ActiveCfg = Debug|x64
-		{98144C83-3F06-474A-8566-015A098E7294}.Debug DX12|Win64.Build.0 = Debug|x64
-		{98144C83-3F06-474A-8566-015A098E7294}.Release DX12|Win64.ActiveCfg = Release|x64
-		{98144C83-3F06-474A-8566-015A098E7294}.Release DX12|Win64.Build.0 = Release|x64
-		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Debug DX12|Win64.ActiveCfg = Debug|x64
-		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Debug DX12|Win64.Build.0 = Debug|x64
-		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Release DX12|Win64.ActiveCfg = Release|x64
-		{23248A7B-A205-424B-B44C-06BB66F4FC71}.Release DX12|Win64.Build.0 = Release|x64
 		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Debug DX12|Win64.ActiveCfg = Debug|x64
 		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Debug DX12|Win64.Build.0 = Debug|x64
+		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Debug DX12|x64.ActiveCfg = Debug|x64
+		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Debug DX12|x64.Build.0 = Debug|x64
 		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Release DX12|Win64.ActiveCfg = Release|x64
 		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Release DX12|Win64.Build.0 = Release|x64
+		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Release DX12|x64.ActiveCfg = Release|x64
+		{142FE21A-AF2B-409B-AAB4-D0E922A51E93}.Release DX12|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{92F5FAF0-8320-4EF3-AB32-CDDE2E846CE7} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
-		{98144C83-3F06-474A-8566-015A098E7294} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
-		{23248A7B-A205-424B-B44C-06BB66F4FC71} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
 		{142FE21A-AF2B-409B-AAB4-D0E922A51E93} = {1E892989-8A4E-4812-9521-9012BBC7D7F6}
 	EndGlobalSection
 EndGlobal

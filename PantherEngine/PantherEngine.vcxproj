@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{142FE21A-AF2B-409B-AAB4-D0E922A51E93}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Panther_Demo</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>PantherEngine</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>bin\</OutDir>
+    <IntDir>intermediate\</IntDir>
+    <TargetName>$(ProjectName)D</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>bin\</OutDir>
+    <IntDir>intermediate\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>inc</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <OmitFramePointers>false</OmitFramePointers>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\GH\Panther-Engine\Panther_Demo\inc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>CopyShaders.bat $(ProjectDir) $(OutDir)</Command>
+      <Message>Copying shaders from resource folder to output folder...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>inc</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\GH\Panther-Engine\Panther_Demo\inc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>CopyShaders.bat $(ProjectDir) $(OutDir)</Command>
+      <Message>Copying shaders from resource folder to output folder...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Actor.h" />
+    <ClInclude Include="src\ActorComponent.h" />
+    <ClInclude Include="src\Adapter.h" />
+    <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Buffer.h" />
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\CommandList.h" />
+    <ClInclude Include="src\Core.h" />
+    <ClInclude Include="src\DemoScene.h" />
+    <ClInclude Include="src\DescriptorHeap.h" />
+    <ClInclude Include="src\DisplayModeList.h" />
+    <ClInclude Include="src\DX12Buffer.h" />
+    <ClInclude Include="src\DX12CommandList.h" />
+    <ClInclude Include="src\DX12DescriptorHeap.h" />
+    <ClInclude Include="src\DX12Material.h" />
+    <ClInclude Include="src\DX12Mesh.h" />
+    <ClInclude Include="src\DX12Renderer.h" />
+    <ClInclude Include="src\DX12RendererPCH.h" />
+    <ClInclude Include="src\DX12RenderTarget.h" />
+    <ClInclude Include="src\DX12Sampler.h" />
+    <ClInclude Include="src\DX12Texture.h" />
+    <ClInclude Include="src\Exceptions.h" />
+    <ClInclude Include="src\Keys.h" />
+    <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Output.h" />
+    <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\RendererFactory.h" />
+    <ClInclude Include="src\RenderTarget.h" />
+    <ClInclude Include="src\Sampler.h" />
+    <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Space.h" />
+    <ClInclude Include="src\SwapChain.h" />
+    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\Vector.h" />
+    <ClInclude Include="src\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Actor.cpp" />
+    <ClCompile Include="src\Adapter.cpp" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Buffer.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\CommandList.cpp" />
+    <ClCompile Include="src\Core.cpp" />
+    <ClCompile Include="src\DemoScene.cpp" />
+    <ClCompile Include="src\DisplayModeList.cpp" />
+    <ClCompile Include="src\DX12Buffer.cpp" />
+    <ClCompile Include="src\DX12CommandList.cpp" />
+    <ClCompile Include="src\DX12DescriptorHeap.cpp" />
+    <ClCompile Include="src\DX12Material.cpp" />
+    <ClCompile Include="src\DX12Mesh.cpp" />
+    <ClCompile Include="src\DX12Renderer.cpp" />
+    <ClCompile Include="src\DX12RendererPCH.cpp" />
+    <ClCompile Include="src\DX12RenderTarget.cpp" />
+    <ClCompile Include="src\DX12Sampler.cpp" />
+    <ClCompile Include="src\DX12Texture.cpp" />
+    <ClCompile Include="src\Exceptions.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Output.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\RendererFactory.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SwapChain.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Panther_Demo.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\shaders\shaders.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="rsc\shaders\skydome.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\shaders\water.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\shaders\lighting.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
