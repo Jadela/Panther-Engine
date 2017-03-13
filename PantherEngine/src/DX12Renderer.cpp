@@ -1,4 +1,3 @@
-#include "DX12RendererPCH.h"
 #include "DX12Renderer.h"
 
 #include <sstream>
@@ -18,6 +17,8 @@
 #include "DX12Texture.h"
 #include "Exceptions.h"
 #include "Window.h"
+
+#include <DirectXColors.h>
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -187,16 +188,16 @@ namespace Panther
 		return new DX12Buffer(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_Size, a_ElementSize);
 	}
 
-	DescriptorHeap* DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type)
+	DescriptorHeap* DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type)
 	{
 		D3D12_DESCRIPTOR_HEAP_TYPE type = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
 		switch (a_Type)
 		{
-		case DescriptorHeap::DescriptorHeapType::ConstantBufferView:
-		case DescriptorHeap::DescriptorHeapType::ShaderResourceView:
+		case DescriptorHeapType::ConstantBufferView:
+		case DescriptorHeapType::ShaderResourceView:
 			type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 			break;
-		case DescriptorHeap::DescriptorHeapType::Sampler:
+		case DescriptorHeapType::Sampler:
 			type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
 			break;
 		default:
@@ -225,7 +226,7 @@ namespace Panther
 		return new DX12Mesh(*this);
 	}
 
-	Sampler* DX12Renderer::CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode)
+	Sampler* DX12Renderer::CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode)
 	{
 		return new DX12Sampler((D3D12_TEXTURE_ADDRESS_MODE)((int)a_TextureCoordinateMode + 1));
 	}

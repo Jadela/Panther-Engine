@@ -1,6 +1,7 @@
-#include "DX12RendererPCH.h"
 #include "DX12Material.h"
 #include "DX12Renderer.h"
+
+#include <D3DCompiler.h>
 
 namespace Panther
 {

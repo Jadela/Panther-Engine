@@ -1,11 +1,10 @@
-#include "DX12RendererPCH.h"
 #include "DX12Texture.h"
 
+#include "Core.h"
 #include "DX12CommandList.h"
 #include "DX12Renderer.h"
 
-#include "Core.h"
-#include "Window.h"
+#include <d3dx12.h>
 
 namespace Panther
 {
@@ -18,7 +17,7 @@ namespace Panther
 		m_ShaderResourceViewDescriptor.Texture2D.MipLevels = 1U;
 	}
 
-	DX12Texture::DX12Texture(DX12Renderer & a_Renderer, D3D12_SHADER_RESOURCE_VIEW_DESC & a_ShaderResourceViewDescriptor) :
+	DX12Texture::DX12Texture(DX12Renderer& a_Renderer, D3D12_SHADER_RESOURCE_VIEW_DESC& a_ShaderResourceViewDescriptor) :
 		m_Renderer(a_Renderer), 
 		m_ShaderResourceViewDescriptor(a_ShaderResourceViewDescriptor)
 	{

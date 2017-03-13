@@ -1,4 +1,10 @@
+#pragma once
 #include "Renderer.h"
+
+#include <dxgi1_5.h>
+#include <wrl.h>
+
+#include <memory>
 
 namespace Panther
 {
@@ -21,11 +27,11 @@ namespace Panther
 
 		Buffer* CreateBuffer(const uint32 a_NumElements, const size_t a_ElementSize) final override;
 		Buffer* CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) final override;
-		DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeap::DescriptorHeapType a_Type) final override;
+		DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type) final override;
 		Texture* CreateTexture(const std::wstring& a_Path) final override;
 		Material* CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) final override;
 		Mesh* CreateMesh() final override;
-		Sampler* CreateSampler(Sampler::TextureCoordinateMode a_TextureCoordinateMode = Sampler::TextureCoordinateMode::Wrap) final override;
+		Sampler* CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode) final override;
 		CommandList* CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) final override;
 
 		CommandList& StartRender() final override;

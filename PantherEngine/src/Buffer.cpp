@@ -1,5 +1,6 @@
-#include "DX12RendererPCH.h"
 #include "Buffer.h"
+
+#include <stdexcept>
 
 namespace Panther
 {

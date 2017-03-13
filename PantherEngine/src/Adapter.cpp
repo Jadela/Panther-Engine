@@ -1,4 +1,3 @@
-#include "DX12RendererPCH.h"
 #include "Adapter.h"
 
 #include "Exceptions.h"

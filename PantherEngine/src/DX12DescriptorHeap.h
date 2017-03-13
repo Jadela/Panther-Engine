@@ -1,6 +1,11 @@
 #pragma once
 #include "DescriptorHeap.h"
 
+#include <d3dx12.h>
+#include <wrl.h>
+
+#include <string>
+
 namespace Panther
 {
 	class DX12DescriptorHeap final : public DescriptorHeap

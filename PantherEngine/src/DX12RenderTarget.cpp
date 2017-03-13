@@ -1,12 +1,12 @@
-#include "DX12RendererPCH.h"
 #include "DX12RenderTarget.h"
+
+#include "Exceptions.h"
 
 namespace Panther
 {
 	DX12RenderTarget::DX12RenderTarget(IDXGISwapChain3& a_SwapChain, uint32 a_BufferIndex)
 	{
-		if (FAILED(a_SwapChain.GetBuffer(a_BufferIndex, IID_PPV_ARGS(&m_TargetBuffer))))
-			throw std::runtime_error("DX12RenderTarget: Could't get SwapChain buffer while constructing render target!");
+		ThrowIfFailed(a_SwapChain.GetBuffer(a_BufferIndex, IID_PPV_ARGS(&m_TargetBuffer)));
 	}
 
 	DX12RenderTarget::~DX12RenderTarget()

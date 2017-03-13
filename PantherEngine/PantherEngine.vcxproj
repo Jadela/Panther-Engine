@@ -73,7 +73,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>inc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
@@ -108,7 +108,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>inc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;winmm.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -136,7 +136,6 @@
     <ClInclude Include="src\DX12Material.h" />
     <ClInclude Include="src\DX12Mesh.h" />
     <ClInclude Include="src\DX12Renderer.h" />
-    <ClInclude Include="src\DX12RendererPCH.h" />
     <ClInclude Include="src\DX12RenderTarget.h" />
     <ClInclude Include="src\DX12Sampler.h" />
     <ClInclude Include="src\DX12Texture.h" />
@@ -174,7 +173,6 @@
     <ClCompile Include="src\DX12Material.cpp" />
     <ClCompile Include="src\DX12Mesh.cpp" />
     <ClCompile Include="src\DX12Renderer.cpp" />
-    <ClCompile Include="src\DX12RendererPCH.cpp" />
     <ClCompile Include="src\DX12RenderTarget.cpp" />
     <ClCompile Include="src\DX12Sampler.cpp" />
     <ClCompile Include="src\DX12Texture.cpp" />

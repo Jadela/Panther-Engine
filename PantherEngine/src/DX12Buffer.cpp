@@ -1,10 +1,10 @@
-#include "DX12RendererPCH.h"
 #include "DX12Buffer.h"
 
 #include "Exceptions.h"
-
 #include "DX12CommandList.h"
 #include "DX12Renderer.h"
+
+#include <d3dx12.h>
 
 namespace Panther
 {

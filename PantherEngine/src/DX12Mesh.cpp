@@ -1,4 +1,3 @@
-#include "DX12RendererPCH.h"
 #include "DX12Mesh.h"
 
 #include "CommandList.h"

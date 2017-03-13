@@ -1,6 +1,8 @@
 #pragma once
 #include "Mesh.h"
 
+#include <d3d12.h>
+
 namespace Panther
 {
 	class DX12Mesh final : public Mesh

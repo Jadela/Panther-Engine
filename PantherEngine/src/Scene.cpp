@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 #include "Window.h"
-#include <../src/TextureManager.h>
+#include "TextureManager.h"
 
 namespace Panther
 {

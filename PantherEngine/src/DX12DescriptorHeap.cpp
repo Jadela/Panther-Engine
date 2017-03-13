@@ -1,4 +1,3 @@
-#include "DX12RendererPCH.h"
 #include "DX12DescriptorHeap.h"
 
 #include "DX12Buffer.h"

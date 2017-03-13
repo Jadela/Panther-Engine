@@ -1,6 +1,8 @@
 #pragma once
 #include "Sampler.h"
 
+#include <d3d12.h>
+
 namespace Panther
 {
 	class DX12Renderer;

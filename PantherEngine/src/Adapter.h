@@ -1,8 +1,11 @@
 #pragma once
-
-#include <vector>
-
 #include "Core.h"
+
+#include <dxgi1_5.h>
+#include <wrl.h>
+
+#include <memory>
+#include <vector>
 
 namespace Panther
 {

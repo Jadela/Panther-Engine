@@ -3,6 +3,9 @@
 
 #include "Core.h"
 
+#include <d3d12.h>
+#include <wrl.h>
+
 namespace Panther
 {
 	class DX12CommandList;

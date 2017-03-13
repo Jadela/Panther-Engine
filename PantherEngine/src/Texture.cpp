@@ -1,4 +1,3 @@
-#include "DX12RendererPCH.h"
 #include "Texture.h"
 
 // NOTE (JDL): Disable wcstombs warning

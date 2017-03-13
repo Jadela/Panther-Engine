@@ -1,6 +1,8 @@
 #pragma once
 #include "CommandList.h"
 
+#include <wrl.h>
+
 namespace Panther
 {
 	class DX12Renderer;

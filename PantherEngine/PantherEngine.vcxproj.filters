@@ -108,9 +108,6 @@
     <ClInclude Include="src\DX12Renderer.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\DX12RendererPCH.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\DX12RenderTarget.h">
       <Filter>Common</Filter>
     </ClInclude>
@@ -201,9 +198,6 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12Renderer.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DX12RendererPCH.cpp">
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12RenderTarget.cpp">

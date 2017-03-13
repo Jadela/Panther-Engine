@@ -1,4 +1,3 @@
-#include "DX12RendererPCH.h"
 #include "RendererFactory.h"
 #include "DX12Renderer.h"
 

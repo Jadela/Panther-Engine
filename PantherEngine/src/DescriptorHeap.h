@@ -10,16 +10,16 @@ namespace Panther
 	class Sampler;
 	class RenderTarget;
 
+	enum class DescriptorHeapType
+	{
+		ConstantBufferView = 0,
+		ShaderResourceView,
+		Sampler
+	};
+
 	class DescriptorHeap
 	{
 	public:
-		enum class DescriptorHeapType
-		{
-			ConstantBufferView = 0,
-			ShaderResourceView,
-			Sampler
-		};
-
 		DescriptorHeap() {};
 		DescriptorHeap(const DescriptorHeap&) = delete;
 		~DescriptorHeap() {};

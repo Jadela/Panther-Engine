@@ -255,10 +255,10 @@ namespace Panther
 	void DemoScene::CreateDescriptorHeaps()
 	{		
 		uint32 CBVSRVUAVHeapSize = 8 + (uint32)Countof(g_Textures);
-		m_CBVSRVUAVDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeap::DescriptorHeapType::ConstantBufferView));
+		m_CBVSRVUAVDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeapType::ConstantBufferView));
 
 		uint32 samplerHeapSize = 2;
-		m_SamplerDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeap::DescriptorHeapType::Sampler));
+		m_SamplerDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(samplerHeapSize, DescriptorHeapType::Sampler));
 	}
 
 	void DemoScene::CreateDescriptors()
@@ -274,8 +274,8 @@ namespace Panther
 
 		LoadTextures();
 
-		m_DefaultSampler = std::unique_ptr<Sampler>(m_Renderer.CreateSampler());
-		m_SkyboxSampler = std::unique_ptr<Sampler>(m_Renderer.CreateSampler(Sampler::TextureCoordinateMode::Clamp));
+		m_DefaultSampler = std::unique_ptr<Sampler>(m_Renderer.CreateSampler(SamplerTextureCoordinateMode::Wrap));
+		m_SkyboxSampler = std::unique_ptr<Sampler>(m_Renderer.CreateSampler(SamplerTextureCoordinateMode::Clamp));
 
 		m_DefaultSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_DefaultSampler.get());
 		m_SkyboxSamplerSlot = m_SamplerDescriptorHeap->RegisterSampler(*m_SkyboxSampler.get());

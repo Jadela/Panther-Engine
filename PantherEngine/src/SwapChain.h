@@ -1,6 +1,12 @@
 #pragma once
-
 #include "Core.h"
+
+#include <dxgi1_5.h>
+#include <d3d12.h>
+#include <d3dx12.h>
+#include <wrl.h>
+
+#include <memory>
 
 namespace Panther
 {

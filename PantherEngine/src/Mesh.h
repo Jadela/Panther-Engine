@@ -1,9 +1,10 @@
 #pragma once
+#include "Core.h"
+
+#include <DirectXMath.h>
 
 #include <vector>
-#include <DirectXColors.h>
-
-#include "Core.h"
+#include <memory>
 
 namespace Panther
 {
