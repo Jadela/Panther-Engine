@@ -1,7 +1,7 @@
 #include "DX12RendererPCH.h"
 #include "Adapter.h"
 
-#include "../../Panther_Demo/src/Exceptions.h"
+#include "Exceptions.h"
 #include "Output.h"
 
 using namespace Microsoft::WRL;

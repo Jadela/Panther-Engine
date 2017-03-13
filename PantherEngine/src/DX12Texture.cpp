@@ -4,8 +4,8 @@
 #include "DX12CommandList.h"
 #include "DX12Renderer.h"
 
-#include "../../Panther_Demo/src/Core.h"
-#include "../../Panther_Demo/src/Window.h"
+#include "Core.h"
+#include "Window.h"
 
 namespace Panther
 {

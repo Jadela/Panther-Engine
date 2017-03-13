@@ -1,7 +1,7 @@
 #include "DX12RendererPCH.h"
 #include "Output.h"
 
-#include "../../Panther_Demo/src/Exceptions.h"
+#include "Exceptions.h"
 #include "DisplayModeList.h"
 
 namespace Panther

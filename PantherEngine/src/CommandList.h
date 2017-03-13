@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Panther_Demo/src/Core.h"
+#include "Core.h"
 #include "Material.h"
 
 #include <d3d12.h>

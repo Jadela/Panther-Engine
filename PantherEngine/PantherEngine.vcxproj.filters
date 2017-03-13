@@ -223,11 +223,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Panther_Demo.rc">
-      <Filter>Resources</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="rsc\shaders\shaders.hlsl">
       <Filter>Resources</Filter>
     </None>
@@ -240,5 +235,10 @@
     <None Include="rsc\shaders\lighting.hlsl">
       <Filter>Resources</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PantherEngine.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

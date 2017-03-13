@@ -3,7 +3,7 @@
 #include <vector>
 #include <DirectXColors.h>
 
-#include "../../Panther_Demo/src/Core.h"
+#include "Core.h"
 
 namespace Panther
 {

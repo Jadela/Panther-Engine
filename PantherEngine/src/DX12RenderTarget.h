@@ -1,7 +1,7 @@
 #pragma once
 #include "RenderTarget.h"
 
-#include "../../Panther_Demo/src/Core.h"
+#include "Core.h"
 
 namespace Panther
 {

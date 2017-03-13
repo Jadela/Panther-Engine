@@ -16,9 +16,8 @@
 #include "DX12RenderTarget.h"
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
-#include "../../Panther_Demo/src/Exceptions.h"
-// TODO: Move over to new Panther projects.
-#include "../../Panther_Demo/src/Window.h"
+#include "Exceptions.h"
+#include "Window.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

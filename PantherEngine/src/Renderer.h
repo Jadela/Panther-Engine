@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Panther_Demo/src/Core.h"
+#include "Core.h"
 #include "DescriptorHeap.h"
 #include "Sampler.h"
 

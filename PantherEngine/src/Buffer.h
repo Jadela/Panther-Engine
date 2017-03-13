@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Panther_Demo/src/Core.h"
+#include "Core.h"
 
 namespace Panther
 {

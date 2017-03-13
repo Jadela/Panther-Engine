@@ -1,7 +1,7 @@
 #pragma once
 #include <memory> // std::unique_ptr<T>
 
-#include "../../Panther_Demo/src/Core.h"
+#include "Core.h"
 
 namespace Panther
 {

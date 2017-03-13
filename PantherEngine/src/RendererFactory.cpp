@@ -3,7 +3,7 @@
 #include "DX12Renderer.h"
 
 // TODO: Move over to new Panther projects.
-#include "../../Panther_Demo/src/Window.h"
+#include "Window.h"
 
 namespace Panther
 {
