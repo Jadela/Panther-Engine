@@ -1,219 +1,237 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Common">
-      <UniqueIdentifier>{eb91a12e-02a4-4e1f-aae4-fc65977d73e4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{fb177175-f593-44b8-9e70-e84c4fa2715e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources\Shaders">
       <UniqueIdentifier>{a55885c3-7207-4b18-9104-6ea5b266c640}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{6263abe7-164b-42cf-ad13-cc8aba9c1bac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\DirectX12">
+      <UniqueIdentifier>{8b8ee5f6-96d1-438f-afb3-8307f48d5beb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Common">
+      <UniqueIdentifier>{b96099f3-89d2-45db-8539-6472d5b64838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{1980fcea-2a1c-41fa-9c97-998fbe7fb0ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Other">
+      <UniqueIdentifier>{d1f70d9c-895b-4331-9548-5942058ec7ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{3ad5709b-8f5e-4063-9900-c1f9dea9fd3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Maths">
+      <UniqueIdentifier>{0ef3a744-2066-4879-b3a5-6584c0f0a7ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Window.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Application.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DemoScene.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Actor.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ActorComponent.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Transform.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Space.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TextureManager.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Exceptions.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Keys.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Vector.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Output.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RendererFactory.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderTarget.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sampler.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SwapChain.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Texture.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Adapter.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Buffer.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandList.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DescriptorHeap.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="src\DisplayModeList.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="src\DX12Buffer.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12CommandList.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12DescriptorHeap.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12Material.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12Mesh.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12Renderer.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12RenderTarget.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12Sampler.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="src\DX12Texture.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Buffer.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandList.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DescriptorHeap.h">
+      <Filter>Rendering\Common</Filter>
     </ClInclude>
     <ClInclude Include="src\Material.h">
-      <Filter>Common</Filter>
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderTarget.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sampler.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Rendering\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actor.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ActorComponent.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Transform.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureManager.h">
+      <Filter>Rendering\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererFactory.h">
+      <Filter>Rendering\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Adapter.h">
+      <Filter>Rendering\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vector.h">
+      <Filter>Core\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Space.h">
+      <Filter>Core\Maths</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DemoScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Application.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SwapChain.h">
+      <Filter>Rendering\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Output.h">
+      <Filter>Rendering\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Keys.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Exceptions.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DisplayModeList.h">
+      <Filter>Rendering\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DemoScene.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Window.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Actor.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Transform.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TextureManager.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Exceptions.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Output.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RendererFactory.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SwapChain.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Texture.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Adapter.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Buffer.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandList.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DisplayModeList.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\DX12Buffer.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12CommandList.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12DescriptorHeap.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12Material.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12Mesh.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12Renderer.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12RenderTarget.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12Sampler.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="src\DX12Texture.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Buffer.cpp">
+      <Filter>Rendering\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandList.cpp">
+      <Filter>Rendering\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Material.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\Common</Filter>
     </ClCompile>
     <ClCompile Include="src\Mesh.cpp">
-      <Filter>Common</Filter>
+      <Filter>Rendering\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Rendering\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Rendering\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actor.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Transform.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RendererFactory.cpp">
+      <Filter>Rendering\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TextureManager.cpp">
+      <Filter>Rendering\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Adapter.cpp">
+      <Filter>Rendering\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DemoScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwapChain.cpp">
+      <Filter>Rendering\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Output.cpp">
+      <Filter>Rendering\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exceptions.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayModeList.cpp">
+      <Filter>Rendering\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
