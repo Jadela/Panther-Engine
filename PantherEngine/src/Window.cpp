@@ -1,11 +1,11 @@
 #include "Window.h"
 
-#include <assert.h>
-
+#include "../resource.h"
 #include "Exceptions.h"
 #include "Keys.h"
-#include "../resource.h"
 #include "Application.h"
+
+#include <assert.h>
 
 namespace Panther
 {

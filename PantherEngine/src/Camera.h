@@ -1,7 +1,5 @@
 #pragma once
-
 #include "Transform.h"
-#include "Space.h"
 
 namespace Panther
 {

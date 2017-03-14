@@ -3,8 +3,6 @@
 #include "Exceptions.h"
 #include "Output.h"
 
-using namespace Microsoft::WRL;
-
 namespace Panther
 {
 	std::unique_ptr<Adapter> Adapter::GetAdapter(IDXGIFactory4& a_Factory, int32 a_Index, bool a_WarpAdapter)

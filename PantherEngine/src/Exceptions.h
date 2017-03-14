@@ -1,9 +1,9 @@
 #pragma once
+#include "Core.h"
 
 #include <windows.h>
-#include <string>
 
-#include "Core.h"
+#include <string>
 
 namespace Panther
 {
@@ -29,10 +29,10 @@ inline std::wstring AnsiToWString(const std::string& str)
 }
 
 #ifndef ThrowIfFailed
-#define ThrowIfFailed(x)                                              \
-{                                                                     \
-	HRESULT hr__ = (x);                                               \
-	std::wstring wfn = AnsiToWString(__FILE__);                       \
+#define ThrowIfFailed(x) \
+{ \
+	HRESULT hr__ = (x); \
+	std::wstring wfn = AnsiToWString(__FILE__); \
 	if(FAILED(hr__)) { throw Panther::WinException(hr__, L#x, wfn, __LINE__); } \
 }
 #endif

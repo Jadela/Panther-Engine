@@ -1,7 +1,6 @@
 #include "RendererFactory.h"
-#include "DX12Renderer.h"
 
-// TODO: Move over to new Panther projects.
+#include "DX12Renderer.h"
 #include "Window.h"
 
 namespace Panther

@@ -1,7 +1,7 @@
 #pragma once
+#include "Space.h"
 
 #include <DirectXMath.h>
-#include "Space.h"
 
 namespace Panther
 {

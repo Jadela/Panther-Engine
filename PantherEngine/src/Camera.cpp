@@ -47,7 +47,7 @@ namespace Panther
 		CalculateProjectionMatrix();
 	}
 
-	void Camera::Translate(DirectX::XMVECTOR a_Translation, Space a_RelativeTo)
+	void Camera::Translate(XMVECTOR a_Translation, Space a_RelativeTo)
 	{
 		m_Transform.Translate(a_Translation, a_RelativeTo);
 	}

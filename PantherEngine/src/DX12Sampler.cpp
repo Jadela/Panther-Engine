@@ -1,4 +1,5 @@
 #include "DX12Sampler.h"
+
 #include "DX12Renderer.h"
 
 namespace Panther

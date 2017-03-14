@@ -1,13 +1,11 @@
 #include "Application.h"
 
-#include <algorithm>
-#include <assert.h>
-
 #include "RendererFactory.h"
-#include "../resource.h"
 #include "Renderer.h"
 #include "Window.h"
 #include "DemoScene.h"
+
+#include <assert.h>
 
 namespace Panther
 {
@@ -75,7 +73,7 @@ namespace Panther
 
 				// Cap the delta time to the max time step (useful if your 
 				// debugging and you don't want the deltaTime value to explode.
-				deltaTime = std::min<float>(deltaTime, maxTimeStep);
+				deltaTime = Min(deltaTime, maxTimeStep);
 				totalTime += deltaTime;
 
 				m_Scene->Update(deltaTime);

@@ -3,14 +3,12 @@
 
 namespace Panther
 {
-	// Panther Renderer
 	class Buffer;
 	class CommandList;
 	class DescriptorHeap;
 	class Mesh;
 	class Sampler;
 	class Texture;
-	// Panther Utilities
 	class Camera;
 	class Transform;
 

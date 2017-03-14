@@ -1,9 +1,9 @@
-#include <windows.h>
-#include <stdexcept>
-
-#include "Application.h"
 #include "Core.h"
 #include "Exceptions.h"
+#include "Application.h"
+
+#include <windows.h>
+#include <stdexcept>
 
 using namespace Panther;
 

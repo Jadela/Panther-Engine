@@ -1,9 +1,8 @@
 #pragma once
+#include "Core.h"
 
 #include <windows.h>
 #include <string>
-
-#include "Core.h"
 
 namespace Panther
 {

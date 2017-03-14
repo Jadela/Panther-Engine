@@ -7,6 +7,9 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{fb177175-f593-44b8-9e70-e84c4fa2715e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Shaders">
+      <UniqueIdentifier>{a55885c3-7207-4b18-9104-6ea5b266c640}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -149,9 +152,6 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Exceptions.cpp">
       <Filter>Common</Filter>
     </ClCompile>
@@ -217,17 +217,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="rsc\shaders\lighting.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
     <None Include="rsc\shaders\shaders.hlsl">
-      <Filter>Resources</Filter>
+      <Filter>Resources\Shaders</Filter>
     </None>
     <None Include="rsc\shaders\skydome.hlsl">
-      <Filter>Resources</Filter>
+      <Filter>Resources\Shaders</Filter>
     </None>
     <None Include="rsc\shaders\water.hlsl">
-      <Filter>Resources</Filter>
-    </None>
-    <None Include="rsc\shaders\lighting.hlsl">
-      <Filter>Resources</Filter>
+      <Filter>Resources\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

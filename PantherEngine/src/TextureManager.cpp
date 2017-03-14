@@ -1,5 +1,8 @@
 #include "TextureManager.h"
 
+#include "Renderer.h"
+#include "Texture.h"
+
 namespace Panther
 {
 	TextureManager::TextureManager(Renderer& a_Renderer, uint32 a_TextureCapacity)

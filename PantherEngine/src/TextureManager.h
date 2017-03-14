@@ -1,16 +1,15 @@
 #pragma once
+#include "Core.h"
 
 #include <string>
 #include <memory>
-#include "D3D12.h" // TODO: Remove DX12 types in Descriptorheap.h & get rid of this include.
-
-#include "Core.h"
-#include "Renderer.h"
-#include "Texture.h"
 
 namespace Panther
 {
 	using TextureID = uint32;
+
+	class Renderer;
+	class Texture;
 
 	class TextureManager final
 	{
