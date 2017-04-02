@@ -17,7 +17,7 @@ namespace Panther
 		void SetNearZ(float a_NewNearZ);
 		void SetFarZ(float a_NewFarZ);
 
-		void Translate(DirectX::XMVECTOR a_Translation, Space a_RelativeTo = Space::Local);
+		void Translate(Vector a_Translation, Space a_RelativeTo = Space::Local);
 		void Rotate(float a_Roll, float a_Pitch, float a_Yaw);
 
 		DirectX::XMMATRIX GetSkyMatrix();

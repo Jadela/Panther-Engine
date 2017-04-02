@@ -233,6 +233,9 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Vector.cpp">
+      <Filter>Core\Maths</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="rsc\shaders\lighting.hlsl">

@@ -47,7 +47,7 @@ namespace Panther
 		CalculateProjectionMatrix();
 	}
 
-	void Camera::Translate(XMVECTOR a_Translation, Space a_RelativeTo)
+	void Camera::Translate(Vector a_Translation, Space a_RelativeTo)
 	{
 		m_Transform.Translate(a_Translation, a_RelativeTo);
 	}
@@ -57,18 +57,23 @@ namespace Panther
 		m_Roll += a_Roll;
 		m_Pitch += a_Pitch;
 		m_Yaw += a_Yaw;
-		m_Transform.SetRotation(XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll)));
+		XMFLOAT4 newRotation;
+		XMStoreFloat4(&newRotation, XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll)));
+		m_Transform.SetRotation(Vector(newRotation.x, newRotation.y, newRotation.z, newRotation.w));
 	}
 
 	XMMATRIX Camera::GetSkyMatrix()
 	{
-		return XMMatrixScaling(-1, 1, 1) * XMMatrixTranslationFromVector(m_Transform.GetPosition());
+		XMVECTOR skyPosition = XMVectorSet(m_Transform.GetPosition().X(), m_Transform.GetPosition().Y(), m_Transform.GetPosition().Z(), m_Transform.GetPosition().W());
+		return XMMatrixScaling(-1, 1, 1) * XMMatrixTranslationFromVector(skyPosition);
 	}
 
 	XMMATRIX Camera::GetViewMatrix()
 	{
-		XMMATRIX rotationMatrix = XMMatrixTranspose(XMMatrixRotationQuaternion(m_Transform.GetRotation()));
-		XMMATRIX translationMatrix = XMMatrixTranslationFromVector(-(m_Transform.GetPosition()));
+		XMVECTOR cameraPosition = XMVectorSet(-m_Transform.GetPosition().X(), -m_Transform.GetPosition().Y(), -m_Transform.GetPosition().Z(), -m_Transform.GetPosition().W());
+		XMVECTOR cameraRotation = XMVectorSet(m_Transform.GetRotation().X(), m_Transform.GetRotation().Y(), m_Transform.GetRotation().Z(), m_Transform.GetRotation().W());
+		XMMATRIX rotationMatrix = XMMatrixTranspose(XMMatrixRotationQuaternion(cameraRotation));
+		XMMATRIX translationMatrix = XMMatrixTranslationFromVector(cameraPosition);
 
 		XMMATRIX viewMatrix = translationMatrix * rotationMatrix;
 		return viewMatrix;

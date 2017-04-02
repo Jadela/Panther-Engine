@@ -28,13 +28,13 @@ namespace Panther
 		virtual void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) = 0;
 
 	protected:
-		void UpdateMouseDelta(Vector2<int> a_NewMousePosition);
+		void UpdateMouseDelta(Vector a_NewMousePosition);
 
 		Renderer& m_Renderer;
 		std::unique_ptr<TextureManager> m_TextureManager;
-		Vector2<int> m_MousePositionDelta;
+		Vector m_MousePositionDelta;
 
 	private:
-		Vector2<int> m_PreviousMousePosition;
+		Vector m_PreviousMousePosition;
 	};
 }

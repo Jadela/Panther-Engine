@@ -13,7 +13,7 @@ namespace Panther
 	{
 	}
 	
-	void Scene::UpdateMouseDelta(Vector2<int> a_NewMousePosition)
+	void Scene::UpdateMouseDelta(Vector a_NewMousePosition)
 	{
 		m_MousePositionDelta = m_PreviousMousePosition - a_NewMousePosition;
 		m_PreviousMousePosition = a_NewMousePosition;

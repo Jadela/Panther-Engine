@@ -33,18 +33,18 @@ namespace Panther
 	struct SkydomeVertexCB
 	{
 		XMMATRIX m_MVP;
-		XMVECTOR m_SunPos;
+		Vector m_SunPos;
 	};
 
 	struct SkydomePixelCB
 	{
-		XMVECTOR m_ScreenResolution;
+		Vector m_ScreenResolution;
 	};
 
 	struct WaterPixelCB
 	{
-		XMVECTOR m_LightDirection;
-		XMVECTOR m_CameraPosition;
+		Vector m_LightDirection;
+		Vector m_CameraPosition;
 		XMMATRIX m_M;
 		float m_WaterOffset;
 	};
@@ -58,8 +58,8 @@ namespace Panther
 
 	struct DefaultPixelCB
 	{
-		XMVECTOR m_LightDirection;
-		XMVECTOR m_CameraPosition;
+		Vector m_LightDirection;
+		Vector m_CameraPosition;
 	};
 
 	DemoScene::DemoScene(Renderer& a_Renderer) 
@@ -162,13 +162,16 @@ namespace Panther
 
 		m_Renderer.Synchronize();
 
-		m_Camera = std::make_unique<Camera>(Transform(XMFLOAT3(0, 0, -10)));
+		m_Camera = std::make_unique<Camera>(Transform(Vector(0, 0, -10)));
 		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.GetWindow().GetWidth()) / m_Renderer.GetWindow().GetHeight());
 
-		m_WaterTransform = std::make_unique<Transform>(XMFLOAT3(0, -3, 0), XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), XMConvertToRadians(-90)), XMFLOAT3(10, 10, 10));
-		m_CubeTransform = std::make_unique<Transform>(XMFLOAT3(-3, 0, 0));
-		m_SphereTransform = std::make_unique<Transform>(XMFLOAT3(0, 0, 0));
-		m_DuckTransform = std::make_unique<Transform>(XMFLOAT3(3, 0, 0));
+		XMFLOAT4 initialWaterRotation;
+		XMStoreFloat4(&initialWaterRotation, XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), XMConvertToRadians(-90)));
+
+		m_WaterTransform = std::make_unique<Transform>(Vector(0, -3, 0), Vector(initialWaterRotation.x, initialWaterRotation.y, initialWaterRotation.z, initialWaterRotation.w), Vector(10, 10, 10));
+		m_CubeTransform = std::make_unique<Transform>(Vector(-3, 0, 0));
+		m_SphereTransform = std::make_unique<Transform>(Vector(0, 0, 0));
+		m_DuckTransform = std::make_unique<Transform>(Vector(3, 0, 0));
 	}
 
 	void DemoScene::CreateMaterials()
@@ -296,13 +299,16 @@ namespace Panther
 
 	void DemoScene::Update(float a_DT)
 	{
-		m_CubeTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
-		m_SphereTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
-		m_DuckTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+		XMFLOAT4 rotation;
+		XMStoreFloat4(&rotation, XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
+
+		m_CubeTransform->Rotate(Vector(rotation.x, rotation.y, rotation.z, rotation.w));
+		m_SphereTransform->Rotate(Vector(rotation.x, rotation.y, rotation.z, rotation.w));
+		m_DuckTransform->Rotate(Vector(rotation.x, rotation.y, rotation.z, rotation.w));
 
 		float speedMultipler = (m_Shift ? 8.0f : 4.0f);
-		XMVECTOR cameraTranslate = XMVectorSet(static_cast<float>(m_D - m_A), 0.0f, static_cast<float>(m_W - m_S), 1.0f) * speedMultipler * a_DT;
-		XMVECTOR cameraPan = XMVectorSet(0.0f, static_cast<float>(m_E - m_Q), 0.0f, 1.0f) * speedMultipler * a_DT;
+		Vector cameraTranslate = Vector(static_cast<float>(m_D - m_A), 0.0f, static_cast<float>(m_W - m_S), 1.0f) * speedMultipler * a_DT;
+		Vector cameraPan = Vector(0.0f, static_cast<float>(m_E - m_Q), 0.0f, 1.0f) * speedMultipler * a_DT;
 		m_Camera->Translate(cameraTranslate, Space::Local);
 		m_Camera->Translate(cameraPan, Space::World);
 
@@ -332,11 +338,11 @@ namespace Panther
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, m_SkydomeVertexCBufferSlot);
 		SkydomeVertexCB skydomeCB;
 		skydomeCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
-		skydomeCB.m_SunPos = XMVectorSet(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
+		skydomeCB.m_SunPos = Vector(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
 		m_SkydomeVertexCBuffer->CopyTo(0, &skydomeCB, sizeof(SkydomeVertexCB));
 		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, m_SkydomePixelCBufferSlot);
 		SkydomePixelCB skydomeCB2;
-		skydomeCB2.m_ScreenResolution = XMVectorSet((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight(), 0, 0);
+		skydomeCB2.m_ScreenResolution = Vector((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight(), 0, 0);
 		m_SkydomePixelCBuffer->CopyTo(0, &skydomeCB2, sizeof(SkydomePixelCB));
 		a_CommandList.ExecuteBundle(*m_SkySphereBundle.get());
 
@@ -489,10 +495,10 @@ namespace Panther
 
 	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)
 	{
-		UpdateMouseDelta(Vector2<int>(a_DeltaX, a_DeltaY));
+		UpdateMouseDelta(Vector((float)a_DeltaX, (float)a_DeltaY));
 		if (a_RMBDown)
 		{
-			m_Camera->Rotate(0.0f, -m_MousePositionDelta.GetY() * 0.1f, -m_MousePositionDelta.GetX() * 0.1f);
+			m_Camera->Rotate(0.0f, -m_MousePositionDelta.Y() * 0.1f, -m_MousePositionDelta.X() * 0.1f);
 		}
 	}
 }
