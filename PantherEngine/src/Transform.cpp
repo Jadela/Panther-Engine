@@ -45,9 +45,7 @@ namespace Panther
 		case Space::Local:
 			XMVECTOR translationVector(XMVectorSet(a_Translation.X(), a_Translation.Y(), a_Translation.Z(), a_Translation.W()));
 			XMVECTOR rotationVector(XMVectorSet(m_Rotation.X(), m_Rotation.Y(), m_Rotation.Z(), m_Rotation.W()));
-			XMFLOAT4 result;
-			XMStoreFloat4(&result, XMVector3Rotate(translationVector, rotationVector));
-			m_Position += Vector(result.x, result.y, result.z, result.w);
+			m_Position += Vector(XMVector3Rotate(translationVector, rotationVector));
 			break;
 		}
 	}
@@ -56,9 +54,7 @@ namespace Panther
 	{
 		XMVECTOR rotationVector1(XMVectorSet(m_Rotation.X(), m_Rotation.Y(), m_Rotation.Z(), m_Rotation.W()));
 		XMVECTOR rotationVector2(XMVectorSet(a_Rotation.X(), a_Rotation.Y(), a_Rotation.Z(), a_Rotation.W()));
-		XMFLOAT4 result;
-		XMStoreFloat4(&result, XMQuaternionMultiply(rotationVector1, rotationVector2));
-		m_Rotation = Vector(result.x, result.y, result.z, result.w);
+		m_Rotation = Vector(XMQuaternionMultiply(rotationVector1, rotationVector2));
 	}
 
 	void Transform::Scale(Vector a_Scale)

@@ -28,6 +28,11 @@ namespace Panther
 	{
 	}
 
+	Vector::Vector(XMVECTOR a_Vector)
+	{
+		XMStoreFloat4(&m_Vector, a_Vector);
+	}
+
 	float Vector::X()
 	{
 		return m_Vector.x;
@@ -118,67 +123,53 @@ namespace Panther
 	Vector Vector::operator-() const
 	{
 		XMVECTOR v1 = XMLoadFloat4(&m_Vector);
-		XMVECTOR X = XMVectorNegate(v1);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorNegate(v1);
+		return Vector(result);
 	}
 
 	Vector operator+ (const Vector& a_Lhs, const Vector& a_Rhs)
 	{
 		XMVECTOR v1 = XMLoadFloat4(&a_Lhs.m_Vector);
 		XMVECTOR v2 = XMLoadFloat4(&a_Rhs.m_Vector);
-		XMVECTOR X = XMVectorAdd(v1, v2);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorAdd(v1, v2);
+		return Vector(result);
 	}
 
 	Vector operator- (const Vector& a_Lhs, const Vector& a_Rhs)
 	{
 		XMVECTOR v1 = XMLoadFloat4(&a_Lhs.m_Vector);
 		XMVECTOR v2 = XMLoadFloat4(&a_Rhs.m_Vector);
-		XMVECTOR X = XMVectorSubtract(v1, v2);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorSubtract(v1, v2);
+		return Vector(result);
 	}
 
 	Vector operator* (const Vector& a_Lhs, const Vector& a_Rhs)
 	{
 		XMVECTOR v1 = XMLoadFloat4(&a_Lhs.m_Vector);
 		XMVECTOR v2 = XMLoadFloat4(&a_Rhs.m_Vector);
-		XMVECTOR X = XMVectorMultiply(v1, v2);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorMultiply(v1, v2);
+		return Vector(result);
 	}
 
 	Vector operator* (const Vector& a_Lhs, float a_Rhs)
 	{
 		XMVECTOR v1 = XMLoadFloat4(&a_Lhs.m_Vector);
-		XMVECTOR X = XMVectorScale(v1, a_Rhs);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorScale(v1, a_Rhs);
+		return Vector(result);
 	}
 
 	Vector operator/ (const Vector& a_Lhs, const Vector& a_Rhs)
 	{
 		XMVECTOR v1 = XMLoadFloat4(&a_Lhs.m_Vector);
 		XMVECTOR v2 = XMLoadFloat4(&a_Rhs.m_Vector);
-		XMVECTOR X = XMVectorDivide(v1, v2);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorDivide(v1, v2);
+		return Vector(result);
 	}
 
 	Vector operator* (float a_Lhs, const Vector& a_Rhs)
 	{
 		XMVECTOR v1 = XMLoadFloat4(&a_Rhs.m_Vector);
-		XMVECTOR X = XMVectorScale(v1, a_Lhs);
-		Vector result;
-		XMStoreFloat4(&result.m_Vector, X);
-		return result;
+		XMVECTOR result = XMVectorScale(v1, a_Lhs);
+		return Vector(result);
 	}
 }

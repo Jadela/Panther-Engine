@@ -12,6 +12,7 @@ namespace Panther
 		Vector(float a_X, float a_Y, float a_Z);
 		Vector(float a_X, float a_Y, float a_Z, float a_W);
 		explicit Vector(const float *a_Array);
+		explicit Vector(DirectX::XMVECTOR a_Vector);
 
 		float X();
 		float Y();

@@ -57,9 +57,7 @@ namespace Panther
 		m_Roll += a_Roll;
 		m_Pitch += a_Pitch;
 		m_Yaw += a_Yaw;
-		XMFLOAT4 newRotation;
-		XMStoreFloat4(&newRotation, XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll)));
-		m_Transform.SetRotation(Vector(newRotation.x, newRotation.y, newRotation.z, newRotation.w));
+		m_Transform.SetRotation(Vector(XMQuaternionRotationRollPitchYaw(XMConvertToRadians(m_Pitch), XMConvertToRadians(m_Yaw), XMConvertToRadians(m_Roll))));
 	}
 
 	XMMATRIX Camera::GetSkyMatrix()
