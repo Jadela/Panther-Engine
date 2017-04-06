@@ -53,6 +53,11 @@ namespace Panther
 		return m_Vector.w;
 	}
 
+	XMVECTOR Vector::AsXMVECTOR()
+	{
+		return XMLoadFloat4(&m_Vector);
+	}
+
 	bool Vector::operator==(const Vector& a_Rhs) const
 	{
 		XMVECTOR v1 = XMLoadFloat4(&m_Vector);

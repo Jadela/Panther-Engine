@@ -43,8 +43,8 @@ namespace Panther
 			m_Position += a_Translation;
 			break;
 		case Space::Local:
-			XMVECTOR translationVector(XMVectorSet(a_Translation.X(), a_Translation.Y(), a_Translation.Z(), a_Translation.W()));
-			XMVECTOR rotationVector(XMVectorSet(m_Rotation.X(), m_Rotation.Y(), m_Rotation.Z(), m_Rotation.W()));
+			XMVECTOR translationVector(a_Translation.AsXMVECTOR());
+			XMVECTOR rotationVector(m_Rotation.AsXMVECTOR());
 			m_Position += Vector(XMVector3Rotate(translationVector, rotationVector));
 			break;
 		}
@@ -52,8 +52,8 @@ namespace Panther
 
 	void Transform::Rotate(Vector a_Rotation)
 	{
-		XMVECTOR rotationVector1(XMVectorSet(m_Rotation.X(), m_Rotation.Y(), m_Rotation.Z(), m_Rotation.W()));
-		XMVECTOR rotationVector2(XMVectorSet(a_Rotation.X(), a_Rotation.Y(), a_Rotation.Z(), a_Rotation.W()));
+		XMVECTOR rotationVector1(m_Rotation.AsXMVECTOR());
+		XMVECTOR rotationVector2(a_Rotation.AsXMVECTOR());
 		m_Rotation = Vector(XMQuaternionMultiply(rotationVector1, rotationVector2));
 	}
 
@@ -64,9 +64,9 @@ namespace Panther
 
 	XMMATRIX Transform::GetTransformMatrix()
 	{
-		XMVECTOR scaleVector(XMVectorSet(m_Scale.X(), m_Scale.Y(), m_Scale.Z(), m_Scale.W()));
-		XMVECTOR rotationVector(XMVectorSet(m_Rotation.X(), m_Rotation.Y(), m_Rotation.Z(), m_Rotation.W()));
-		XMVECTOR positionVector(XMVectorSet(m_Position.X(), m_Position.Y(), m_Position.Z(), m_Position.W()));
+		XMVECTOR scaleVector(m_Scale.AsXMVECTOR());
+		XMVECTOR rotationVector(m_Rotation.AsXMVECTOR());
+		XMVECTOR positionVector(m_Position.AsXMVECTOR());
 		return XMMatrixScalingFromVector(scaleVector) * XMMatrixRotationQuaternion(rotationVector) * XMMatrixTranslationFromVector(positionVector);
 	}
 }

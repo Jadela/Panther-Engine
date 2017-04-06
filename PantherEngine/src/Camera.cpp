@@ -62,14 +62,14 @@ namespace Panther
 
 	XMMATRIX Camera::GetSkyMatrix()
 	{
-		XMVECTOR skyPosition = XMVectorSet(m_Transform.GetPosition().X(), m_Transform.GetPosition().Y(), m_Transform.GetPosition().Z(), m_Transform.GetPosition().W());
+		XMVECTOR skyPosition = m_Transform.GetPosition().AsXMVECTOR();
 		return XMMatrixScaling(-1, 1, 1) * XMMatrixTranslationFromVector(skyPosition);
 	}
 
 	XMMATRIX Camera::GetViewMatrix()
 	{
-		XMVECTOR cameraPosition = XMVectorSet(-m_Transform.GetPosition().X(), -m_Transform.GetPosition().Y(), -m_Transform.GetPosition().Z(), -m_Transform.GetPosition().W());
-		XMVECTOR cameraRotation = XMVectorSet(m_Transform.GetRotation().X(), m_Transform.GetRotation().Y(), m_Transform.GetRotation().Z(), m_Transform.GetRotation().W());
+		XMVECTOR cameraPosition = (-m_Transform.GetPosition()).AsXMVECTOR();
+		XMVECTOR cameraRotation = m_Transform.GetRotation().AsXMVECTOR();
 		XMMATRIX rotationMatrix = XMMatrixTranspose(XMMatrixRotationQuaternion(cameraRotation));
 		XMMATRIX translationMatrix = XMMatrixTranslationFromVector(cameraPosition);
 

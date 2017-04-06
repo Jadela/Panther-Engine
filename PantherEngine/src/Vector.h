@@ -18,6 +18,7 @@ namespace Panther
 		float Y();
 		float Z();
 		float W();
+		DirectX::XMVECTOR AsXMVECTOR();
 
 		bool operator == (const Vector& a_Rhs) const;
 		bool operator != (const Vector& a_Rhs) const;
