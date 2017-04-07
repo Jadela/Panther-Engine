@@ -141,44 +141,14 @@ namespace Panther
 			}
 			case WM_KEYDOWN:
 			{
-				MSG charMsg;
-				// Get the unicode character (UTF-16)
-				uint32 c = 0;
-				// For printable characters, the next a_Message will be WM_CHAR.
-				// This message contains the character code we need to send the KeyPressed event.
-				// Inspired by the SDL implementation.
-				if (PeekMessage(&charMsg, a_WindowHandle, 0, 0, PM_NOREMOVE) && charMsg.message == WM_CHAR)
-				{
-					GetMessage(&charMsg, a_WindowHandle, 0, 0);
-					c = (uint32)charMsg.wParam;
-				}
-				bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
-				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
-				bool alt = GetAsyncKeyState(VK_MENU) > 0;
 				Key key = (Key)a_WParam;
-				app.OnKeyDown(key, c, control, shift, alt);
+				app.OnKeyDown(key);
 				return 0;
 			}
 			case WM_KEYUP:
 			{
-				uint32 c = 0;
-				uint32 scanCode = (a_LParam & 0x00FF0000) >> 16;
-
-				// Determine which key was released by converting the key code and the scan code
-				// to a printable character (if possible).
-				// Inspired by the SDL implementation.
-				ubyte8 keyboardState[256];
-				GetKeyboardState(keyboardState);
-				wchar_t translatedCharacters[4];
-				if (int32 result = ToUnicodeEx((uint32)a_WParam, scanCode, keyboardState, translatedCharacters, 4, 0, NULL) > 0)
-				{
-					c = translatedCharacters[0];
-				}
-				bool shift = GetAsyncKeyState(VK_SHIFT) > 0;
-				bool control = GetAsyncKeyState(VK_CONTROL) > 0;
-				bool alt = GetAsyncKeyState(VK_MENU) > 0;
 				Key key = (Key)a_WParam;
-				app.OnKeyUp(key, c, control, shift, alt);
+				app.OnKeyUp(key);
 				return 0;
 			}
 			case WM_MOUSEMOVE:

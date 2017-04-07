@@ -23,8 +23,6 @@ namespace Panther
 		void Update(float a_DT) final override;
 		void Render(CommandList& a_CommandList) final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
-		void OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) final override;
-		void OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) final override;
 		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) final override;
 
 	private:
@@ -99,11 +97,6 @@ namespace Panther
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
 		std::unique_ptr<Transform> m_DuckTransform = nullptr;
 		
-		// For panning the camera.
-		int32 m_W = 0, m_A = 0, m_S = 0, m_D = 0;
-		int32 m_Q = 0, m_E = 0;
-		bool m_Shift = true;
-
 		// Skydome
 		float m_SunAngle = 90.0f;
 

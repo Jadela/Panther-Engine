@@ -99,19 +99,19 @@ namespace Panther
 			m_Scene->OnResize(a_Width, a_Height);
 	}
 
-	void Application::OnKeyDown(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt)
+	void Application::OnKeyDown(Key a_Key)
 	{
 		if (m_Scene)
 		{
-			m_Scene->OnKeyDown(a_Key, a_Character, KeyState::Pressed, a_Ctrl, a_Shift, a_Alt);
+			m_Scene->OnKeyDown(a_Key);
 		}
 	}
 
-	void Application::OnKeyUp(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt)
+	void Application::OnKeyUp(Key a_Key)
 	{
 		if (m_Scene)
 		{
-			m_Scene->OnKeyUp(a_Key, a_Character, KeyState::Released, a_Ctrl, a_Shift, a_Alt);
+			m_Scene->OnKeyUp(a_Key);
 		}
 	}
 

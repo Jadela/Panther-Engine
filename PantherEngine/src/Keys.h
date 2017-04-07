@@ -210,11 +210,6 @@ namespace Panther
 		NoName				= 0xfc, // Reserved
 		Pa1					= 0xfd, // The PA1 key
 		OemClear			= 0xfe, // The Clear key
-	};
-
-	enum class KeyState : ubyte8
-	{
-		Released,
-		Pressed
+		KeyCount			= 0xff
 	};
 }

@@ -31,8 +31,8 @@ namespace Panther
 		HINSTANCE& GetInstanceHandle() { return m_InstanceHandle; }
 
 		void OnResize(int32 a_Width, int32 a_Height);		
-		void OnKeyDown(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt);
-		void OnKeyUp(Key a_Key, uint32 a_Character, bool a_Ctrl, bool a_Shift, bool a_Alt);
+		void OnKeyDown(Key a_Key);
+		void OnKeyUp(Key a_Key);
 		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown);
 
 	private:

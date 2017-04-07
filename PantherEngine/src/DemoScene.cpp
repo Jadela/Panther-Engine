@@ -302,9 +302,9 @@ namespace Panther
 		m_SphereTransform->Rotate(rotation);
 		m_DuckTransform->Rotate(rotation);
 
-		float speedMultipler = (m_Shift ? 8.0f : 4.0f);
-		Vector cameraTranslate = Vector(static_cast<float>(m_D - m_A), 0.0f, static_cast<float>(m_W - m_S), 1.0f) * speedMultipler * a_DT;
-		Vector cameraPan = Vector(0.0f, static_cast<float>(m_E - m_Q), 0.0f, 1.0f) * speedMultipler * a_DT;
+		float speedMultipler = (m_KeyStates[Key::ShiftKey] ? 8.0f : 4.0f);
+		Vector cameraTranslate = Vector(static_cast<float>(m_KeyStates[Key::D] - m_KeyStates[Key::A]), 0.0f, static_cast<float>(m_KeyStates[Key::W] - m_KeyStates[Key::S]), 1.0f) * speedMultipler * a_DT;
+		Vector cameraPan = Vector(0.0f, static_cast<float>(m_KeyStates[Key::E] - m_KeyStates[Key::Q]), 0.0f, 1.0f) * speedMultipler * a_DT;
 		m_Camera->Translate(cameraTranslate, Space::Local);
 		m_Camera->Translate(cameraPan, Space::World);
 
@@ -316,6 +316,11 @@ namespace Panther
 		}
 
 		m_WaterOffset = fmodf(m_WaterOffset + 0.05f * a_DT, 1.0f);
+
+		if (m_KeyStates[Key::Escape])
+		{
+			Application::Quit();
+		}
 	}
 
 	void DemoScene::Render(CommandList& a_CommandList)
@@ -398,95 +403,6 @@ namespace Panther
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)
 	{
 		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.GetWindow().GetWidth()) / m_Renderer.GetWindow().GetHeight());
-	}
-
-	void DemoScene::OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt)
-	{
-		switch (a_Key)
-		{
-		case Key::W:
-		{
-			m_W = 1;
-		}
-		break;
-		case Key::S:
-		{
-			m_S = 1;
-		}
-		break;
-		case Key::A:
-		{
-			m_A = 1;
-		}
-		break;
-		case Key::D:
-		{
-			m_D = 1;
-		}
-		break;
-		case Key::Q:
-		{
-			m_Q = 1;
-		}
-		break;
-		case Key::E:
-		{
-			m_E = 1;
-		}
-		break;
-		case Key::ShiftKey:
-		{
-			m_Shift = 1;
-		}
-		break;
-		case Key::Escape:
-		{
-			Application::Quit();
-		}
-		break;
-		}
-	}
-
-	void DemoScene::OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt)
-	{
-		switch (a_Key)
-		{
-		case Key::W:
-		{
-			m_W = 0;
-		}
-		break;
-		case Key::S:
-		{
-			m_S = 0;
-		}
-		break;
-		case Key::A:
-		{
-			m_A = 0;
-		}
-		break;
-		case Key::D:
-		{
-			m_D = 0;
-		}
-		break;
-		case Key::Q:
-		{
-			m_Q = 0;
-		}
-		break;
-		case Key::E:
-		{
-			m_E = 0;
-		}
-		break;
-		case Key::ShiftKey:
-		{
-			m_Shift = 0;
-		}
-		break;
-		}
 	}
 
 	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)

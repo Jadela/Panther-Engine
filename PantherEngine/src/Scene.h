@@ -4,6 +4,7 @@
 #include "Vector.h"
 
 #include <memory>
+#include <unordered_map> 
 
 namespace Panther
 {
@@ -23,8 +24,8 @@ namespace Panther
 		virtual void Update(float a_DT) = 0;
 		virtual void Render(CommandList& a_CommandList) = 0;
 		virtual void OnResize(uint32 a_Width, uint32 a_Height) = 0;
-		virtual void OnKeyDown(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) = 0;
-		virtual void OnKeyUp(Key a_Key, uint32 a_Character, KeyState a_KeyState, bool a_Ctrl, bool a_Shift, bool a_Alt) = 0;
+		void OnKeyDown(Key a_Key);
+		void OnKeyUp(Key a_Key);
 		virtual void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) = 0;
 
 	protected:
@@ -32,6 +33,8 @@ namespace Panther
 
 		Renderer& m_Renderer;
 		std::unique_ptr<TextureManager> m_TextureManager;
+
+		std::unordered_map<Key, bool> m_KeyStates;
 		Vector m_MousePositionDelta;
 
 	private:
