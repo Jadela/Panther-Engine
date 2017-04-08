@@ -302,9 +302,9 @@ namespace Panther
 		m_SphereTransform->Rotate(rotation);
 		m_DuckTransform->Rotate(rotation);
 
-		float speedMultipler = (m_KeyStates[Key::ShiftKey] ? 8.0f : 4.0f);
-		Vector cameraTranslate = Vector(static_cast<float>(m_KeyStates[Key::D] - m_KeyStates[Key::A]), 0.0f, static_cast<float>(m_KeyStates[Key::W] - m_KeyStates[Key::S]), 1.0f) * speedMultipler * a_DT;
-		Vector cameraPan = Vector(0.0f, static_cast<float>(m_KeyStates[Key::E] - m_KeyStates[Key::Q]), 0.0f, 1.0f) * speedMultipler * a_DT;
+		float speedMultipler = GetKey(Key::ShiftKey) ? 8.0f : 4.0f;
+		Vector cameraTranslate = Vector(static_cast<float>(GetKey(Key::D) - GetKey(Key::A)), 0.0f, static_cast<float>(GetKey(Key::W) - GetKey(Key::S)), 1.0f) * speedMultipler * a_DT;
+		Vector cameraPan = Vector(0.0f, static_cast<float>(GetKey(Key::E) - GetKey(Key::Q)), 0.0f, 1.0f) * speedMultipler * a_DT;
 		m_Camera->Translate(cameraTranslate, Space::Local);
 		m_Camera->Translate(cameraPan, Space::World);
 
@@ -317,7 +317,7 @@ namespace Panther
 
 		m_WaterOffset = fmodf(m_WaterOffset + 0.05f * a_DT, 1.0f);
 
-		if (m_KeyStates[Key::Escape])
+		if (GetKey(Key::Escape))
 		{
 			Application::Quit();
 		}
