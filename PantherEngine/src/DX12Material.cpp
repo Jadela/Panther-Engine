@@ -1,6 +1,7 @@
 #include "DX12Material.h"
 
 #include "DX12Renderer.h"
+#include "Exceptions.h"
 
 #include <D3DCompiler.h>
 
@@ -130,7 +131,6 @@ namespace Panther
 
 	void DX12Material::LoadShader(std::wstring a_Path, std::string a_EntryPoint, ShaderType a_Type)
 	{
-		HRESULT hr = S_OK;
 #ifdef _DEBUG
 		Panther::uint32 compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
@@ -141,17 +141,16 @@ namespace Panther
 		{
 		case ShaderType::Vertex:
 			if (m_VertexBlob != nullptr) throw std::runtime_error("Vertex shader has already been loaded for this material before!");
-			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, a_EntryPoint.c_str(), "vs_5_0", compileFlags, 0, &m_VertexBlob, &errorBlob);
+			ThrowIfFailed(D3DCompileFromFile(a_Path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, a_EntryPoint.c_str(), "vs_5_0", compileFlags, 0, &m_VertexBlob, &errorBlob));
 			break;
 		case ShaderType::Pixel:
 			if (m_PixelBlob != nullptr) throw std::runtime_error("Pixel shader has already been loaded for this material before!");
-			hr = D3DCompileFromFile(a_Path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, a_EntryPoint.c_str(), "ps_5_0", compileFlags, 0, &m_PixelBlob, &errorBlob);
+			ThrowIfFailed(D3DCompileFromFile(a_Path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, a_EntryPoint.c_str(), "ps_5_0", compileFlags, 0, &m_PixelBlob, &errorBlob));
 			break;
 		default:
 			throw std::runtime_error("Trying to load shader of unknown type!");
 			break;
 		}
-		if (FAILED(hr)) throw std::runtime_error("Could not load shader: " + std::string((char*)errorBlob->GetBufferPointer()));
 	}
 
 	void DX12Material::Compile(DepthWrite a_DepthWrite)
