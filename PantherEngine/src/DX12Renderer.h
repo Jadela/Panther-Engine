@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderer.h"
 
+#include "d3dx12.h"
 #include <dxgi1_5.h>
 #include <wrl.h>
 
@@ -42,8 +43,8 @@ namespace Panther
 		ID3D12CommandAllocator* GetCommandAllocatorDirect() { return m_D3DCommandAllocator.Get(); }
 		ID3D12CommandAllocator* GetCommandAllocatorBundle() { return m_D3DBundleAllocator.Get(); }
 		DX12CommandList& GetCommandList() { return *m_CommandList.get(); }
-		D3D12_VIEWPORT& GetViewport() { return m_D3DViewport; }
-		D3D12_RECT& GetScissorRect() { return m_D3DRectScissor; }
+		CD3DX12_VIEWPORT& GetViewport() { return m_D3DViewport; }
+		CD3DX12_RECT& GetScissorRect() { return m_D3DRectScissor; }
 
 	private:
 		DX12Renderer(const DX12Renderer& other) = delete;
@@ -51,7 +52,7 @@ namespace Panther
 		Microsoft::WRL::ComPtr<IDXGIFactory5> CreateDXGIFactory();
 		Microsoft::WRL::ComPtr<ID3D12Device> TryCreateD3D12DeviceForAdapter(Adapter& a_Adapter, const D3D_FEATURE_LEVEL* a_FeatureLevels, 
 			uint32 a_FeatureLevelCount, D3D_FEATURE_LEVEL* out_FeatureLevel);
-		void ResizeSwapChain(uint32 width, uint32 height);
+		void ResizeSwapChain(uint32 a_Width, uint32 a_Height);
 
 	private:
 		std::unique_ptr<Adapter> m_Adapter = nullptr;
@@ -62,8 +63,8 @@ namespace Panther
 		std::unique_ptr<SwapChain> m_SwapChain = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DCommandAllocator = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_D3DBundleAllocator = nullptr;
-		D3D12_VIEWPORT m_D3DViewport;
-		D3D12_RECT m_D3DRectScissor;
+		CD3DX12_VIEWPORT m_D3DViewport;
+		CD3DX12_RECT m_D3DRectScissor;
 		std::unique_ptr<DX12CommandList> m_CommandList = nullptr;
 		Microsoft::WRL::ComPtr<ID3D12Fence> m_D3DFence;
 		uint64 m_FenceValue = 0;

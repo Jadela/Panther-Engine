@@ -177,8 +177,8 @@ namespace Panther
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = {};
 		PSDesc.InputLayout = { &m_InputLayout[0], (uint32)m_InputLayout.size() };
 		PSDesc.pRootSignature = m_RootSignature.Get();
-		PSDesc.VS = { m_VertexBlob->GetBufferPointer(),	m_VertexBlob->GetBufferSize() };
-		PSDesc.PS = { m_PixelBlob->GetBufferPointer(), m_PixelBlob->GetBufferSize() };
+		PSDesc.VS = CD3DX12_SHADER_BYTECODE(m_VertexBlob.Get());
+		PSDesc.PS = CD3DX12_SHADER_BYTECODE(m_PixelBlob.Get());
 		PSDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 		PSDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		PSDesc.DepthStencilState = DSDesc;

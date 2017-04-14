@@ -289,18 +289,10 @@ namespace Panther
 		return D3D12Device;
 	}
 
-	void DX12Renderer::ResizeSwapChain(uint32 width, uint32 height)
+	void DX12Renderer::ResizeSwapChain(uint32 a_Width, uint32 a_Height)
 	{
-		m_SwapChain->Resize(NumBackBuffers, width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
-
-		// Initialize viewport and scissor rect.
-		ZeroMemory(&m_D3DViewport, sizeof(m_D3DViewport));
-		m_D3DViewport.Width = static_cast<float>(m_Window.GetWidth());
-		m_D3DViewport.Height = static_cast<float>(m_Window.GetHeight());
-		m_D3DViewport.MaxDepth = 1.0f;
-
-		ZeroMemory(&m_D3DRectScissor, sizeof(m_D3DRectScissor));
-		m_D3DRectScissor.right = static_cast<LONG>(m_Window.GetWidth());
-		m_D3DRectScissor.bottom = static_cast<LONG>(m_Window.GetHeight());
+		m_SwapChain->Resize(NumBackBuffers, a_Width, a_Height, DXGI_FORMAT_R8G8B8A8_UNORM);
+		m_D3DViewport = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(a_Width), static_cast<float>(a_Height));
+		m_D3DRectScissor = CD3DX12_RECT(0, 0, static_cast<LONG>(a_Width), static_cast<LONG>(a_Height));
 	}
 }
