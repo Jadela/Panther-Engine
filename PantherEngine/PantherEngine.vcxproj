@@ -14,7 +14,7 @@
     <ProjectGuid>{142FE21A-AF2B-409B-AAB4-D0E922A51E93}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Panther_Demo</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <ProjectName>PantherEngine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
