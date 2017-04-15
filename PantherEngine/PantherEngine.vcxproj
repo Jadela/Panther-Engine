@@ -140,6 +140,7 @@
     <ClInclude Include="src\DX12Sampler.h" />
     <ClInclude Include="src\DX12Texture.h" />
     <ClInclude Include="src\Exceptions.h" />
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Keys.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="src\DX12Sampler.cpp" />
     <ClCompile Include="src\DX12Texture.cpp" />
     <ClCompile Include="src\Exceptions.cpp" />
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />

@@ -1,5 +1,6 @@
 #include "Application.h"
 
+#include "Input.h"
 #include "RendererFactory.h"
 #include "Renderer.h"
 #include "Window.h"
@@ -33,6 +34,8 @@ namespace Panther
 
 	bool Application::Initialize(EGraphicsAPI a_GraphicsAPI)
 	{
+		Input::Initialize();
+
 		m_Window = new Window(L"DX12 Demo", 640, 480, true, true);
 
 		if (!CreateRenderer(a_GraphicsAPI))
@@ -101,26 +104,17 @@ namespace Panther
 
 	void Application::OnKeyDown(Key a_Key)
 	{
-		if (m_Scene)
-		{
-			m_Scene->OnKeyDown(a_Key);
-		}
+		Input::KeyDown(a_Key);
 	}
 
 	void Application::OnKeyUp(Key a_Key)
 	{
-		if (m_Scene)
-		{
-			m_Scene->OnKeyUp(a_Key);
-		}
+		Input::KeyUp(a_Key);
 	}
 
-	void Application::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)
+	void Application::OnMouseMove(int32 a_X, int32 a_Y)
 	{
-		if (m_Scene)
-		{
-			m_Scene->OnMouseMove(a_DeltaX, a_DeltaY, a_LMBDown, a_RMBDown);
-		}
+		Input::MouseMove(a_X, a_Y);
 	}
 
 	bool Application::CreateRenderer(EGraphicsAPI a_GraphicsAPI)

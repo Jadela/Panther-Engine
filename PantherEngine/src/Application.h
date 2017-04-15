@@ -33,7 +33,7 @@ namespace Panther
 		void OnResize(int32 a_Width, int32 a_Height);		
 		void OnKeyDown(Key a_Key);
 		void OnKeyUp(Key a_Key);
-		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown);
+		void OnMouseMove(int32 a_X, int32 a_Y);
 
 	private:
 		bool CreateRenderer(EGraphicsAPI a_GraphicsAPI);

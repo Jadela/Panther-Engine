@@ -1,4 +1,5 @@
 #pragma once
+#include "Core.h"
 
 // Credits: Jeremiah van Oosten
 namespace Panther

@@ -141,6 +141,9 @@
     <ClInclude Include="src\Camera.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Input.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DX12Buffer.cpp">
@@ -235,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="src\Vector.cpp">
       <Filter>Core\Maths</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

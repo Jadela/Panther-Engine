@@ -5,6 +5,8 @@
 #include "Keys.h"
 #include "Application.h"
 
+#include "Windowsx.h"
+
 #include <assert.h>
 
 namespace Panther
@@ -153,9 +155,29 @@ namespace Panther
 			}
 			case WM_MOUSEMOVE:
 			{
-				int32 x = LOWORD(a_LParam);
-				int32 y = HIWORD(a_LParam);
-				app.OnMouseMove(x, y, (a_WParam & MK_LBUTTON) != 0, (a_WParam & MK_RBUTTON) != 0);
+				int32 x = GET_X_LPARAM(a_LParam);
+				int32 y = GET_Y_LPARAM(a_LParam);
+				app.OnMouseMove(x, y);
+				return 0;
+			}
+			case WM_LBUTTONDOWN:
+			{
+				app.OnKeyDown(Key::LButton);
+				return 0;
+			}
+			case WM_LBUTTONUP:
+			{
+				app.OnKeyUp(Key::LButton);
+				return 0;
+			}
+			case WM_RBUTTONDOWN:
+			{
+				app.OnKeyDown(Key::RButton);
+				return 0;
+			}
+			case WM_RBUTTONUP:
+			{
+				app.OnKeyUp(Key::RButton);
 				return 0;
 			}
 		}

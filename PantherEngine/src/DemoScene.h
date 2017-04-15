@@ -23,7 +23,6 @@ namespace Panther
 		void Update(float a_DT) final override;
 		void Render(CommandList& a_CommandList) final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
-		void OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown) final override;
 
 	private:
 		void CreateMaterials();
@@ -97,10 +96,10 @@ namespace Panther
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
 		std::unique_ptr<Transform> m_DuckTransform = nullptr;
 		
-		// Skydome
 		float m_SunAngle = 90.0f;
 
-		// Water
 		float m_WaterOffset = 0.0f;
+
+		Vector m_PreviousMousePosition = Vector();
 	};
 }

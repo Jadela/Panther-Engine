@@ -13,6 +13,7 @@
 #include "DescriptorHeap.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Input.h"
 
 using namespace DirectX;
 
@@ -296,15 +297,22 @@ namespace Panther
 
 	void DemoScene::Update(float a_DT)
 	{
+		Vector mousePosition(Input::GetMousePosition());
+		Vector mouseDelta = mousePosition - m_PreviousMousePosition;
+		if (Input::GetKey(Key::RButton))
+		{
+			m_Camera->Rotate(0.0f, -mouseDelta.Y() * 0.1f, -mouseDelta.X() * 0.1f);
+		}
+
 		Vector rotation(XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(90 * a_DT)));
 
 		m_CubeTransform->Rotate(rotation);
 		m_SphereTransform->Rotate(rotation);
 		m_DuckTransform->Rotate(rotation);
 
-		float speedMultipler = GetKey(Key::ShiftKey) ? 8.0f : 4.0f;
-		Vector cameraTranslate = Vector(static_cast<float>(GetKey(Key::D) - GetKey(Key::A)), 0.0f, static_cast<float>(GetKey(Key::W) - GetKey(Key::S)), 1.0f) * speedMultipler * a_DT;
-		Vector cameraPan = Vector(0.0f, static_cast<float>(GetKey(Key::E) - GetKey(Key::Q)), 0.0f, 1.0f) * speedMultipler * a_DT;
+		float speedMultipler = Input::GetKey(Key::ShiftKey) ? 8.0f : 4.0f;
+		Vector cameraTranslate = Vector(static_cast<float>(Input::GetKey(Key::D) - Input::GetKey(Key::A)), 0.0f, static_cast<float>(Input::GetKey(Key::W) - Input::GetKey(Key::S)), 1.0f) * speedMultipler * a_DT;
+		Vector cameraPan = Vector(0.0f, static_cast<float>(Input::GetKey(Key::E) - Input::GetKey(Key::Q)), 0.0f, 1.0f) * speedMultipler * a_DT;
 		m_Camera->Translate(cameraTranslate, Space::Local);
 		m_Camera->Translate(cameraPan, Space::World);
 
@@ -317,10 +325,12 @@ namespace Panther
 
 		m_WaterOffset = fmodf(m_WaterOffset + 0.05f * a_DT, 1.0f);
 
-		if (GetKey(Key::Escape))
+		if (Input::GetKey(Key::Escape))
 		{
 			Application::Quit();
 		}
+
+		m_PreviousMousePosition = mousePosition;
 	}
 
 	void DemoScene::Render(CommandList& a_CommandList)
@@ -403,14 +413,5 @@ namespace Panther
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)
 	{
 		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.GetWindow().GetWidth()) / m_Renderer.GetWindow().GetHeight());
-	}
-
-	void DemoScene::OnMouseMove(int32 a_DeltaX, int32 a_DeltaY, bool a_LMBDown, bool a_RMBDown)
-	{
-		UpdateMouseDelta(Vector((float)a_DeltaX, (float)a_DeltaY));
-		if (a_RMBDown)
-		{
-			m_Camera->Rotate(0.0f, -m_MousePositionDelta.Y() * 0.1f, -m_MousePositionDelta.X() * 0.1f);
-		}
 	}
 }
