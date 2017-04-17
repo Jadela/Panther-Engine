@@ -8,6 +8,7 @@ namespace Panther
 	class DescriptorHeap;
 	class Mesh;
 	class Sampler;
+	class Shader;
 	class Texture;
 	class Camera;
 	class Transform;
@@ -25,6 +26,7 @@ namespace Panther
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
 	private:
+		void LoadShaders();
 		void CreateMaterials();
 		void CreateGeometry(CommandList& a_CommandList);
 		void CreateConstantBuffers();
@@ -60,6 +62,10 @@ namespace Panther
 		uint32 m_SkydomeVertexCBufferSlot = 0;
 		uint32 m_LightPositionBufferSlot = 0;
 		uint32 m_SkydomePixelCBufferSlot = 0;
+
+		std::unique_ptr<Shader> m_SkyShader = nullptr;
+		std::unique_ptr<Shader> m_WaterShader = nullptr;
+		std::unique_ptr<Shader> m_DefaultShader = nullptr;
 
 		// Skybox Material
 		std::unique_ptr<Material> m_SkyDomeMaterial = nullptr;

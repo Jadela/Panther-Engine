@@ -10,11 +10,15 @@
 namespace Panther
 {
 	class DX12Renderer;
+	class DX12Shader;
 
 	class DX12Material final : public Material
 	{
 	public:
+		DX12Material() = delete;
+		DX12Material(const DX12Material&) = delete;
 		DX12Material(DX12Renderer& a_Renderer, uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity);
+		DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader);
 		~DX12Material();
 
 		DescriptorSlot DeclareShaderDescriptor(DescriptorType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader) final override;
@@ -26,8 +30,6 @@ namespace Panther
 		ID3D12RootSignature* GetRootSig();
 
 	private:
-		DX12Material(const DX12Material&) = delete;
-
 		// Renderer reference
 		DX12Renderer& m_Renderer;
 

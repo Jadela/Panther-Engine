@@ -13,6 +13,7 @@ namespace Panther
 	class Material;
 	class Mesh;
 	class Sampler;
+	class Shader;
 	class Texture;
 	class Window;
 	enum class DescriptorHeapType;
@@ -34,8 +35,10 @@ namespace Panther
 		virtual DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type) = 0;
 		virtual Texture* CreateTexture(const std::wstring& a_Path) = 0;
 		virtual Material* CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) = 0;
+		virtual Material* CreateMaterial(Shader& a_Shader) = 0;
 		virtual Mesh* CreateMesh() = 0;
 		virtual Sampler* CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode) = 0;
+		virtual Shader* CreateShader() = 0;
 		virtual CommandList* CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material) = 0;
 
 		virtual CommandList& StartRender() = 0;

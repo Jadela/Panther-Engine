@@ -14,6 +14,7 @@
 #include "DX12Mesh.h"
 #include "DX12RenderTarget.h"
 #include "DX12Sampler.h"
+#include "DX12Shader.h"
 #include "DX12Texture.h"
 #include "Exceptions.h"
 #include "Window.h"
@@ -221,6 +222,11 @@ namespace Panther
 		return new DX12Material(*this, a_ConstantsCapacity, a_InputParameterCapacity);
 	}
 
+	Material* DX12Renderer::CreateMaterial(Shader& a_Shader)
+	{
+		return new DX12Material(*this, static_cast<DX12Shader&>(a_Shader));
+	}
+
 	Mesh* DX12Renderer::CreateMesh()
 	{
 		return new DX12Mesh(*this);
@@ -229,6 +235,11 @@ namespace Panther
 	Sampler* DX12Renderer::CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode)
 	{
 		return new DX12Sampler((D3D12_TEXTURE_ADDRESS_MODE)((int)a_TextureCoordinateMode + 1));
+	}
+
+	Shader* DX12Renderer::CreateShader()
+	{
+		return new DX12Shader(*m_D3DDevice.Get());
 	}
 
 	CommandList* DX12Renderer::CreateCommandList(D3D12_COMMAND_LIST_TYPE a_Type, Material* a_Material)

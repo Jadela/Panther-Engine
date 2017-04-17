@@ -18,6 +18,11 @@ namespace Panther
 		m_InputLayout.reserve(m_InputParameterCapacity);
 	}
 
+	DX12Material::DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader)
+		: m_Renderer(a_Renderer)
+	{
+	}
+
 	DX12Material::~DX12Material()
 	{
 	}
