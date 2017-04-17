@@ -7,6 +7,7 @@
 
 namespace Panther
 {
+	enum class DepthWrite : ubyte8;
 	class Buffer;
 	class CommandList;
 	class DescriptorHeap;
@@ -35,7 +36,7 @@ namespace Panther
 		virtual DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type) = 0;
 		virtual Texture* CreateTexture(const std::wstring& a_Path) = 0;
 		virtual Material* CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) = 0;
-		virtual Material* CreateMaterial(Shader& a_Shader) = 0;
+		virtual Material* CreateMaterial(Shader& a_Shader, DepthWrite a_DepthWriteEnabled) = 0;
 		virtual Mesh* CreateMesh() = 0;
 		virtual Sampler* CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode) = 0;
 		virtual Shader* CreateShader() = 0;

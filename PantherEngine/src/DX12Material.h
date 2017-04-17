@@ -18,7 +18,7 @@ namespace Panther
 		DX12Material() = delete;
 		DX12Material(const DX12Material&) = delete;
 		DX12Material(DX12Renderer& a_Renderer, uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity);
-		DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader);
+		DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader, DepthWrite a_DepthWriteEnabled);
 		~DX12Material();
 
 		DescriptorSlot DeclareShaderDescriptor(DescriptorType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader) final override;
@@ -32,6 +32,7 @@ namespace Panther
 	private:
 		// Renderer reference
 		DX12Renderer& m_Renderer;
+		DX12Shader* m_Shader;
 
 		// Shaders
 		Microsoft::WRL::ComPtr<ID3DBlob> m_VertexBlob = nullptr;

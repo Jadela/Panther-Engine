@@ -208,7 +208,7 @@ namespace Panther
 			m_SkyDomeMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
 			m_SkyDomeMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
 
-			m_SkyDomeMaterial->Compile(Material::DepthWrite::Off);
+			m_SkyDomeMaterial->Compile(DepthWrite::Off);
 		}
 
 		// Create water material

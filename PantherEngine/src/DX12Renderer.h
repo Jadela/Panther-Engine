@@ -31,7 +31,7 @@ namespace Panther
 		DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type) final override;
 		Texture* CreateTexture(const std::wstring& a_Path) final override;
 		Material* CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) final override;
-		Material* CreateMaterial(Shader& a_Shader) final override;
+		Material* CreateMaterial(Shader& a_Shader, DepthWrite a_DepthWriteEnabled) final override;
 		Mesh* CreateMesh() final override;
 		Sampler* CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode) final override;
 		Shader* CreateShader() final override;

@@ -63,9 +63,9 @@ namespace Panther
 		D3D12_SHADER_DESC shaderInfo;
 		a_Reflection->GetDesc(&shaderInfo);
 
-		m_NumInputParameters = shaderInfo.InputParameters;
-		m_InputLayout = std::make_unique<D3D12_INPUT_ELEMENT_DESC[]>(m_NumInputParameters);
-		for (uint32 i = 0; i < m_NumInputParameters; ++i)
+		m_InputParameterCount = shaderInfo.InputParameters;
+		m_InputLayout = std::make_unique<D3D12_INPUT_ELEMENT_DESC[]>(m_InputParameterCount);
+		for (uint32 i = 0; i < m_InputParameterCount; ++i)
 		{
 			D3D12_SIGNATURE_PARAMETER_DESC inputParameterInfo;
 			a_Reflection->GetInputParameterDesc(i, &inputParameterInfo);
@@ -163,13 +163,8 @@ namespace Panther
 
 		ComPtr<ID3DBlob> signature;
 		ComPtr<ID3DBlob> error;
-		HRESULT hr = D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error);
-		if (FAILED(hr))
-		{
-			std::string errorString = static_cast<char*>(error->GetBufferPointer());
-			throw std::runtime_error("Could not serialize root signature: " + errorString);
-		}
-		hr = m_Device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature));
-		if (FAILED(hr)) throw std::runtime_error("Could not create root signature.");
+		// TODO (JDL): Throw a different kind of exception which includes errorMessages.
+		ThrowIfFailed(D3D12SerializeVersionedRootSignature(&rootSignatureDesc, &signature, &error));
+		ThrowIfFailed(m_Device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
 	}
 }

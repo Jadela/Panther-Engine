@@ -1,5 +1,6 @@
 #include "DX12Material.h"
 
+#include "DX12Shader.h"
 #include "DX12Renderer.h"
 #include "Exceptions.h"
 
@@ -18,9 +19,27 @@ namespace Panther
 		m_InputLayout.reserve(m_InputParameterCapacity);
 	}
 
-	DX12Material::DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader)
-		: m_Renderer(a_Renderer)
+	DX12Material::DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader, DepthWrite a_DepthWriteEnabled)
+		: m_Renderer(a_Renderer), m_Shader(&a_Shader)
 	{
+		D3D12_DEPTH_STENCIL_DESC DSDesc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		DSDesc.DepthWriteMask = (a_DepthWriteEnabled == DepthWrite::On) ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO;
+
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC PSDesc = {};
+		PSDesc.InputLayout = { m_Shader->GetInputLayoutPointer(), m_Shader->GetInputLayoutCount() };
+		PSDesc.pRootSignature = m_Shader->GetRootSignature();
+		PSDesc.VS = CD3DX12_SHADER_BYTECODE(m_Shader->GetVertexShaderBlob());
+		PSDesc.PS = CD3DX12_SHADER_BYTECODE(m_Shader->GetPixelShaderBlob());
+		PSDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		PSDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		PSDesc.DepthStencilState = DSDesc;
+		PSDesc.SampleMask = UINT_MAX;
+		PSDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		PSDesc.NumRenderTargets = 1;
+		PSDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		PSDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		PSDesc.SampleDesc.Count = 1;
+		ThrowIfFailed(m_Renderer.GetDevice().CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineState)));
 	}
 
 	DX12Material::~DX12Material()

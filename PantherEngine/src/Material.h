@@ -5,6 +5,8 @@
 
 namespace Panther
 {
+	enum class DepthWrite : ubyte8 { Off, On };
+
 	class Material
 	{
 	public:
@@ -18,7 +20,6 @@ namespace Panther
 		enum class DescriptorType : ubyte8 { ShaderResource, ConstantBuffer, Sampler };
 		enum class ShaderType : ubyte8 { Vertex, Pixel };
 		enum class InputType : ubyte8 { Float };
-		enum class DepthWrite : ubyte8 { Off, On };
 
 		virtual DescriptorSlot DeclareShaderDescriptor(DescriptorType a_Type, uint32 a_Amount, uint32 a_BaseShaderRegister, ShaderType a_VisibleToShader) = 0;
 		virtual void DeclareInputParameter(std::string a_Semantic, InputType a_Type, uint32 a_VectorElementCount) = 0;

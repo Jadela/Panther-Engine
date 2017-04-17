@@ -24,6 +24,12 @@ namespace Panther
 		void LoadPixelShader(std::wstring a_Path, std::string a_EntryPoint) final override;
 		void Finalize() final override;
 
+		D3D12_INPUT_ELEMENT_DESC* GetInputLayoutPointer() { return m_InputLayout.get(); }
+		uint32 GetInputLayoutCount() { return m_InputParameterCount; }
+		ID3D12RootSignature* GetRootSignature() { return m_RootSignature.Get(); }
+		ID3DBlob* GetVertexShaderBlob() { return m_VertexCode.Get(); }
+		ID3DBlob* GetPixelShaderBlob() { return m_PixelCode.Get(); }
+
 	private:
 		ID3DBlob* LoadHLSLShader(std::wstring a_Path, std::string a_EntryPoint, std::string a_ShaderTarget, bool a_Debug);
 		ID3D12ShaderReflection* ReflectShader(ID3DBlob* a_ShaderCode);
@@ -37,7 +43,7 @@ namespace Panther
 		Microsoft::WRL::ComPtr<ID3DBlob> m_VertexCode = nullptr;
 		Microsoft::WRL::ComPtr<ID3DBlob> m_PixelCode = nullptr;
 		std::unique_ptr<D3D12_INPUT_ELEMENT_DESC[]> m_InputLayout;
-		uint32 m_NumInputParameters;
+		uint32 m_InputParameterCount;
 		std::vector<std::unique_ptr<CD3DX12_DESCRIPTOR_RANGE1>> m_DescriptorRanges;
 		std::vector<CD3DX12_ROOT_PARAMETER1> m_RootParameters; 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
