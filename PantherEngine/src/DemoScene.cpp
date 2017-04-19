@@ -81,11 +81,11 @@ namespace Panther
 		CommandList& commandList(m_Renderer.StartRecording());
 
 		LoadShaders();
-		CreateMaterials();
 		CreateGeometry(commandList);	
 		CreateConstantBuffers();
 		CreateDescriptorHeaps();
 		CreateDescriptors();
+		CreateMaterials();
 
 		commandList.Close();
 

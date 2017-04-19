@@ -248,7 +248,9 @@
     <ClCompile Include="src\Input.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\DX12Shader.cpp" />
+    <ClCompile Include="src\DX12Shader.cpp">
+      <Filter>Rendering\DirectX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="rsc\shaders\lighting.hlsl">
