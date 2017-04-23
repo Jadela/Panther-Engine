@@ -6,6 +6,8 @@
 namespace Panther
 {
 	enum class DepthWrite : ubyte8 { Off, On };
+	class CommandList;
+	class DescriptorHeap;
 
 	class Material
 	{
@@ -25,6 +27,10 @@ namespace Panther
 		virtual void DeclareInputParameter(std::string a_Semantic, InputType a_Type, uint32 a_VectorElementCount) = 0;
 		virtual void LoadShader(std::wstring a_Path, std::string a_EntryPoint, ShaderType a_Type) = 0;
 		virtual void Compile(DepthWrite a_DepthWrite = DepthWrite::On) = 0;
+
+		virtual void SetResource(std::string a_ResourceNameInShader, DescriptorHeap& a_ResourceHeap, uint32 a_HeapOffset) = 0;
+		virtual void Use(CommandList& a_CommandList) = 0;
+
 	protected:
 		Material();
 

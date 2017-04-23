@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 namespace Panther
 {
@@ -29,6 +30,7 @@ namespace Panther
 		ID3D12RootSignature* GetRootSignature() { return m_RootSignature.Get(); }
 		ID3DBlob* GetVertexShaderBlob() { return m_VertexCode.Get(); }
 		ID3DBlob* GetPixelShaderBlob() { return m_PixelCode.Get(); }
+		uint32 GetRootParameterIndex(std::string a_RootParameterName);
 
 	private:
 		ID3DBlob* LoadHLSLShader(std::wstring a_Path, std::string a_EntryPoint, std::string a_ShaderTarget, bool a_Debug);
@@ -46,6 +48,7 @@ namespace Panther
 		uint32 m_InputParameterCount;
 		std::vector<std::unique_ptr<CD3DX12_DESCRIPTOR_RANGE1>> m_DescriptorRanges;
 		std::vector<CD3DX12_ROOT_PARAMETER1> m_RootParameters; 
+		std::unordered_map<std::string, uint32> m_RootParameterIndices;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_RootSignature = nullptr;
 	};
 }

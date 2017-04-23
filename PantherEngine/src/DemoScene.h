@@ -88,6 +88,9 @@ namespace Panther
 		Material::DescriptorSlot m_DefaultTextureSlot = {};
 		Material::DescriptorSlot m_DefaultSamplerDescriptorSlot = {};
 
+		std::unique_ptr<Material> m_TestMaterial = nullptr;
+		std::unique_ptr<Material> m_DuckMaterial = nullptr;
+
 		uint32* m_TextureSlots = nullptr;
 		std::unique_ptr<Sampler> m_DefaultSampler = nullptr;
 		std::unique_ptr<Sampler> m_SkyboxSampler = nullptr;

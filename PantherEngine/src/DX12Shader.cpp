@@ -39,6 +39,20 @@ namespace Panther
 		ObtainRootParameters(shaderReflection.Get(), D3D12_SHADER_VISIBILITY_PIXEL);
 	}
 
+	uint32 DX12Shader::GetRootParameterIndex(std::string a_RootParameterName)
+	{
+		auto search = m_RootParameterIndices.find(a_RootParameterName);
+		if (search != m_RootParameterIndices.end()) 
+		{
+			return search->second;
+		}
+		else 
+		{
+			throw std::runtime_error("DX12SHADER: No root parameter exists with name " + a_RootParameterName);
+		}
+
+	}
+
 	ID3DBlob* DX12Shader::LoadHLSLShader(std::wstring a_Path, std::string a_EntryPoint, std::string a_ShaderTarget, bool a_Debug)
 	{
 		uint32 compileFlags = a_Debug ? D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION : 0;
@@ -137,6 +151,8 @@ namespace Panther
 
 			CD3DX12_ROOT_PARAMETER1 rootParameter;
 			rootParameter.InitAsDescriptorTable(1U, m_DescriptorRanges.back().get(), a_ShaderVisibility);
+
+			m_RootParameterIndices[resourceInfo.Name] = (uint32)m_RootParameters.size();
 			m_RootParameters.push_back(rootParameter);
 		}
 	}

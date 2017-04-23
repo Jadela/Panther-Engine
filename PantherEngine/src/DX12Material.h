@@ -5,6 +5,7 @@
 #include <d3dx12.h>
 #include <wrl.h>
 
+#include <unordered_map>
 #include <vector>
 
 namespace Panther
@@ -26,13 +27,18 @@ namespace Panther
 		void LoadShader(std::wstring a_Path, std::string a_EntryPoint, ShaderType a_Type) final override;
 		void Compile(DepthWrite a_DepthWrite = DepthWrite::On) final override;
 
+		void SetResource(std::string a_ResourceNameInShader, DescriptorHeap& a_ResourceHeap, uint32 a_HeapOffset) final override;
+		void Use(CommandList& a_CommandList) final override;
+
 		ID3D12PipelineState* GetPSO();
 		ID3D12RootSignature* GetRootSig();
 
 	private:
+		DX12Shader* m_Shader;
+		std::unordered_map<uint32, CD3DX12_GPU_DESCRIPTOR_HANDLE> m_RootParameterBindings;
+
 		// Renderer reference
 		DX12Renderer& m_Renderer;
-		DX12Shader* m_Shader;
 
 		// Shaders
 		Microsoft::WRL::ComPtr<ID3DBlob> m_VertexBlob = nullptr;

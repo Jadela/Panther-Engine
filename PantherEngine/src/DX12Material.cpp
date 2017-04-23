@@ -1,5 +1,7 @@
 #include "DX12Material.h"
 
+#include "DX12CommandList.h"
+#include "DX12DescriptorHeap.h"
 #include "DX12Shader.h"
 #include "DX12Renderer.h"
 #include "Exceptions.h"
@@ -214,6 +216,31 @@ namespace Panther
 		PSDesc.SampleDesc.Count = 1;
 		hr = m_Renderer.GetDevice().CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineState));
 		if (FAILED(hr)) throw std::runtime_error("Could not create graphics pipeline state.");
+	}
+
+	void DX12Material::SetResource(std::string a_ResourceNameInShader, DescriptorHeap& a_ResourceHeap, uint32 a_HeapOffset)
+	{
+		uint32 shaderRootParameterIndex = m_Shader->GetRootParameterIndex(a_ResourceNameInShader);
+
+		DX12DescriptorHeap* resourceHeap = static_cast<DX12DescriptorHeap*>(&a_ResourceHeap);
+		CD3DX12_GPU_DESCRIPTOR_HANDLE descriptorHeapGPUHandle(resourceHeap->GetDescriptorHeap().GetGPUDescriptorHandleForHeapStart(),
+			a_HeapOffset, m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(resourceHeap->GetType()));
+
+		m_RootParameterBindings[shaderRootParameterIndex] = descriptorHeapGPUHandle;
+	}
+
+	void DX12Material::Use(CommandList& a_CommandList)
+	{
+		DX12CommandList* commandList = static_cast<DX12CommandList*>(&a_CommandList);
+		ID3D12GraphicsCommandList& d3dCommandList(commandList->GetCommandList());
+
+		d3dCommandList.SetGraphicsRootSignature(m_Shader->GetRootSignature());
+		d3dCommandList.SetPipelineState(m_PipelineState.Get());
+
+		for (auto iterator : m_RootParameterBindings)
+		{
+			d3dCommandList.SetGraphicsRootDescriptorTable(iterator.first, iterator.second);
+		}
 	}
 
 	ID3D12PipelineState* DX12Material::GetPSO()
