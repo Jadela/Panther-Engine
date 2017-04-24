@@ -185,9 +185,6 @@
     <ClCompile Include="src\CommandList.cpp">
       <Filter>Rendering\Common</Filter>
     </ClCompile>
-    <ClCompile Include="src\Material.cpp">
-      <Filter>Rendering\Common</Filter>
-    </ClCompile>
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Rendering\Common</Filter>
     </ClCompile>

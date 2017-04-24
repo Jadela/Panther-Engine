@@ -35,7 +35,6 @@ namespace Panther
 		virtual Buffer* CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) = 0;
 		virtual DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type) = 0;
 		virtual Texture* CreateTexture(const std::wstring& a_Path) = 0;
-		virtual Material* CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity) = 0;
 		virtual Material* CreateMaterial(Shader& a_Shader, DepthWrite a_DepthWriteEnabled) = 0;
 		virtual Mesh* CreateMesh() = 0;
 		virtual Sampler* CreateSampler(SamplerTextureCoordinateMode a_TextureCoordinateMode) = 0;

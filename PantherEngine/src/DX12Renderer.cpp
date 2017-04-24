@@ -217,11 +217,6 @@ namespace Panther
 		return texture;
 	}
 
-	Material* DX12Renderer::CreateMaterial(uint32 a_ConstantsCapacity, uint32 a_InputParameterCapacity)
-	{
-		return new DX12Material(*this, a_ConstantsCapacity, a_InputParameterCapacity);
-	}
-
 	Material* DX12Renderer::CreateMaterial(Shader& a_Shader, DepthWrite a_DepthWriteEnabled)
 	{
 		return new DX12Material(*this, static_cast<DX12Shader&>(a_Shader), a_DepthWriteEnabled);

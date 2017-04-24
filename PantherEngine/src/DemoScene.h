@@ -37,12 +37,6 @@ namespace Panther
 		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
 		std::unique_ptr<DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
 
-		std::unique_ptr<CommandList> m_SkySphereBundle = nullptr;
-		std::unique_ptr<CommandList> m_WaterBundle = nullptr;
-		std::unique_ptr<CommandList> m_CubeBundle = nullptr;
-		std::unique_ptr<CommandList> m_SphereBundle = nullptr;
-		std::unique_ptr<CommandList> m_DuckBundle = nullptr;
-
 		std::unique_ptr<Mesh> m_PlaneMesh = nullptr;
 		std::unique_ptr<Mesh> m_CubeMesh = nullptr;
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
@@ -67,27 +61,8 @@ namespace Panther
 		std::unique_ptr<Shader> m_WaterShader = nullptr;
 		std::unique_ptr<Shader> m_DefaultShader = nullptr;
 
-		// Skybox Material
 		std::unique_ptr<Material> m_SkyDomeMaterial = nullptr;
-		Material::DescriptorSlot m_SkyDomeVertexCBSlot = {};
-		Material::DescriptorSlot m_SkyDomePixelCBSlot = {};
-		Material::DescriptorSlot m_SkyDomeTexturesSlot = {};
-		Material::DescriptorSlot m_SkyDomeClampedSamplerSlot = {};
-
-		// Water Material
 		std::unique_ptr<Material> m_WaterMaterial = nullptr;
-		Material::DescriptorSlot m_WaterVertexCBSlot = {};
-		Material::DescriptorSlot m_WaterPixelCBSlot = {};
-		Material::DescriptorSlot m_WaterTexture0Slot = {};
-		Material::DescriptorSlot m_WaterSamplerSlot = {};
-
-		// Default Material
-		std::unique_ptr<Material> m_DefaultMaterial = nullptr;
-		Material::DescriptorSlot m_DefaultVertexCBSlot = {};
-		Material::DescriptorSlot m_DefaultPixelCBSlot = {};
-		Material::DescriptorSlot m_DefaultTextureSlot = {};
-		Material::DescriptorSlot m_DefaultSamplerDescriptorSlot = {};
-
 		std::unique_ptr<Material> m_TestMaterial = nullptr;
 		std::unique_ptr<Material> m_DuckMaterial = nullptr;
 

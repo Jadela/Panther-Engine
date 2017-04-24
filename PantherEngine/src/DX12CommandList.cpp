@@ -18,9 +18,8 @@ namespace Panther
 
 		ID3D12CommandAllocator* allocator = (m_CommandListType == D3D12_COMMAND_LIST_TYPE_DIRECT) 
 			? m_Renderer.GetCommandAllocatorDirect() : m_Renderer.GetCommandAllocatorBundle();
-		ID3D12PipelineState* PSO = a_Material ? a_Material->GetPSO() : nullptr;
 
-		HRESULT hr = m_Renderer.GetDevice().CreateCommandList(0, m_CommandListType, allocator, PSO, IID_PPV_ARGS(&m_CommandList));
+		HRESULT hr = m_Renderer.GetDevice().CreateCommandList(0, m_CommandListType, allocator, nullptr, IID_PPV_ARGS(&m_CommandList));
 		if (FAILED(hr))
 			throw std::runtime_error("Panther DX12 ERROR: Creation of command list failed!");
 	}
@@ -39,15 +38,6 @@ namespace Panther
 		m_CommandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 	}
 
-	void DX12CommandList::SetMaterial(Material& a_Material, bool a_ResetState)
-	{
-		DX12Material* mat = static_cast<DX12Material*>(&a_Material);
-
-		if (a_ResetState)
-			m_CommandList->SetPipelineState(mat->GetPSO());
-		m_CommandList->SetGraphicsRootSignature(mat->GetRootSig());
-	}
-
 	void DX12CommandList::SetMesh(Mesh& a_Mesh)
 	{
 		DX12Mesh* mesh = static_cast<DX12Mesh*>(&a_Mesh);
@@ -55,15 +45,6 @@ namespace Panther
 		m_CommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandList->IASetVertexBuffers(0, 1, &mesh->GetVertexBufferView());
 		m_CommandList->IASetIndexBuffer(&mesh->GetIndexBufferView());
-	}
-
-	void DX12CommandList::SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset)
-	{
-		DX12DescriptorHeap* descriptorHeap = static_cast<DX12DescriptorHeap*>(&a_DescriptorHeap);
-		CD3DX12_GPU_DESCRIPTOR_HANDLE descriptorHeapGPUHandle(descriptorHeap->GetDescriptorHeap().GetGPUDescriptorHandleForHeapStart(),
-			a_HeapElementOffset, m_Renderer.GetDevice().GetDescriptorHandleIncrementSize(descriptorHeap->GetType()));
-
-		m_CommandList->SetGraphicsRootDescriptorTable(a_Slot.m_Slot, descriptorHeapGPUHandle);
 	}
 
 	void DX12CommandList::UseDescriptorHeaps(DescriptorHeap** a_DescriptorHeaps, const uint32 a_NumDescriptorHeaps)
@@ -112,11 +93,10 @@ namespace Panther
 	{
 		ID3D12CommandAllocator* allocator = (m_CommandListType == D3D12_COMMAND_LIST_TYPE_DIRECT)
 			? m_Renderer.GetCommandAllocatorDirect() : m_Renderer.GetCommandAllocatorBundle();
-		ID3D12PipelineState* PSO = a_Material ? a_Material->GetPSO() : nullptr;
 		
 		// However, when ExecuteCommandList() is called on a particular command
 		// list, that command list can then be reset at any time and must be before
 		// re-recording.
-		m_CommandList->Reset(allocator, PSO);
+		m_CommandList->Reset(allocator, nullptr);
 	}
 }

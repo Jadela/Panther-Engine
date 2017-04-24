@@ -91,78 +91,6 @@ namespace Panther
 
 		CommandList* commandLists[] = {&commandList};
 		m_Renderer.SubmitCommandLists(commandLists, 1);
-
-		// Create and record the bundles.
-		{
-			m_SkySphereBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_SkyDomeMaterial.get()));
-
-			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-			m_SkySphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
-			m_SkySphereBundle->SetMaterial(*m_SkyDomeMaterial, false);
-			m_SkySphereBundle->SetMesh(*m_SphereMesh);
-			m_SkySphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeTexturesSlot, m_TextureSlots[2]);
-			m_SkySphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_SkyDomeClampedSamplerSlot, m_SkyboxSamplerSlot);
-			m_SkySphereBundle->Draw(m_SphereMesh->GetNumIndices());
-
-			m_SkySphereBundle->Close();
-		}
-
-		{
-			m_WaterBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_WaterMaterial.get()));
-
-			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-			m_WaterBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
-			m_WaterBundle->SetMaterial(*m_WaterMaterial, false);
-			m_WaterBundle->SetMesh(*m_PlaneMesh);
-			m_WaterBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterTexture0Slot, m_TextureSlots[6]);
-			m_WaterBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_WaterSamplerSlot, m_DefaultSamplerSlot);
-			m_WaterBundle->Draw(m_PlaneMesh->GetNumIndices());
-
-			m_WaterBundle->Close();
-		}
-
-		{
-			m_CubeBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get()));
-
-			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-			m_CubeBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
-			m_CubeBundle->SetMaterial(*m_DefaultMaterial, false);
-			m_CubeBundle->SetMesh(*m_CubeMesh);
-			m_CubeBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[0]);
-			m_CubeBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
-			m_CubeBundle->Draw(m_CubeMesh->GetNumIndices());
-
-			m_CubeBundle->Close();
-		}
-
-		{
-			m_SphereBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get()));
-
-			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-			m_SphereBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
-			m_SphereBundle->SetMaterial(*m_DefaultMaterial, false);
-			m_SphereBundle->SetMesh(*m_SphereMesh);
-			m_SphereBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[0]);
-			m_SphereBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
-			m_SphereBundle->Draw(m_SphereMesh->GetNumIndices());
-
-			m_SphereBundle->Close();
-		}
-
-		{
-			m_DuckBundle = std::unique_ptr<CommandList>(m_Renderer.CreateCommandList(D3D12_COMMAND_LIST_TYPE_BUNDLE, m_DefaultMaterial.get()));
-
-			DescriptorHeap* usedHeaps[] = { m_CBVSRVUAVDescriptorHeap.get(), m_SamplerDescriptorHeap.get() };
-			m_DuckBundle->UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
-			m_DuckBundle->SetMaterial(*m_DefaultMaterial, false);
-			m_DuckBundle->SetMesh(*m_DuckMesh);
-			m_DuckBundle->SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultTextureSlot, m_TextureSlots[1]);
-			m_DuckBundle->SetDescriptorHeap(*m_SamplerDescriptorHeap.get(), m_DefaultSamplerDescriptorSlot, m_DefaultSamplerSlot);
-			m_DuckBundle->Draw(m_DuckMesh->GetNumIndices());
-
-			m_DuckBundle->Close();
-		}
-
 		m_Renderer.Synchronize();
 
 		m_Camera = std::make_unique<Camera>(Transform(Vector(0, 0, -10)));
@@ -194,59 +122,20 @@ namespace Panther
 
 	void DemoScene::CreateMaterials()
 	{
-		// Create skysphere material.
-		{
-			m_SkyDomeMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(7, 2));
-			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_SkyDomeMaterial->LoadShader(L"../rsc/shaders/skydome.hlsl", "PSMain", Material::ShaderType::Pixel);
+		m_SkyDomeMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_SkyShader.get(), DepthWrite::Off));
+		m_SkyDomeMaterial->SetResource("VertexCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkydomeVertexCBufferSlot);
+		m_SkyDomeMaterial->SetResource("PixelCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkydomePixelCBufferSlot);
+		m_SkyDomeMaterial->SetResource("dayTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[2]);
+		m_SkyDomeMaterial->SetResource("nightTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[3]);
+		m_SkyDomeMaterial->SetResource("sunTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[4]);
+		m_SkyDomeMaterial->SetResource("moonTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[5]);
+		m_SkyDomeMaterial->SetResource("clampedSampler", *m_SamplerDescriptorHeap.get(), m_SkyboxSamplerSlot);
 
-			m_SkyDomeVertexCBSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
-			m_SkyDomePixelCBSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
-			m_SkyDomeTexturesSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 4, 0, Material::ShaderType::Pixel);
-			m_SkyDomeClampedSamplerSlot = m_SkyDomeMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
-
-			m_SkyDomeMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_SkyDomeMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
-
-			m_SkyDomeMaterial->Compile(DepthWrite::Off);
-		}
-
-		// Create water material
-		{
-			m_WaterMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(4, 3));
-			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_WaterMaterial->LoadShader(L"../rsc/shaders/water.hlsl", "PSMain", Material::ShaderType::Pixel);
-
-			m_WaterVertexCBSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
-			m_WaterPixelCBSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
-			m_WaterTexture0Slot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
-			m_WaterSamplerSlot = m_WaterMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
-
-			m_WaterMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_WaterMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
-			m_WaterMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
-
-			m_WaterMaterial->Compile();
-		}
-
-		// Create diffuse material.
-		{
-			m_DefaultMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(4, 4));
-			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "VSMain", Material::ShaderType::Vertex);
-			m_DefaultMaterial->LoadShader(L"../rsc/shaders/shaders.hlsl", "PSMain", Material::ShaderType::Pixel);
-
-			m_DefaultVertexCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 0, Material::ShaderType::Vertex);
-			m_DefaultPixelCBSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ConstantBuffer, 1, 1, Material::ShaderType::Pixel);
-			m_DefaultTextureSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::ShaderResource, 1, 0, Material::ShaderType::Pixel);
-			m_DefaultSamplerDescriptorSlot = m_DefaultMaterial->DeclareShaderDescriptor(Material::DescriptorType::Sampler, 1, 0, Material::ShaderType::Pixel);
-
-			m_DefaultMaterial->DeclareInputParameter("POSITION", Material::InputType::Float, 3);
-			m_DefaultMaterial->DeclareInputParameter("NORMAL", Material::InputType::Float, 3);
-			m_DefaultMaterial->DeclareInputParameter("COLOR", Material::InputType::Float, 4);
-			m_DefaultMaterial->DeclareInputParameter("TEXCOORD", Material::InputType::Float, 2);
-
-			m_DefaultMaterial->Compile();
-		}
+		m_WaterMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_WaterShader.get(), DepthWrite::On));
+		m_WaterMaterial->SetResource("VertexConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBufferSlot);
+		m_WaterMaterial->SetResource("PixelConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBufferSlot);
+		m_WaterMaterial->SetResource("waterTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[6]);
+		m_WaterMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 
 		m_TestMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_DefaultShader.get(), DepthWrite::On));
 		m_TestMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[0]);
@@ -371,40 +260,38 @@ namespace Panther
 		a_CommandList.UseDescriptorHeaps(usedHeaps, (uint32)Countof(usedHeaps));
 
 		XMMATRIX vpMatrix = m_Camera->GetViewProjectionMatrix();
-
-		// Use skydome shader
-		a_CommandList.SetMaterial(*m_SkyDomeMaterial, true);
-
-		// Skydome	
-		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomeVertexCBSlot, m_SkydomeVertexCBufferSlot);
+		
+		// Sky
 		SkydomeVertexCB skydomeCB;
 		skydomeCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
 		skydomeCB.m_SunPos = Vector(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
 		m_SkydomeVertexCBuffer->CopyTo(0, &skydomeCB, sizeof(SkydomeVertexCB));
-		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_SkyDomePixelCBSlot, m_SkydomePixelCBufferSlot);
+
 		SkydomePixelCB skydomeCB2;
 		skydomeCB2.m_ScreenResolution = Vector((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight());
 		m_SkydomePixelCBuffer->CopyTo(0, &skydomeCB2, sizeof(SkydomePixelCB));
-		a_CommandList.ExecuteBundle(*m_SkySphereBundle.get());
 
-		// Use water shader
-		a_CommandList.SetMaterial(*m_WaterMaterial, true);
+		m_SkyDomeMaterial->Use(a_CommandList);
+		a_CommandList.SetMesh(*m_SphereMesh);
+		a_CommandList.Draw(m_SphereMesh->GetNumIndices());
 
 		// Water
-		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterVertexCBSlot, m_WaterVertexCBufferSlot);
 		DefaultVertexCB defaultVertexCB;
 		defaultVertexCB.m_WorldMatrix = m_WaterTransform->GetTransformMatrix();
 		defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
 		defaultVertexCB.m_MVP = m_WaterTransform->GetTransformMatrix() * vpMatrix;
 		m_DefaultVertexCBuffer->CopyTo(3, &defaultVertexCB, sizeof(DefaultVertexCB));
-		a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBSlot, m_WaterPixelCBufferSlot);
+
 		WaterPixelCB waterPixelCB;
 		waterPixelCB.m_LightDirection = skydomeCB.m_SunPos;
 		waterPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		waterPixelCB.m_M = m_WaterTransform->GetTransformMatrix();
 		waterPixelCB.m_WaterOffset = m_WaterOffset;
 		m_WaterPixelCBuffer->CopyTo(0, &waterPixelCB, sizeof(WaterPixelCB));
-		a_CommandList.ExecuteBundle(*m_WaterBundle.get());
+
+		m_WaterMaterial->Use(a_CommandList);
+		a_CommandList.SetMesh(*m_PlaneMesh);
+		a_CommandList.Draw(m_PlaneMesh->GetNumIndices());
 		
 		// Default material
 		DefaultPixelCB defaultPixelCB;
@@ -429,8 +316,7 @@ namespace Panther
 		defaultVertexCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
 		m_DefaultVertexCBuffer->CopyTo(1, &defaultVertexCB, sizeof(DefaultVertexCB));
 
-		m_TestMaterial->SetResource("VertexConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_SphereMatrixBufferSlot);
-		m_TestMaterial->Use(a_CommandList);
+		m_TestMaterial->SetResource("VertexConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_SphereMatrixBufferSlot, a_CommandList);
 		a_CommandList.SetMesh(*m_SphereMesh);
 		a_CommandList.Draw(m_SphereMesh->GetNumIndices());
 
@@ -444,35 +330,6 @@ namespace Panther
 		m_DuckMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_DuckMesh);
 		a_CommandList.Draw(m_DuckMesh->GetNumIndices());
-
-		// Use default shader
-		//a_CommandList.SetMaterial(*m_DefaultMaterial, true);
-
-		//a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultPixelCBSlot, m_LightPositionBufferSlot);
-
-		// Cube
-		//a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_CubeMatrixBufferSlot);
-		//defaultVertexCB.m_WorldMatrix = m_CubeTransform->GetTransformMatrix();
-		//defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_CubeTransform->GetTransformMatrix()));
-		//defaultVertexCB.m_MVP = m_CubeTransform->GetTransformMatrix() * vpMatrix;
-		//m_DefaultVertexCBuffer->CopyTo(0, &defaultVertexCB, sizeof(DefaultVertexCB));
-		//a_CommandList.ExecuteBundle(*m_CubeBundle.get());
-
-		// Sphere
-		//a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_SphereMatrixBufferSlot);
-		//defaultVertexCB.m_WorldMatrix = m_SphereTransform->GetTransformMatrix();
-		//defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_SphereTransform->GetTransformMatrix()));
-		//defaultVertexCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
-		//m_DefaultVertexCBuffer->CopyTo(1, &defaultVertexCB, sizeof(DefaultVertexCB));
-		//a_CommandList.ExecuteBundle(*m_SphereBundle.get());
-
-		// Duck
-		//a_CommandList.SetDescriptorHeap(*m_CBVSRVUAVDescriptorHeap.get(), m_DefaultVertexCBSlot, m_DuckMatrixBufferSlot);
-		//defaultVertexCB.m_WorldMatrix = m_DuckTransform->GetTransformMatrix();
-		//defaultVertexCB.m_InverseTransposeMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, m_DuckTransform->GetTransformMatrix()));
-		//defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
-		//m_DefaultVertexCBuffer->CopyTo(2, &defaultVertexCB, sizeof(DefaultVertexCB));
-		//a_CommandList.ExecuteBundle(*m_DuckBundle.get());
 	}
 
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)

@@ -16,9 +16,7 @@ namespace Panther
 		virtual ~DX12CommandList() final override;
 
 		void SetAndClearRenderTarget(SwapChain& a_SwapChain, const float a_Color[4]) final override;
-		void SetMaterial(Material& a_Material, bool a_ResetState) final override;
 		void SetMesh(Mesh& a_Mesh) final override;
-		void SetDescriptorHeap(DescriptorHeap& a_DescriptorHeap, Material::DescriptorSlot& a_Slot, uint32 a_HeapElementOffset) final override;
 		void UseDescriptorHeaps(DescriptorHeap** a_DescriptorHeaps, const uint32 a_NumDescriptorHeaps) final override;
 		void UseDefaultViewport() final override;
 		void ExecuteBundle(CommandList& a_Bundle) final override;
