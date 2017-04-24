@@ -146,6 +146,7 @@ namespace Panther
 		m_DuckMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[1]);
 		m_DuckMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 		m_DuckMaterial->SetResource("PixelConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_LightPositionBufferSlot);
+		m_DuckMaterial->SetResource("VertexConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckMatrixBufferSlot);
 	}
 
 	void DemoScene::CreateGeometry(CommandList& a_CommandList)
@@ -326,7 +327,6 @@ namespace Panther
 		defaultVertexCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
 		m_DefaultVertexCBuffer->CopyTo(2, &defaultVertexCB, sizeof(DefaultVertexCB));
 
-		m_DuckMaterial->SetResource("VertexConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckMatrixBufferSlot);
 		m_DuckMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_DuckMesh);
 		a_CommandList.Draw(m_DuckMesh->GetNumIndices());
