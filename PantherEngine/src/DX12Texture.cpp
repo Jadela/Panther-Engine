@@ -1,6 +1,7 @@
 #include "DX12Texture.h"
 
 #include "Core.h"
+#include "Exceptions.h"
 #include "DX12CommandList.h"
 #include "DX12Renderer.h"
 
@@ -27,22 +28,14 @@ namespace Panther
 	{
 		CD3DX12_RESOURCE_DESC textureDesc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM, m_Width, m_Height,
 			1U, 1U);
-		HRESULT hr = m_Renderer.GetDevice().CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-			D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_GPUResource));
-		if (FAILED(hr))
-		{
-			throw std::runtime_error("Panther DX12 ERROR: Could not create texture GPU resource.");
-		}
+		ThrowIfFailed(m_Renderer.GetDevice().CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+			D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_GPUResource)));
 
 		const uint32 subresourceCount = textureDesc.DepthOrArraySize * textureDesc.MipLevels;
 		const uint64 uploadBufferSize = GetRequiredIntermediateSize(m_GPUResource.Get(), 0, subresourceCount);
-		hr = m_Renderer.GetDevice().CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		ThrowIfFailed(m_Renderer.GetDevice().CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr, IID_PPV_ARGS(&m_UploadResource));
-		if (FAILED(hr))
-		{
-			throw std::runtime_error("Panther DX12 ERROR: Could not create texture upload resource.");
-		}
+			nullptr, IID_PPV_ARGS(&m_UploadResource)));
 
 		// Copy data to the intermediate upload heap and then schedule a copy 
 		// from the upload heap to the Texture2D.

@@ -1,5 +1,6 @@
 #include "DX12CommandList.h"
 
+#include "Exceptions.h"
 #include "DX12DescriptorHeap.h"
 #include "DX12Renderer.h"
 #include "DX12Material.h"
@@ -19,9 +20,7 @@ namespace Panther
 		ID3D12CommandAllocator* allocator = (m_CommandListType == D3D12_COMMAND_LIST_TYPE_DIRECT) 
 			? m_Renderer.GetCommandAllocatorDirect() : m_Renderer.GetCommandAllocatorBundle();
 
-		HRESULT hr = m_Renderer.GetDevice().CreateCommandList(0, m_CommandListType, allocator, nullptr, IID_PPV_ARGS(&m_CommandList));
-		if (FAILED(hr))
-			throw std::runtime_error("Panther DX12 ERROR: Creation of command list failed!");
+		ThrowIfFailed(m_Renderer.GetDevice().CreateCommandList(0, m_CommandListType, allocator, nullptr, IID_PPV_ARGS(&m_CommandList)));
 	}
 
 	DX12CommandList::~DX12CommandList()
@@ -84,19 +83,13 @@ namespace Panther
 
 	void DX12CommandList::Close()
 	{
-		HRESULT hr = m_CommandList->Close();
-		if (FAILED(hr))
-			throw std::runtime_error("Panther DX12 ERROR: Closure of DX12 command list failed, check logs for errors!");
+		ThrowIfFailed(m_CommandList->Close());
 	}
 
 	void DX12CommandList::Reset(DX12Material* a_Material)
 	{
 		ID3D12CommandAllocator* allocator = (m_CommandListType == D3D12_COMMAND_LIST_TYPE_DIRECT)
 			? m_Renderer.GetCommandAllocatorDirect() : m_Renderer.GetCommandAllocatorBundle();
-		
-		// However, when ExecuteCommandList() is called on a particular command
-		// list, that command list can then be reset at any time and must be before
-		// re-recording.
-		m_CommandList->Reset(allocator, nullptr);
+		ThrowIfFailed(m_CommandList->Reset(allocator, nullptr));
 	}
 }

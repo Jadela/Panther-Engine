@@ -1,5 +1,6 @@
 #include "DX12DescriptorHeap.h"
 
+#include "Exceptions.h"
 #include "DX12Buffer.h"
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
@@ -14,13 +15,7 @@ namespace Panther
 		heapDescriptor.NumDescriptors = m_Capacity;
 		heapDescriptor.Type = m_Type;
 		heapDescriptor.Flags = (m_Type <= D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER) ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
-		HRESULT hr = m_D3DDevice.CreateDescriptorHeap(&heapDescriptor, IID_PPV_ARGS(&m_D3DDescriptorHeap));
-		if (FAILED(hr))
-		{
-			throw std::runtime_error("Panther DX12 ERROR: Could not create descriptor heap.\nType: " + GetTypeString() + "\nCapacity: "
-				+ std::to_string(m_Capacity));
-		}
+		ThrowIfFailed(m_D3DDevice.CreateDescriptorHeap(&heapDescriptor, IID_PPV_ARGS(&m_D3DDescriptorHeap)));
 
 		m_DescriptorHandle = m_D3DDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	}
