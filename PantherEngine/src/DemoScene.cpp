@@ -67,13 +67,12 @@ namespace Panther
 	DemoScene::DemoScene(Renderer& a_Renderer) 
 		: Scene(a_Renderer) 
 	{
-		m_TextureSlots = new TextureID[Countof(g_Textures)];
+		m_TextureSlots = std::make_unique<TextureID[]>(Countof(g_Textures));
 		m_TextureManager = std::make_unique<TextureManager>(a_Renderer, (uint32)Countof(g_Textures));
 	}
 
 	DemoScene::~DemoScene()
 	{
-		delete[] m_TextureSlots;
 	}
 
 	void DemoScene::Load()
