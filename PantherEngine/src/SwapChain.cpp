@@ -73,7 +73,8 @@ namespace Panther
 
 			ThrowIfFailed(m_Device.CreateCommittedResource(
 				&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Tex2D(
-					DXGI_FORMAT_D32_FLOAT, a_Width, a_Height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+					DXGI_FORMAT_D32_FLOAT, a_Width, a_Height, 1, 0, 1, 0, 
+					D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE),
 				D3D12_RESOURCE_STATE_DEPTH_WRITE, &depthOptimizedClearValue, IID_PPV_ARGS(&m_DepthStencil)));
 
 			m_DSVDescHeap.RegisterDepthStencil(*m_DepthStencil.Get(), depthStencilDesc);
