@@ -19,6 +19,7 @@ namespace Panther
 		DX12Material(DX12Renderer& a_Renderer, DX12Shader& a_Shader, DepthWrite a_DepthWriteEnabled);
 		~DX12Material();
 
+		void SetWireframe(bool a_Enabled);
 		void SetResource(std::string a_ResourceNameInShader, DescriptorHeap& a_ResourceHeap, uint32 a_HeapOffset) final override;
 		void SetResource(std::string a_ResourceNameInShader, DescriptorHeap& a_ResourceHeap, uint32 a_HeapOffset, CommandList& a_CommandList) final override;
 		void Use(CommandList& a_CommandList) final override;
@@ -30,6 +31,8 @@ namespace Panther
 		DX12Renderer& m_Renderer;
 		DX12Shader& m_Shader;
 		std::unordered_map<uint32, CD3DX12_GPU_DESCRIPTOR_HANDLE> m_RootParameterBindings;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineState = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineStateSolid = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_PipelineStateWireframe = nullptr;
+		ID3D12PipelineState* m_ActivePipelineState = nullptr;
 	};
 }

@@ -30,11 +30,21 @@ namespace Panther
 		PSDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		PSDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		PSDesc.SampleDesc.Count = 1;
-		ThrowIfFailed(m_Renderer.GetDevice().CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineState)));
+		ThrowIfFailed(m_Renderer.GetDevice().CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineStateSolid)));
+
+		PSDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		ThrowIfFailed(m_Renderer.GetDevice().CreateGraphicsPipelineState(&PSDesc, IID_PPV_ARGS(&m_PipelineStateWireframe)));
+
+		m_ActivePipelineState = m_PipelineStateSolid.Get();
 	}
 
 	DX12Material::~DX12Material()
 	{
+	}
+
+	void DX12Material::SetWireframe(bool a_Enabled)
+	{
+		m_ActivePipelineState = a_Enabled ? m_PipelineStateWireframe.Get() : m_PipelineStateSolid.Get();
 	}
 
 	void DX12Material::SetResource(std::string a_ResourceNameInShader, DescriptorHeap& a_ResourceHeap, uint32 a_HeapOffset)
@@ -65,7 +75,7 @@ namespace Panther
 		ID3D12GraphicsCommandList& d3dCommandList(commandList->GetCommandList());
 
 		d3dCommandList.SetGraphicsRootSignature(m_Shader.GetRootSignature());
-		d3dCommandList.SetPipelineState(m_PipelineState.Get());
+		d3dCommandList.SetPipelineState(m_ActivePipelineState);
 
 		for (auto iterator : m_RootParameterBindings)
 		{

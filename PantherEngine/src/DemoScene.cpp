@@ -249,6 +249,22 @@ namespace Panther
 			Application::Quit();
 		}
 
+		if (Input::GetKey(Key::D1))
+		{
+			m_TestMaterial->SetWireframe(true);
+			m_DuckMaterial->SetWireframe(true);
+			m_WaterMaterial->SetWireframe(true);
+			m_SkyDomeMaterial->SetWireframe(true);
+		}
+
+		if (Input::GetKey(Key::D2))
+		{
+			m_TestMaterial->SetWireframe(false);
+			m_DuckMaterial->SetWireframe(false);
+			m_WaterMaterial->SetWireframe(false);
+			m_SkyDomeMaterial->SetWireframe(false);
+		}
+
 		m_PreviousMousePosition = mousePosition;
 	}
 
