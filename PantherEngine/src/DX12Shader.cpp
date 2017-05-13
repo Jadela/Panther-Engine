@@ -146,14 +146,23 @@ namespace Panther
 			D3D12_SHADER_INPUT_BIND_DESC resourceInfo;
 			a_Reflection->GetResourceBindingDesc(i, &resourceInfo);
 
-			m_DescriptorRanges.push_back(
-				std::make_unique<CD3DX12_DESCRIPTOR_RANGE1>(GetDescriptorRangeTypeFromShaderInputType(resourceInfo.Type), 1, resourceInfo.BindPoint));
+			auto search = m_RootParameterIndices.find(resourceInfo.Name);
+			if (search != m_RootParameterIndices.end())
+			{
+				m_RootParameters[search->second].ShaderVisibility = (D3D12_SHADER_VISIBILITY)(m_RootParameters[search->second].ShaderVisibility | 
+					a_ShaderVisibility);
+			}
+			else
+			{
+				m_DescriptorRanges.push_back(
+					std::make_unique<CD3DX12_DESCRIPTOR_RANGE1>(GetDescriptorRangeTypeFromShaderInputType(resourceInfo.Type), 1, resourceInfo.BindPoint));
 
-			CD3DX12_ROOT_PARAMETER1 rootParameter;
-			rootParameter.InitAsDescriptorTable(1U, m_DescriptorRanges.back().get(), a_ShaderVisibility);
+				CD3DX12_ROOT_PARAMETER1 rootParameter;
+				rootParameter.InitAsDescriptorTable(1U, m_DescriptorRanges.back().get(), a_ShaderVisibility);
 
-			m_RootParameterIndices[resourceInfo.Name] = (uint32)m_RootParameters.size();
-			m_RootParameters.push_back(rootParameter);
+				m_RootParameterIndices[resourceInfo.Name] = (uint32)m_RootParameters.size();
+				m_RootParameters.push_back(rootParameter);
+			}
 		}
 	}
 
