@@ -24,7 +24,7 @@ int WINAPI wWinMain(HINSTANCE a_InstanceHandle, HINSTANCE a_Nothing, PWSTR a_Com
 	}
 	catch (WinException& e)
 	{
-		MessageBox(nullptr, e.ToString().c_str(), L"Panther::WinException", MB_OK | MB_ICONERROR);
+		MessageBox(nullptr, e.ToString().c_str(), L"Panther::WinException", MB_OK | MB_ICONERROR | MB_DEFAULT_DESKTOP_ONLY);
 		return 1;
 	}
 }
