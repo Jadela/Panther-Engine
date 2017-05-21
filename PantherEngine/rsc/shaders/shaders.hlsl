@@ -1,10 +1,22 @@
-// Vertex shader
-cbuffer VertexConstants : register(b0)
+cbuffer AppCB : register(b0)
 {
-	matrix WorldMatrix;
-	matrix InverseTransposeWorldMatrix;
-	matrix ModelViewProjectionMatrix;
-}
+	float4 m_ScreenResolution;
+};
+
+cbuffer FrameCB : register(b1)
+{
+	float4 m_Light0Pos;
+	float4 m_Light0Direction;
+	float4 m_CameraPosition;
+	float m_Time;
+};
+
+cbuffer ObjectCB : register(b2)
+{
+	matrix m_MVP;
+	matrix m_M;
+	matrix m_IT_M;
+};
 
 struct VtP
 {
@@ -20,11 +32,11 @@ VtP VSMain(float3 Position : POSITION, float3 Normal : NORMAL, float4 Color : CO
 {
 	VtP output;
 
-	output.Position = mul(ModelViewProjectionMatrix, float4(Position, 1));
-	output.Normal_WS = mul((float3x3)InverseTransposeWorldMatrix, Normal);
+	output.Position = mul(m_MVP, float4(Position, 1));
+	output.Normal_WS = mul((float3x3)m_IT_M, Normal);
 	output.Color = Color;
 	output.UV = UV;
-	output.Pos_WS = mul(WorldMatrix, float4(Position, 1));
+	output.Pos_WS = mul(m_M, float4(Position, 1));
 
 	return output;
 }
@@ -32,7 +44,7 @@ VtP VSMain(float3 Position : POSITION, float3 Normal : NORMAL, float4 Color : CO
 // Pixel shader
 #include "lighting.hlsl"
 
-cbuffer PixelConstants : register(b1)
+cbuffer PixelConstants : register(b4)
 {
 	float3 LightDirection;
 	float Padding;
