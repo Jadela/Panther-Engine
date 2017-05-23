@@ -1,9 +1,21 @@
-// Vertex shader
-cbuffer VertexCB : register(b0)
+cbuffer AppCB : register(b0)
 {
-	matrix MVP;
-	float3 SunDirection;
-}
+	float4 m_ScreenResolution;
+};
+
+cbuffer FrameCB : register(b1)
+{
+	float4 m_Light0Direction;
+	float4 m_CameraPosition;
+	float m_Time;
+};
+
+cbuffer ObjectCB : register(b2)
+{
+	matrix m_MVP;
+	matrix m_M;
+	matrix m_IT_M;
+};
 
 struct VtP
 {
@@ -19,18 +31,18 @@ VtP VSMain(float3 Position : POSITION, float2 UV : TEXCOORD)
 {
 	VtP output;
 
-	output.Position = mul(MVP, float4(Position, 1));
+	output.Position = mul(m_MVP, float4(Position, 1));
 	output.UV = UV;
-	output.Sun_WS = SunDirection;
-	output.Sun_SS = mul(MVP, float4(SunDirection, 1));
-	output.Moon_SS = mul(MVP, float4(-SunDirection, 1));
+	output.Sun_WS = m_Light0Direction.xyz;
+    output.Sun_SS = mul(m_MVP, float4(m_Light0Direction.xyz, 1));
+    output.Moon_SS = mul(m_MVP, float4(-m_Light0Direction.xyz, 1));
 	output.Pos_SS = output.Position;
 
 	return output;
 }
 
 // Pixel shader
-cbuffer PixelCB : register(b1)
+cbuffer PixelCB : register(b4)
 {
 	float2 ScreenDimensions;
 }

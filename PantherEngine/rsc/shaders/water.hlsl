@@ -5,7 +5,6 @@ cbuffer AppCB : register(b0)
 
 cbuffer FrameCB : register(b1)
 {
-	float4 m_Light0Pos;
 	float4 m_Light0Direction;
 	float4 m_CameraPosition;
 	float m_Time;

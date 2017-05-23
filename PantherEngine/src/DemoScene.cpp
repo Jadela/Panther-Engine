@@ -39,7 +39,6 @@ namespace Panther
 
 	struct FrameCB
 	{
-		Vector m_Light0Pos;
 		Vector m_Light0Direction;
 		Vector m_CameraPosition;
 		float m_Time;
@@ -50,12 +49,6 @@ namespace Panther
 		XMMATRIX m_MVP;
 		XMMATRIX m_M;
 		XMMATRIX m_IT_M;
-	};
-
-	struct SkydomeVertexCB
-	{
-		XMMATRIX m_MVP;
-		Vector m_SunPos;
 	};
 
 	struct SkydomePixelCB
@@ -135,7 +128,8 @@ namespace Panther
 	void DemoScene::CreateMaterials()
 	{
 		m_SkyDomeMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_SkyShader.get(), DepthWrite::Off));
-		m_SkyDomeMaterial->SetResource("VertexCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkydomeVertexCBufferSlot);
+		m_SkyDomeMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
+		m_SkyDomeMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkyObjectCBSlot);
 		m_SkyDomeMaterial->SetResource("PixelCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkydomePixelCBufferSlot);
 		m_SkyDomeMaterial->SetResource("dayTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[2]);
 		m_SkyDomeMaterial->SetResource("nightTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[3]);
@@ -178,17 +172,17 @@ namespace Panther
 
 	void DemoScene::CreateConstantBuffers()
 	{
-		m_ObjectCBuffer = std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(5, sizeof(ObjectCB)));
+		m_FrameCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(FrameCB)));
+		m_ObjectCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(5, sizeof(ObjectCB)));
 
 		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(WaterPixelCB)));
-		m_SkydomeVertexCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(SkydomeVertexCB)));
 		m_LightPositionBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(DefaultPixelCB)));
 		m_SkydomePixelCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(SkydomePixelCB)));
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
 	{		
-		uint32 CBVSRVUAVHeapSize = 8 + (uint32)Countof(g_Textures);
+		uint32 CBVSRVUAVHeapSize = 9 + (uint32)Countof(g_Textures);
 		m_CBVSRVUAVDescriptorHeap = std::unique_ptr<DescriptorHeap>(m_Renderer.CreateDescriptorHeap(CBVSRVUAVHeapSize, DescriptorHeapType::ConstantBufferView));
 
 		uint32 samplerHeapSize = 2;
@@ -197,13 +191,14 @@ namespace Panther
 
 	void DemoScene::CreateDescriptors()
 	{
+		m_FrameCBSlot			= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_FrameCBuffer.get(), 0);
+		m_SkyObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 0);
 		m_WaterObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 1);
 		m_CubeObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 2);
 		m_SphereObjectCBSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 3);
 		m_DuckObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 4);
 
 		m_WaterPixelCBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get(), 0);
-		m_SkydomeVertexCBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomeVertexCBuffer.get(), 0);
 		m_SkydomePixelCBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get(), 0);
 		m_LightPositionBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get(), 0);
 
@@ -292,11 +287,18 @@ namespace Panther
 
 		XMMATRIX vpMatrix = m_Camera->GetViewProjectionMatrix();
 		
+		FrameCB frameCB;
+		frameCB.m_Light0Direction = Vector(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
+		frameCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
+		frameCB.m_Time = m_WaterOffset; // TODO (JDL): Change this.
+		m_FrameCBuffer->CopyTo(0, &frameCB, sizeof(FrameCB));
+
 		// Sky
-		SkydomeVertexCB skydomeCB;
-		skydomeCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
-		skydomeCB.m_SunPos = Vector(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
-		m_SkydomeVertexCBuffer->CopyTo(0, &skydomeCB, sizeof(SkydomeVertexCB));
+		ObjectCB objectCB;
+		objectCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
+		objectCB.m_M = m_Camera->GetSkyMatrix();
+		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_Camera->GetSkyMatrix()));
+		m_ObjectCBuffer->CopyTo(0, &objectCB, sizeof(ObjectCB));
 
 		SkydomePixelCB skydomeCB2;
 		skydomeCB2.m_ScreenResolution = Vector((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight());
@@ -307,14 +309,13 @@ namespace Panther
 		a_CommandList.Draw(m_SphereMesh->GetNumIndices());
 
 		// Water
-		ObjectCB objectCB;
 		objectCB.m_MVP = m_WaterTransform->GetTransformMatrix() * vpMatrix;
 		objectCB.m_M = m_WaterTransform->GetTransformMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
 		m_ObjectCBuffer->CopyTo(1, &objectCB, sizeof(ObjectCB));
 
 		WaterPixelCB waterPixelCB;
-		waterPixelCB.m_LightDirection = skydomeCB.m_SunPos;
+		waterPixelCB.m_LightDirection = frameCB.m_Light0Direction;
 		waterPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		waterPixelCB.m_M = m_WaterTransform->GetTransformMatrix();
 		waterPixelCB.m_WaterOffset = m_WaterOffset;
@@ -326,7 +327,7 @@ namespace Panther
 		
 		// Default material
 		DefaultPixelCB defaultPixelCB;
-		defaultPixelCB.m_LightDirection = skydomeCB.m_SunPos;
+		defaultPixelCB.m_LightDirection = frameCB.m_Light0Direction;
 		defaultPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		m_LightPositionBuffer->CopyTo(0, &defaultPixelCB, sizeof(DefaultPixelCB));
 
