@@ -56,7 +56,10 @@ namespace Panther
 
 	DX12Renderer::~DX12Renderer()
 	{
-		Synchronize();
+		if (m_D3DCommandQueue != nullptr)
+		{
+			Synchronize();
+		}
 	}
 
 	bool DX12Renderer::Initialize()
