@@ -11,4 +11,10 @@ namespace Panther
 	Entity::~Entity()
 	{
 	}
+
+	void Entity::AddComponent(Component* a_Component)
+	{
+		a_Component->m_Entity = this;
+		m_Components.push_back(std::unique_ptr<Component>(a_Component));
+	}
 }

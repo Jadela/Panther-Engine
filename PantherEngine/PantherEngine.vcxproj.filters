@@ -28,6 +28,9 @@
     <Filter Include="Core\Maths">
       <UniqueIdentifier>{0ef3a744-2066-4879-b3a5-6584c0f0a7ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{f10ff374-4305-453e-9ebc-493fcfd98787}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DX12Buffer.h">
@@ -148,7 +151,10 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Component.h">
-      <Filter>Scene</Filter>
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MeshComponent.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +253,12 @@
     </ClCompile>
     <ClCompile Include="src\Entity.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Component.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MeshComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

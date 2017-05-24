@@ -14,6 +14,8 @@ namespace Panther
 		Entity& operator=(const Entity& a_Rhs) = delete;
 		~Entity();
 
+		void AddComponent(Component* a_Component);
+
 	private:
 		std::vector<std::unique_ptr<Component>> m_Components;
 	};
