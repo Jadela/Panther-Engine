@@ -51,14 +51,6 @@ namespace Panther
 		XMMATRIX m_IT_M;
 	};
 
-	struct WaterPixelCB
-	{
-		Vector m_LightDirection;
-		Vector m_CameraPosition;
-		XMMATRIX m_M;
-		float m_WaterOffset;
-	};
-
 	DemoScene::DemoScene(Renderer& a_Renderer) 
 		: Scene(a_Renderer) 
 	{
@@ -128,8 +120,8 @@ namespace Panther
 		m_SkyDomeMaterial->SetResource("clampedSampler", *m_SamplerDescriptorHeap.get(), m_SkyboxSamplerSlot);
 
 		m_WaterMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_WaterShader.get(), DepthWrite::On));
+		m_WaterMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
 		m_WaterMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_WaterObjectCBSlot);
-		m_WaterMaterial->SetResource("PixelConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_WaterPixelCBufferSlot);
 		m_WaterMaterial->SetResource("waterTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[6]);
 		m_WaterMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 
@@ -165,8 +157,6 @@ namespace Panther
 		m_AppCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(AppCB)));
 		m_FrameCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(FrameCB)));
 		m_ObjectCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(5, sizeof(ObjectCB)));
-
-		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(WaterPixelCB)));
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
@@ -187,8 +177,6 @@ namespace Panther
 		m_CubeObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 2);
 		m_SphereObjectCBSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 3);
 		m_DuckObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 4);
-
-		m_WaterPixelCBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get(), 0);
 
 		LoadTextures();
 
@@ -297,13 +285,6 @@ namespace Panther
 		objectCB.m_M = m_WaterTransform->GetTransformMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
 		m_ObjectCBuffer->CopyTo(1, &objectCB, sizeof(ObjectCB));
-
-		WaterPixelCB waterPixelCB;
-		waterPixelCB.m_LightDirection = frameCB.m_Light0Direction;
-		waterPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
-		waterPixelCB.m_M = m_WaterTransform->GetTransformMatrix();
-		waterPixelCB.m_WaterOffset = m_WaterOffset;
-		m_WaterPixelCBuffer->CopyTo(0, &waterPixelCB, sizeof(WaterPixelCB));
 
 		m_WaterMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_PlaneMesh);

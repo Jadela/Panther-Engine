@@ -1,4 +1,8 @@
 #include "ConstantBuffers.hlsli"
+#include "lighting.hlsl"
+
+Texture2D waterTexture : register(t0);
+SamplerState defaultSampler : register(s0);
 
 struct VtP
 {
@@ -20,38 +24,23 @@ VtP VSMain(float3 Position : POSITION, float3 Normal : NORMAL, float2 UV : TEXCO
 	return output;
 }
 
-// Pixel shader
-#include "lighting.hlsl"
-
-cbuffer PixelConstants : register(b1)
-{
-	float3 LightDirection;
-	float Padding;
-	float4 CameraPosition;
-	matrix ModelMatrix;
-	float WaterAnimationOffset;
-}
-
-Texture2D		waterTexture : register(t0);
-SamplerState	defaultSampler : register(s0);
-
 LightingOutput ComputeLighting(float4 Pos_WS, float3 Normal)
 {
-	float3 CameraDirection = normalize(CameraPosition.xyz - Pos_WS.xyz);
+	float3 CameraDirection = normalize(m_CameraPosition.xyz - Pos_WS.xyz);
 
 	LightingOutput result = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
 
-	result.Diffuse = CalculateDiffuse(LightDirection, Normal);
-	result.Specular = CalculateSpecular(CameraDirection, LightDirection, Normal);
+	result.Diffuse = CalculateDiffuse(m_Light0Direction.xyz, Normal);
+	result.Specular = CalculateSpecular(CameraDirection, m_Light0Direction.xyz, Normal);
 
 	return result;
 }
 
 float4 PSMain(VtP input) : SV_TARGET
 {
-	float3 normal = (waterTexture.Sample(defaultSampler, input.UV + WaterAnimationOffset).xyz + waterTexture.Sample(defaultSampler, input.UV - WaterAnimationOffset).xyz + waterTexture.Sample(defaultSampler, input.UV + float2(WaterAnimationOffset, -WaterAnimationOffset)).xyz) / 3.0;
+	float3 normal = (waterTexture.Sample(defaultSampler, input.UV + m_Time).xyz + waterTexture.Sample(defaultSampler, input.UV - m_Time).xyz + waterTexture.Sample(defaultSampler, input.UV + float2(m_Time, -m_Time)).xyz) / 3.0;
 	normal = (normal * 2) - 1; // Expand from range [0,1] to [-1,1]
-	normal = normalize(mul((float3x3)ModelMatrix, normal)); // Texture to world space
+	normal = normalize(mul((float3x3) m_M, normal)); // Texture to world space
 
 	LightingOutput lighting = ComputeLighting(input.Pos_WS, normal);
 
