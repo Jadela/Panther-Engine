@@ -51,11 +51,6 @@ namespace Panther
 		XMMATRIX m_IT_M;
 	};
 
-	struct SkydomePixelCB
-	{
-		Vector m_ScreenResolution;
-	};
-
 	struct WaterPixelCB
 	{
 		Vector m_LightDirection;
@@ -99,12 +94,13 @@ namespace Panther
 		m_Renderer.Synchronize();
 
 		m_Camera = std::make_unique<Camera>(Transform(Vector(0, 0, -10)));
-		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.GetWindow().GetWidth()) / m_Renderer.GetWindow().GetHeight());
 
 		m_WaterTransform = std::make_unique<Transform>(Vector(0, -3, 0), Vector(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), XMConvertToRadians(-90))), Vector(10, 10, 10));
 		m_CubeTransform = std::make_unique<Transform>(Vector(-3, 0, 0));
 		m_SphereTransform = std::make_unique<Transform>(Vector(0, 0, 0));
 		m_DuckTransform = std::make_unique<Transform>(Vector(3, 0, 0));
+
+		OnResize(m_Renderer.GetWindow().GetWidth(), m_Renderer.GetWindow().GetHeight());
 	}
 
 	void DemoScene::LoadShaders()
@@ -128,9 +124,9 @@ namespace Panther
 	void DemoScene::CreateMaterials()
 	{
 		m_SkyDomeMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_SkyShader.get(), DepthWrite::Off));
+		m_SkyDomeMaterial->SetResource("AppCB", *m_CBVSRVUAVDescriptorHeap.get(), m_AppCBSlot);
 		m_SkyDomeMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
 		m_SkyDomeMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkyObjectCBSlot);
-		m_SkyDomeMaterial->SetResource("PixelCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkydomePixelCBufferSlot);
 		m_SkyDomeMaterial->SetResource("dayTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[2]);
 		m_SkyDomeMaterial->SetResource("nightTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[3]);
 		m_SkyDomeMaterial->SetResource("sunTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[4]);
@@ -172,12 +168,12 @@ namespace Panther
 
 	void DemoScene::CreateConstantBuffers()
 	{
+		m_AppCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(AppCB)));
 		m_FrameCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(FrameCB)));
 		m_ObjectCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(5, sizeof(ObjectCB)));
 
 		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(WaterPixelCB)));
 		m_LightPositionBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(DefaultPixelCB)));
-		m_SkydomePixelCBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(SkydomePixelCB)));
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
@@ -191,6 +187,7 @@ namespace Panther
 
 	void DemoScene::CreateDescriptors()
 	{
+		m_AppCBSlot				= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_AppCBuffer.get(), 0);
 		m_FrameCBSlot			= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_FrameCBuffer.get(), 0);
 		m_SkyObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 0);
 		m_WaterObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 1);
@@ -199,7 +196,6 @@ namespace Panther
 		m_DuckObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 4);
 
 		m_WaterPixelCBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get(), 0);
-		m_SkydomePixelCBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_SkydomePixelCBuffer.get(), 0);
 		m_LightPositionBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get(), 0);
 
 		LoadTextures();
@@ -300,10 +296,6 @@ namespace Panther
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_Camera->GetSkyMatrix()));
 		m_ObjectCBuffer->CopyTo(0, &objectCB, sizeof(ObjectCB));
 
-		SkydomePixelCB skydomeCB2;
-		skydomeCB2.m_ScreenResolution = Vector((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight());
-		m_SkydomePixelCBuffer->CopyTo(0, &skydomeCB2, sizeof(SkydomePixelCB));
-
 		m_SkyDomeMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_SphereMesh);
 		a_CommandList.Draw(m_SphereMesh->GetNumIndices());
@@ -366,5 +358,9 @@ namespace Panther
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)
 	{
 		m_Camera->SetAspectRatio(static_cast<float>(m_Renderer.GetWindow().GetWidth()) / m_Renderer.GetWindow().GetHeight());
+
+		AppCB appCB;
+		appCB.m_ScreenResolution = Vector((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight());
+		m_AppCBuffer->CopyTo(0, &appCB, sizeof(AppCB));
 	}
 }

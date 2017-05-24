@@ -1,5 +1,11 @@
 #include "ConstantBuffers.hlsli"
 
+Texture2D dayTexture : register(t0);
+Texture2D nightTexture : register(t1);
+Texture2D sunTexture : register(t2);
+Texture2D moonTexture : register(t3);
+SamplerState clampedSampler : register(s0);
+
 struct VtP
 {
 	float4 Position	: SV_POSITION;
@@ -24,21 +30,9 @@ VtP VSMain(float3 Position : POSITION, float2 UV : TEXCOORD)
 	return output;
 }
 
-// Pixel shader
-cbuffer PixelCB : register(b4)
-{
-	float2 ScreenDimensions;
-}
-
-Texture2D		dayTexture : register(t0);
-Texture2D		nightTexture : register(t1);
-Texture2D		sunTexture : register(t2);
-Texture2D		moonTexture : register(t3);
-SamplerState	clampedSampler : register(s0);
-
 float4 PSMain(VtP input) : SV_TARGET
 {
-	float AspectRatio = ScreenDimensions.y / ScreenDimensions.x;
+	float AspectRatio = m_ScreenResolution.y / m_ScreenResolution.x;
 
 	float4 SunC = float4(0, 0, 0, 0);
 	float4 MoonC = float4(0, 0, 0, 0);

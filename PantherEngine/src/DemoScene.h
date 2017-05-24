@@ -42,13 +42,14 @@ namespace Panther
 		std::unique_ptr<Mesh> m_SphereMesh = nullptr;
 		std::unique_ptr<Mesh> m_DuckMesh = nullptr;
 
+		std::unique_ptr<Buffer> m_AppCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_FrameCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_ObjectCBuffer = nullptr;
 		// Legacy below
 		std::unique_ptr<Buffer> m_WaterPixelCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_LightPositionBuffer = nullptr;
-		std::unique_ptr<Buffer> m_SkydomePixelCBuffer = nullptr;
 
+		uint32 m_AppCBSlot = 0;
 		uint32 m_FrameCBSlot = 0;
 		uint32 m_SkyObjectCBSlot = 0;
 		uint32 m_WaterObjectCBSlot = 0;
@@ -58,7 +59,6 @@ namespace Panther
 		// Legacy below
 		uint32 m_WaterPixelCBufferSlot = 0;
 		uint32 m_LightPositionBufferSlot = 0;
-		uint32 m_SkydomePixelCBufferSlot = 0;
 
 		std::unique_ptr<Shader> m_SkyShader = nullptr;
 		std::unique_ptr<Shader> m_WaterShader = nullptr;
