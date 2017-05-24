@@ -59,12 +59,6 @@ namespace Panther
 		float m_WaterOffset;
 	};
 
-	struct DefaultPixelCB
-	{
-		Vector m_LightDirection;
-		Vector m_CameraPosition;
-	};
-
 	DemoScene::DemoScene(Renderer& a_Renderer) 
 		: Scene(a_Renderer) 
 	{
@@ -140,15 +134,15 @@ namespace Panther
 		m_WaterMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 
 		m_TestMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_DefaultShader.get(), DepthWrite::On));
+		m_TestMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
 		m_TestMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[0]);
 		m_TestMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
-		m_TestMaterial->SetResource("PixelConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_LightPositionBufferSlot);
 
 		m_DuckMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_DefaultShader.get(), DepthWrite::On));
+		m_DuckMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
+		m_DuckMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckObjectCBSlot);
 		m_DuckMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[1]);
 		m_DuckMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
-		m_DuckMaterial->SetResource("PixelConstants", *m_CBVSRVUAVDescriptorHeap.get(), m_LightPositionBufferSlot);
-		m_DuckMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckObjectCBSlot);
 	}
 
 	void DemoScene::CreateGeometry(CommandList& a_CommandList)
@@ -173,7 +167,6 @@ namespace Panther
 		m_ObjectCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(5, sizeof(ObjectCB)));
 
 		m_WaterPixelCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(WaterPixelCB)));
-		m_LightPositionBuffer	= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(DefaultPixelCB)));
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
@@ -196,7 +189,6 @@ namespace Panther
 		m_DuckObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 4);
 
 		m_WaterPixelCBufferSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_WaterPixelCBuffer.get(), 0);
-		m_LightPositionBufferSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_LightPositionBuffer.get(), 0);
 
 		LoadTextures();
 
@@ -317,12 +309,6 @@ namespace Panther
 		a_CommandList.SetMesh(*m_PlaneMesh);
 		a_CommandList.Draw(m_PlaneMesh->GetNumIndices());
 		
-		// Default material
-		DefaultPixelCB defaultPixelCB;
-		defaultPixelCB.m_LightDirection = frameCB.m_Light0Direction;
-		defaultPixelCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
-		m_LightPositionBuffer->CopyTo(0, &defaultPixelCB, sizeof(DefaultPixelCB));
-
 		// Cube
 		objectCB.m_MVP = m_CubeTransform->GetTransformMatrix() * vpMatrix;
 		objectCB.m_M = m_CubeTransform->GetTransformMatrix();

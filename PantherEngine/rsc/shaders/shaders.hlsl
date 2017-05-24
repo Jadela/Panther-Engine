@@ -1,4 +1,8 @@
 #include "ConstantBuffers.hlsli"
+#include "lighting.hlsl"
+
+Texture2D diffuseTexture : register(t0);
+SamplerState defaultSampler : register(s0);
 
 struct VtP
 {
@@ -23,27 +27,14 @@ VtP VSMain(float3 Position : POSITION, float3 Normal : NORMAL, float4 Color : CO
 	return output;
 }
 
-// Pixel shader
-#include "lighting.hlsl"
-
-cbuffer PixelConstants : register(b4)
-{
-	float3 LightDirection;
-	float Padding;
-	float4 CameraPosition;
-}
-
-Texture2D		diffuseTexture : register(t0);
-SamplerState	defaultSampler : register(s0);
-
 LightingOutput ComputeLighting(float4 Pos_WS, float3 Normal)
 {
-	float3 CameraDirection = normalize(CameraPosition.xyz - Pos_WS.xyz);
+	float3 CameraDirection = normalize(m_CameraPosition.xyz - Pos_WS.xyz);
 
 	LightingOutput result = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
 
-	result.Diffuse = CalculateDiffuse(LightDirection, Normal);
-	result.Specular = CalculateSpecular(CameraDirection, LightDirection, Normal);
+	result.Diffuse = CalculateDiffuse(m_Light0Direction.xyz, Normal);
+	result.Specular = CalculateSpecular(CameraDirection, m_Light0Direction.xyz, Normal);
 
 	return result;
 }
@@ -52,7 +43,7 @@ float4 PSMain(VtP input) : SV_TARGET
 {
 	LightingOutput lighting = ComputeLighting(input.Pos_WS, normalize(input.Normal_WS));
 	
-	float day = LightDirection.y;
+	float day = m_Light0Direction.y;
 
 	float4 emissive = { 0, 0, 0, 0 };
 	float4 ambient = { 0.1f, 0.1f, 0.1f, 0.1f };
