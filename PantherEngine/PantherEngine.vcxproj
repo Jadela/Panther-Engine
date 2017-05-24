@@ -195,6 +195,7 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="rsc\shaders\ConstantBuffers.hlsli" />
     <None Include="rsc\shaders\shaders.hlsl">
       <FileType>Document</FileType>
     </None>

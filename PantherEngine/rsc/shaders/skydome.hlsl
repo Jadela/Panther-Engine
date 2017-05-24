@@ -1,21 +1,4 @@
-cbuffer AppCB : register(b0)
-{
-	float4 m_ScreenResolution;
-};
-
-cbuffer FrameCB : register(b1)
-{
-	float4 m_Light0Direction;
-	float4 m_CameraPosition;
-	float m_Time;
-};
-
-cbuffer ObjectCB : register(b2)
-{
-	matrix m_MVP;
-	matrix m_M;
-	matrix m_IT_M;
-};
+#include "ConstantBuffers.hlsli"
 
 struct VtP
 {
@@ -34,8 +17,8 @@ VtP VSMain(float3 Position : POSITION, float2 UV : TEXCOORD)
 	output.Position = mul(m_MVP, float4(Position, 1));
 	output.UV = UV;
 	output.Sun_WS = m_Light0Direction.xyz;
-    output.Sun_SS = mul(m_MVP, float4(m_Light0Direction.xyz, 1));
-    output.Moon_SS = mul(m_MVP, float4(-m_Light0Direction.xyz, 1));
+	output.Sun_SS = mul(m_MVP, float4(m_Light0Direction.xyz, 1));
+	output.Moon_SS = mul(m_MVP, float4(-m_Light0Direction.xyz, 1));
 	output.Pos_SS = output.Position;
 
 	return output;
