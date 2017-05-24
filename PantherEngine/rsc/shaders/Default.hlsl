@@ -1,5 +1,5 @@
 #include "ConstantBuffers.hlsli"
-#include "lighting.hlsl"
+#include "Lighting.hlsli"
 
 Texture2D diffuseTexture : register(t0);
 SamplerState defaultSampler : register(s0);

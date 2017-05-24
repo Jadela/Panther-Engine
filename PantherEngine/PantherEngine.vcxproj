@@ -209,7 +209,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="rsc\shaders\Light.hlsl">
+    <None Include="rsc\shaders\Lighting.hlsli">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

@@ -262,7 +262,7 @@
     <None Include="rsc\shaders\Default.hlsl">
       <Filter>Resources\Shaders</Filter>
     </None>
-    <None Include="rsc\shaders\Light.hlsl">
+    <None Include="rsc\shaders\Lighting.hlsli">
       <Filter>Resources\Shaders</Filter>
     </None>
   </ItemGroup>
