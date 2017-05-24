@@ -84,12 +84,6 @@
     <ClInclude Include="src\Texture.h">
       <Filter>Rendering\Common</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actor.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ActorComponent.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Transform.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -150,6 +144,12 @@
     <ClInclude Include="src\DX12Shader.h">
       <Filter>Rendering\DirectX12</Filter>
     </ClInclude>
+    <ClInclude Include="src\Entity.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Component.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DX12Buffer.cpp">
@@ -193,9 +193,6 @@
     </ClCompile>
     <ClCompile Include="src\Texture.cpp">
       <Filter>Rendering\Common</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Actor.cpp">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Transform.cpp">
       <Filter>Scene</Filter>
@@ -247,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="src\DX12Shader.cpp">
       <Filter>Rendering\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entity.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

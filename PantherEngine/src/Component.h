@@ -2,7 +2,7 @@
 
 namespace Panther
 {
-	class ActorComponent
+	class Component
 	{
 
 	};

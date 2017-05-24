@@ -119,8 +119,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Actor.h" />
-    <ClInclude Include="src\ActorComponent.h" />
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\Adapter.h" />
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Buffer.h" />
@@ -161,7 +161,7 @@
     <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Actor.cpp" />
+    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Adapter.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Buffer.cpp" />
