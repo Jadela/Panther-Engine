@@ -250,19 +250,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="rsc\shaders\lighting.hlsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="rsc\shaders\shaders.hlsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="rsc\shaders\skydome.hlsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="rsc\shaders\water.hlsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
     <None Include="rsc\shaders\ConstantBuffers.hlsli">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="rsc\shaders\Water.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="rsc\shaders\Sky.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="rsc\shaders\Default.hlsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="rsc\shaders\Light.hlsl">
       <Filter>Resources\Shaders</Filter>
     </None>
   </ItemGroup>

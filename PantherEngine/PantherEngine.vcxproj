@@ -196,20 +196,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="rsc\shaders\ConstantBuffers.hlsli" />
-    <None Include="rsc\shaders\shaders.hlsl">
+    <None Include="rsc\shaders\Default.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="rsc\shaders\skydome.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="rsc\shaders\water.hlsl">
+    <None Include="rsc\shaders\Sky.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="rsc\shaders\lighting.hlsl">
+    <None Include="rsc\shaders\Water.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rsc\shaders\Light.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

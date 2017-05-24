@@ -92,18 +92,18 @@ namespace Panther
 	void DemoScene::LoadShaders()
 	{
 		m_SkyShader = std::unique_ptr<Shader>(m_Renderer.CreateShader());
-		m_SkyShader->LoadVertexShader(L"../rsc/shaders/skydome.hlsl", "VSMain");
-		m_SkyShader->LoadPixelShader(L"../rsc/shaders/skydome.hlsl", "PSMain");
+		m_SkyShader->LoadVertexShader(L"../rsc/shaders/Sky.hlsl", "VSMain");
+		m_SkyShader->LoadPixelShader(L"../rsc/shaders/Sky.hlsl", "PSMain");
 		m_SkyShader->Finalize();
 
 		m_WaterShader = std::unique_ptr<Shader>(m_Renderer.CreateShader());
-		m_WaterShader->LoadVertexShader(L"../rsc/shaders/water.hlsl", "VSMain");
-		m_WaterShader->LoadPixelShader(L"../rsc/shaders/water.hlsl", "PSMain");
+		m_WaterShader->LoadVertexShader(L"../rsc/shaders/Water.hlsl", "VSMain");
+		m_WaterShader->LoadPixelShader(L"../rsc/shaders/Water.hlsl", "PSMain");
 		m_WaterShader->Finalize();
 
 		m_DefaultShader = std::unique_ptr<Shader>(m_Renderer.CreateShader());
-		m_DefaultShader->LoadVertexShader(L"../rsc/shaders/shaders.hlsl", "VSMain");
-		m_DefaultShader->LoadPixelShader(L"../rsc/shaders/shaders.hlsl", "PSMain");
+		m_DefaultShader->LoadVertexShader(L"../rsc/shaders/Default.hlsl", "VSMain");
+		m_DefaultShader->LoadPixelShader(L"../rsc/shaders/Default.hlsl", "PSMain");
 		m_DefaultShader->Finalize();
 	}
 
