@@ -149,8 +149,7 @@ namespace Panther
 			auto search = m_RootParameterIndices.find(resourceInfo.Name);
 			if (search != m_RootParameterIndices.end())
 			{
-				m_RootParameters[search->second].ShaderVisibility = (D3D12_SHADER_VISIBILITY)(m_RootParameters[search->second].ShaderVisibility | 
-					a_ShaderVisibility);
+				m_RootParameters[search->second].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 			}
 			else
 			{
