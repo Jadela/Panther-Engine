@@ -145,7 +145,7 @@
     <ClInclude Include="src\Keys.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\MeshComponent.h" />
+    <ClInclude Include="src\StaticMeshRendererComponent.h" />
     <ClInclude Include="src\Output.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\RendererFactory.h" />
@@ -185,7 +185,7 @@
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\MeshComponent.cpp" />
+    <ClCompile Include="src\StaticMeshRendererComponent.cpp" />
     <ClCompile Include="src\Output.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\RendererFactory.cpp" />

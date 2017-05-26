@@ -153,7 +153,7 @@
     <ClInclude Include="src\Component.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="src\MeshComponent.h">
+    <ClInclude Include="src\StaticMeshRendererComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
@@ -257,7 +257,7 @@
     <ClCompile Include="src\Component.cpp">
       <Filter>Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshComponent.cpp">
+    <ClCompile Include="src\StaticMeshRendererComponent.cpp">
       <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,10 +5,10 @@ namespace Panther
 {
 	class Mesh;
 
-	class MeshComponent final : public Component
+	class StaticMeshRendererComponent final : public Component
 	{
 	public:
-		MeshComponent(Mesh* a_Mesh);
+		StaticMeshRendererComponent(Mesh* a_Mesh);
 
 	private:
 		Mesh* m_Mesh;
