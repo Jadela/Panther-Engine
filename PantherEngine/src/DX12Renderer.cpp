@@ -182,14 +182,14 @@ namespace Panther
 
 	Buffer* DX12Renderer::CreateBuffer(const uint32 a_NumElements, const size_t a_ElementSize)
 	{
-		assert(a_ElementSize > 0 && a_NumElements > 0);
+		assert(a_NumElements * a_ElementSize > 0);
 		return new DX12Buffer(*this, a_NumElements, a_ElementSize);
 	}
 
-	Buffer* DX12Renderer::CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize)
+	Buffer* DX12Renderer::CreateBuffer(CommandList& a_CommandList, const void* a_Data, const uint32 a_NumElements, const size_t a_ElementSize)
 	{
-		assert(a_Data != 0 && a_Size > 0 && a_ElementSize > 0);
-		return new DX12Buffer(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_Size, a_ElementSize);
+		assert(a_Data != 0 && a_NumElements * a_ElementSize > 0);
+		return new DX12Buffer(*this, *static_cast<DX12CommandList*>(&a_CommandList), a_Data, a_NumElements, a_ElementSize);
 	}
 
 	DescriptorHeap* DX12Renderer::CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type)

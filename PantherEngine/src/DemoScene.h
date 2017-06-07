@@ -46,13 +46,21 @@ namespace Panther
 		std::unique_ptr<Buffer> m_FrameCBuffer = nullptr;
 		std::unique_ptr<Buffer> m_ObjectCBuffer = nullptr;
 
-		uint32 m_AppCBSlot = 0;
-		uint32 m_FrameCBSlot = 0;
-		uint32 m_SkyObjectCBSlot = 0;
-		uint32 m_WaterObjectCBSlot = 0;
-		uint32 m_CubeObjectCBSlot = 0;
-		uint32 m_SphereObjectCBSlot = 0;
-		uint32 m_DuckObjectCBSlot = 0;
+		uint32 m_AppCBElementSlot = 0;
+		uint32 m_FrameCBElementSlot = 0;
+		uint32 m_SkyObjectCBElementSlot = 0;
+		uint32 m_WaterObjectCBElementSlot = 0;
+		uint32 m_CubeObjectCBElementSlot = 0;
+		uint32 m_SphereObjectCBElementSlot = 0;
+		uint32 m_DuckObjectCBElementSlot = 0;
+
+		uint32 m_AppCBHeapSlot = 0;
+		uint32 m_FrameCBHeapSlot = 0;
+		uint32 m_SkyObjectCBHeapSlot = 0;
+		uint32 m_WaterObjectCBHeapSlot = 0;
+		uint32 m_CubeObjectCBHeapSlot = 0;
+		uint32 m_SphereObjectCBHeapSlot = 0;
+		uint32 m_DuckObjectCBHeapSlot = 0;
 
 		std::unique_ptr<Shader> m_SkyShader = nullptr;
 		std::unique_ptr<Shader> m_WaterShader = nullptr;

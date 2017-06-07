@@ -8,13 +8,15 @@
 
 namespace Panther
 {
-	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, uint32 a_NumElements, size_t a_BufferSize)
-		: Buffer(CalculateConstantBufferSize(a_BufferSize), BufferType::ConstantBuffer), m_Renderer(a_Renderer)
+	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, uint32 a_NumElements, size_t a_ElementSize)
+		: Buffer(a_NumElements, CalculateConstantBufferSize(a_ElementSize), BufferType::ConstantBuffer), m_Renderer(a_Renderer)
 	{
+		size_t elementSize = CalculateConstantBufferSize(a_ElementSize);
+
 		ThrowIfFailed(m_Renderer.GetDevice().CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE, 
-			&CD3DX12_RESOURCE_DESC::Buffer(m_BufferSize * a_NumElements),
+			&CD3DX12_RESOURCE_DESC::Buffer(a_NumElements * elementSize),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr, 
 			IID_PPV_ARGS(&m_ConstantBuffer)));
@@ -22,16 +24,18 @@ namespace Panther
 		ThrowIfFailed(m_ConstantBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_CPUBuffer)));
 
 		m_CBufferViewDescription.BufferLocation = m_ConstantBuffer->GetGPUVirtualAddress();
-		m_CBufferViewDescription.SizeInBytes = (UINT)m_BufferSize;
+		m_CBufferViewDescription.SizeInBytes = (UINT)elementSize;
 	}
 
-	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, DX12CommandList& a_CommandList, const void* a_Data, size_t a_Size, size_t a_ElementSize)
-		: Buffer(a_Size, BufferType::UploadBuffer), m_Renderer(a_Renderer)
+	DX12Buffer::DX12Buffer(DX12Renderer& a_Renderer, DX12CommandList& a_CommandList, const void* a_Data, uint32 a_NumElements, size_t a_ElementSize)
+		: Buffer(a_NumElements, a_ElementSize, BufferType::UploadBuffer), m_Renderer(a_Renderer)
 	{
+		size_t bufferSize = GetSize();
+
 		ThrowIfFailed(m_Renderer.GetDevice().CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(a_Size),
+			&CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
 			D3D12_RESOURCE_STATE_COPY_DEST,
 			nullptr,
 			IID_PPV_ARGS(&m_GPUBuffer)));
@@ -39,7 +43,7 @@ namespace Panther
 		ThrowIfFailed(m_Renderer.GetDevice().CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(a_Size),
+			&CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&m_UploadBuffer)));

@@ -110,9 +110,9 @@ namespace Panther
 	void DemoScene::CreateMaterials()
 	{
 		m_SkyDomeMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_SkyShader.get(), DepthWrite::Off));
-		m_SkyDomeMaterial->SetResource("AppCB", *m_CBVSRVUAVDescriptorHeap.get(), m_AppCBSlot);
-		m_SkyDomeMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
-		m_SkyDomeMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkyObjectCBSlot);
+		m_SkyDomeMaterial->SetResource("AppCB", *m_CBVSRVUAVDescriptorHeap.get(), m_AppCBHeapSlot);
+		m_SkyDomeMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBHeapSlot);
+		m_SkyDomeMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SkyObjectCBHeapSlot);
 		m_SkyDomeMaterial->SetResource("dayTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[2]);
 		m_SkyDomeMaterial->SetResource("nightTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[3]);
 		m_SkyDomeMaterial->SetResource("sunTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[4]);
@@ -120,19 +120,19 @@ namespace Panther
 		m_SkyDomeMaterial->SetResource("clampedSampler", *m_SamplerDescriptorHeap.get(), m_SkyboxSamplerSlot);
 
 		m_WaterMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_WaterShader.get(), DepthWrite::On));
-		m_WaterMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
-		m_WaterMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_WaterObjectCBSlot);
+		m_WaterMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBHeapSlot);
+		m_WaterMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_WaterObjectCBHeapSlot);
 		m_WaterMaterial->SetResource("waterTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[6]);
 		m_WaterMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 
 		m_TestMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_DefaultShader.get(), DepthWrite::On));
-		m_TestMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
+		m_TestMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBHeapSlot);
 		m_TestMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[0]);
 		m_TestMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 
 		m_DuckMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_DefaultShader.get(), DepthWrite::On));
-		m_DuckMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBSlot);
-		m_DuckMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckObjectCBSlot);
+		m_DuckMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBHeapSlot);
+		m_DuckMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckObjectCBHeapSlot);
 		m_DuckMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[1]);
 		m_DuckMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 	}
@@ -157,6 +157,14 @@ namespace Panther
 		m_AppCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(AppCB)));
 		m_FrameCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(1, sizeof(FrameCB)));
 		m_ObjectCBuffer		= std::unique_ptr<Buffer>(m_Renderer.CreateBuffer(5, sizeof(ObjectCB)));
+
+		m_AppCBElementSlot		= m_AppCBuffer->GetSlot();
+		m_FrameCBElementSlot	= m_FrameCBuffer->GetSlot();
+		m_SkyObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
+		m_WaterObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
+		m_CubeObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
+		m_SphereObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
+		m_DuckObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
@@ -170,13 +178,13 @@ namespace Panther
 
 	void DemoScene::CreateDescriptors()
 	{
-		m_AppCBSlot				= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_AppCBuffer.get(), 0);
-		m_FrameCBSlot			= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_FrameCBuffer.get(), 0);
-		m_SkyObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 0);
-		m_WaterObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 1);
-		m_CubeObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 2);
-		m_SphereObjectCBSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 3);
-		m_DuckObjectCBSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), 4);
+		m_AppCBHeapSlot				= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_AppCBuffer.get(), m_AppCBElementSlot);
+		m_FrameCBHeapSlot			= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_FrameCBuffer.get(), m_FrameCBElementSlot);
+		m_SkyObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_SkyObjectCBElementSlot);
+		m_WaterObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_WaterObjectCBElementSlot);
+		m_CubeObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_CubeObjectCBElementSlot);
+		m_SphereObjectCBHeapSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_SphereObjectCBElementSlot);
+		m_DuckObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_DuckObjectCBElementSlot);
 
 		LoadTextures();
 
@@ -267,14 +275,14 @@ namespace Panther
 		frameCB.m_Light0Direction = Vector(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
 		frameCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
 		frameCB.m_Time = m_WaterOffset; // TODO (JDL): Change this.
-		m_FrameCBuffer->CopyTo(0, &frameCB, sizeof(FrameCB));
+		m_FrameCBuffer->CopyTo(m_FrameCBElementSlot, &frameCB, sizeof(FrameCB));
 
 		// Sky
 		ObjectCB objectCB;
 		objectCB.m_MVP = m_Camera->GetSkyMatrix() * vpMatrix;
 		objectCB.m_M = m_Camera->GetSkyMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_Camera->GetSkyMatrix()));
-		m_ObjectCBuffer->CopyTo(0, &objectCB, sizeof(ObjectCB));
+		m_ObjectCBuffer->CopyTo(m_SkyObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
 
 		m_SkyDomeMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_SphereMesh);
@@ -284,7 +292,7 @@ namespace Panther
 		objectCB.m_MVP = m_WaterTransform->GetTransformMatrix() * vpMatrix;
 		objectCB.m_M = m_WaterTransform->GetTransformMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_WaterTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(1, &objectCB, sizeof(ObjectCB));
+		m_ObjectCBuffer->CopyTo(m_WaterObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
 
 		m_WaterMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_PlaneMesh);
@@ -294,9 +302,9 @@ namespace Panther
 		objectCB.m_MVP = m_CubeTransform->GetTransformMatrix() * vpMatrix;
 		objectCB.m_M = m_CubeTransform->GetTransformMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_CubeTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(2, &objectCB, sizeof(ObjectCB));
+		m_ObjectCBuffer->CopyTo(m_CubeObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
 
-		m_TestMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_CubeObjectCBSlot);
+		m_TestMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_CubeObjectCBHeapSlot);
 		m_TestMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_CubeMesh);
 		a_CommandList.Draw(m_CubeMesh->GetNumIndices());
@@ -305,9 +313,9 @@ namespace Panther
 		objectCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
 		objectCB.m_M = m_SphereTransform->GetTransformMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_SphereTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(3, &objectCB, sizeof(ObjectCB));
+		m_ObjectCBuffer->CopyTo(m_SphereObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
 
-		m_TestMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SphereObjectCBSlot, a_CommandList);
+		m_TestMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SphereObjectCBHeapSlot, a_CommandList);
 		a_CommandList.SetMesh(*m_SphereMesh);
 		a_CommandList.Draw(m_SphereMesh->GetNumIndices());
 
@@ -315,7 +323,7 @@ namespace Panther
 		objectCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
 		objectCB.m_M = m_DuckTransform->GetTransformMatrix();
 		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_DuckTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(4, &objectCB, sizeof(ObjectCB));
+		m_ObjectCBuffer->CopyTo(m_DuckObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
 
 		m_DuckMaterial->Use(a_CommandList);
 		a_CommandList.SetMesh(*m_DuckMesh);
@@ -328,6 +336,6 @@ namespace Panther
 
 		AppCB appCB;
 		appCB.m_ScreenResolution = Vector((float)m_Renderer.GetWindow().GetWidth(), (float)m_Renderer.GetWindow().GetHeight());
-		m_AppCBuffer->CopyTo(0, &appCB, sizeof(AppCB));
+		m_AppCBuffer->CopyTo(m_AppCBElementSlot, &appCB, sizeof(AppCB));
 	}
 }

@@ -14,8 +14,8 @@ namespace Panther
 	class DX12Buffer final : public Buffer
 	{
 	public:
-		DX12Buffer(DX12Renderer& a_Renderer, uint32 a_NumElements, size_t a_BufferSize);
-		DX12Buffer(DX12Renderer& a_Renderer, DX12CommandList& a_CommandList, const void* a_Data, size_t a_Size, size_t a_ElementSize);
+		DX12Buffer(DX12Renderer& a_Renderer, uint32 a_NumElements, size_t a_ElementSize);
+		DX12Buffer(DX12Renderer& a_Renderer, DX12CommandList& a_CommandList, const void* a_Data, uint32 a_NumElements, size_t a_ElementSize);
 		DX12Buffer(const DX12Buffer&) = delete;
 		virtual ~DX12Buffer() final override;
 

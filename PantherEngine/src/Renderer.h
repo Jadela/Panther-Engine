@@ -32,7 +32,7 @@ namespace Panther
 		virtual void Synchronize() = 0;
 
 		virtual Buffer* CreateBuffer(const uint32 a_NumElements, const size_t a_ElementSize) = 0;
-		virtual Buffer* CreateBuffer(CommandList& a_CommandList, const void* a_Data, const size_t a_Size, const size_t a_ElementSize) = 0;
+		virtual Buffer* CreateBuffer(CommandList& a_CommandList, const void* a_Data, const uint32 a_NumElements, const size_t a_ElementSize) = 0;
 		virtual DescriptorHeap* CreateDescriptorHeap(uint32 a_Capacity, DescriptorHeapType a_Type) = 0;
 		virtual Texture* CreateTexture(const std::wstring& a_Path) = 0;
 		virtual Material* CreateMaterial(Shader& a_Shader, DepthWrite a_DepthWriteEnabled) = 0;
