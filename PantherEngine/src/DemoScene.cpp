@@ -1,20 +1,22 @@
 #include "DemoScene.h"
 
-#include "Window.h"
 #include "Application.h"
-#include "Camera.h"
-#include "Transform.h"
-#include "TextureManager.h"
 #include "Buffer.h"
+#include "Camera.h"
 #include "CommandList.h"
-#include "Renderer.h"
-#include "Texture.h"
-#include "Sampler.h"
-#include "Shader.h"
 #include "DescriptorHeap.h"
+#include "Entity.h"
+#include "Input.h"
 #include "Material.h"
 #include "Mesh.h"
-#include "Input.h"
+#include "Sampler.h"
+#include "Shader.h"
+#include "StaticMeshRendererComponent.h"
+#include "Renderer.h"
+#include "Texture.h"
+#include "TextureManager.h"
+#include "Transform.h"
+#include "Window.h"
 
 using namespace DirectX;
 
@@ -72,6 +74,7 @@ namespace Panther
 		CreateDescriptorHeaps();
 		CreateDescriptors();
 		CreateMaterials();
+		CreateEntities();
 
 		commandList.Close();
 
@@ -132,7 +135,6 @@ namespace Panther
 
 		m_DuckMaterial = std::unique_ptr<Material>(m_Renderer.CreateMaterial(*m_DefaultShader.get(), DepthWrite::On));
 		m_DuckMaterial->SetResource("FrameCB", *m_CBVSRVUAVDescriptorHeap.get(), m_FrameCBHeapSlot);
-		m_DuckMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_DuckObjectCBHeapSlot);
 		m_DuckMaterial->SetResource("diffuseTexture", *m_CBVSRVUAVDescriptorHeap.get(), m_TextureSlots[1]);
 		m_DuckMaterial->SetResource("defaultSampler", *m_SamplerDescriptorHeap.get(), m_DefaultSamplerSlot);
 	}
@@ -162,9 +164,6 @@ namespace Panther
 		m_FrameCBElementSlot	= m_FrameCBuffer->GetSlot();
 		m_SkyObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
 		m_WaterObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
-		m_CubeObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
-		m_SphereObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
-		m_DuckObjectCBElementSlot = m_ObjectCBuffer->GetSlot();
 	}
 
 	void DemoScene::CreateDescriptorHeaps()
@@ -182,9 +181,6 @@ namespace Panther
 		m_FrameCBHeapSlot			= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_FrameCBuffer.get(), m_FrameCBElementSlot);
 		m_SkyObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_SkyObjectCBElementSlot);
 		m_WaterObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_WaterObjectCBElementSlot);
-		m_CubeObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_CubeObjectCBElementSlot);
-		m_SphereObjectCBHeapSlot	= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_SphereObjectCBElementSlot);
-		m_DuckObjectCBHeapSlot		= m_CBVSRVUAVDescriptorHeap->RegisterConstantBuffer(*m_ObjectCBuffer.get(), m_DuckObjectCBElementSlot);
 
 		LoadTextures();
 
@@ -202,6 +198,20 @@ namespace Panther
 			const std::wstring filePath = g_Textures[i];
 			m_TextureSlots[i] = m_CBVSRVUAVDescriptorHeap->RegisterTexture(*m_TextureManager->GetTexture(m_TextureManager->LoadTexture(filePath)));
 		}
+	}
+
+	void DemoScene::CreateEntities()
+	{
+		m_CubeMeshComponent = new StaticMeshRendererComponent(*m_ObjectCBuffer.get(), *m_CBVSRVUAVDescriptorHeap.get(), m_CubeMesh.get(), m_TestMaterial.get());
+		m_SphereMeshComponent = new StaticMeshRendererComponent(*m_ObjectCBuffer.get(), *m_CBVSRVUAVDescriptorHeap.get(), m_SphereMesh.get(), m_TestMaterial.get());
+		m_DuckMeshComponent = new StaticMeshRendererComponent(*m_ObjectCBuffer.get(), *m_CBVSRVUAVDescriptorHeap.get(), m_DuckMesh.get(), m_DuckMaterial.get());
+
+		m_Cube = std::make_unique<Entity>();
+		m_Cube->AddComponent(m_CubeMeshComponent);
+		m_Sphere = std::make_unique<Entity>();
+		m_Sphere->AddComponent(m_SphereMeshComponent);
+		m_Duck = std::make_unique<Entity>();
+		m_Duck->AddComponent(m_DuckMeshComponent);
 	}
 
 	void DemoScene::Unload()
@@ -299,35 +309,16 @@ namespace Panther
 		a_CommandList.Draw(m_PlaneMesh->GetNumIndices());
 		
 		// Cube
-		objectCB.m_MVP = m_CubeTransform->GetTransformMatrix() * vpMatrix;
-		objectCB.m_M = m_CubeTransform->GetTransformMatrix();
-		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_CubeTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(m_CubeObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
-
-		m_TestMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_CubeObjectCBHeapSlot);
-		m_TestMaterial->Use(a_CommandList);
-		a_CommandList.SetMesh(*m_CubeMesh);
-		a_CommandList.Draw(m_CubeMesh->GetNumIndices());
+		m_CubeMeshComponent->UpdateObjectCB(m_CubeTransform->GetTransformMatrix(), vpMatrix);
+		m_CubeMeshComponent->Record(a_CommandList);
 
 		// Sphere
-		objectCB.m_MVP = m_SphereTransform->GetTransformMatrix() * vpMatrix;
-		objectCB.m_M = m_SphereTransform->GetTransformMatrix();
-		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_SphereTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(m_SphereObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
-
-		m_TestMaterial->SetResource("ObjectCB", *m_CBVSRVUAVDescriptorHeap.get(), m_SphereObjectCBHeapSlot, a_CommandList);
-		a_CommandList.SetMesh(*m_SphereMesh);
-		a_CommandList.Draw(m_SphereMesh->GetNumIndices());
+		m_SphereMeshComponent->UpdateObjectCB(m_SphereTransform->GetTransformMatrix(), vpMatrix);
+		m_SphereMeshComponent->Record(a_CommandList);
 
 		// Duck
-		objectCB.m_MVP = m_DuckTransform->GetTransformMatrix() * vpMatrix;
-		objectCB.m_M = m_DuckTransform->GetTransformMatrix();
-		objectCB.m_IT_M = XMMatrixTranspose(XMMatrixInverse(nullptr, m_DuckTransform->GetTransformMatrix()));
-		m_ObjectCBuffer->CopyTo(m_DuckObjectCBElementSlot, &objectCB, sizeof(ObjectCB));
-
-		m_DuckMaterial->Use(a_CommandList);
-		a_CommandList.SetMesh(*m_DuckMesh);
-		a_CommandList.Draw(m_DuckMesh->GetNumIndices());
+		m_DuckMeshComponent->UpdateObjectCB(m_DuckTransform->GetTransformMatrix(), vpMatrix);
+		m_DuckMeshComponent->Record(a_CommandList);
 	}
 
 	void DemoScene::OnResize(uint32 a_Width, uint32 a_Height)

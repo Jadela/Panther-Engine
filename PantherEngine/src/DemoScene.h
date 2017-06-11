@@ -4,13 +4,15 @@
 namespace Panther
 {
 	class Buffer;
+	class Camera;
 	class CommandList;
 	class DescriptorHeap;
+	class Entity;
 	class Mesh;
 	class Sampler;
 	class Shader;
+	class StaticMeshRendererComponent;
 	class Texture;
-	class Camera;
 	class Transform;
 
 	class DemoScene final : public Scene
@@ -33,6 +35,7 @@ namespace Panther
 		void CreateDescriptorHeaps();
 		void CreateDescriptors();
 		void LoadTextures();
+		void CreateEntities();
 
 		std::unique_ptr<DescriptorHeap> m_CBVSRVUAVDescriptorHeap = nullptr;
 		std::unique_ptr<DescriptorHeap> m_SamplerDescriptorHeap = nullptr;
@@ -50,17 +53,11 @@ namespace Panther
 		uint32 m_FrameCBElementSlot = 0;
 		uint32 m_SkyObjectCBElementSlot = 0;
 		uint32 m_WaterObjectCBElementSlot = 0;
-		uint32 m_CubeObjectCBElementSlot = 0;
-		uint32 m_SphereObjectCBElementSlot = 0;
-		uint32 m_DuckObjectCBElementSlot = 0;
 
 		uint32 m_AppCBHeapSlot = 0;
 		uint32 m_FrameCBHeapSlot = 0;
 		uint32 m_SkyObjectCBHeapSlot = 0;
 		uint32 m_WaterObjectCBHeapSlot = 0;
-		uint32 m_CubeObjectCBHeapSlot = 0;
-		uint32 m_SphereObjectCBHeapSlot = 0;
-		uint32 m_DuckObjectCBHeapSlot = 0;
 
 		std::unique_ptr<Shader> m_SkyShader = nullptr;
 		std::unique_ptr<Shader> m_WaterShader = nullptr;
@@ -84,6 +81,14 @@ namespace Panther
 		std::unique_ptr<Transform> m_CubeTransform = nullptr;
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
 		std::unique_ptr<Transform> m_DuckTransform = nullptr;
+
+		std::unique_ptr<Entity> m_Cube = nullptr;
+		std::unique_ptr<Entity> m_Sphere = nullptr;
+		std::unique_ptr<Entity> m_Duck = nullptr;
+
+		StaticMeshRendererComponent* m_CubeMeshComponent = nullptr;
+		StaticMeshRendererComponent* m_SphereMeshComponent = nullptr;
+		StaticMeshRendererComponent* m_DuckMeshComponent = nullptr;
 		
 		float m_SunAngle = 90.0f;
 
