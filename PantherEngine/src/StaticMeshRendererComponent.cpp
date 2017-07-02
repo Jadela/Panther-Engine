@@ -22,13 +22,6 @@ namespace Panther
 
 	void StaticMeshRendererComponent::UpdateObjectCB(DirectX::XMMATRIX a_WorldMatrix, DirectX::XMMATRIX a_ViewProjectionMatrix)
 	{
-		struct ObjectCB
-		{
-			XMMATRIX m_MVP;
-			XMMATRIX m_M;
-			XMMATRIX m_IT_M;
-		};
-
 		ObjectCB objectCB;
 		objectCB.m_MVP = a_WorldMatrix * a_ViewProjectionMatrix;
 		objectCB.m_M = a_WorldMatrix;

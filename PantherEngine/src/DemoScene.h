@@ -51,13 +51,9 @@ namespace Panther
 
 		uint32 m_AppCBElementSlot = 0;
 		uint32 m_FrameCBElementSlot = 0;
-		uint32 m_SkyObjectCBElementSlot = 0;
-		uint32 m_WaterObjectCBElementSlot = 0;
 
 		uint32 m_AppCBHeapSlot = 0;
 		uint32 m_FrameCBHeapSlot = 0;
-		uint32 m_SkyObjectCBHeapSlot = 0;
-		uint32 m_WaterObjectCBHeapSlot = 0;
 
 		std::unique_ptr<Shader> m_SkyShader = nullptr;
 		std::unique_ptr<Shader> m_WaterShader = nullptr;
@@ -82,10 +78,14 @@ namespace Panther
 		std::unique_ptr<Transform> m_SphereTransform = nullptr;
 		std::unique_ptr<Transform> m_DuckTransform = nullptr;
 
+		std::unique_ptr<Entity> m_Sky = nullptr;
+		std::unique_ptr<Entity> m_Water = nullptr;
 		std::unique_ptr<Entity> m_Cube = nullptr;
 		std::unique_ptr<Entity> m_Sphere = nullptr;
 		std::unique_ptr<Entity> m_Duck = nullptr;
 
+		StaticMeshRendererComponent* m_SkyMeshComponent = nullptr;
+		StaticMeshRendererComponent* m_WaterMeshComponent = nullptr;
 		StaticMeshRendererComponent* m_CubeMeshComponent = nullptr;
 		StaticMeshRendererComponent* m_SphereMeshComponent = nullptr;
 		StaticMeshRendererComponent* m_DuckMeshComponent = nullptr;
