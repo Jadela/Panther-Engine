@@ -10,6 +10,7 @@ struct VtP
 	float3 Normal_WS : NORMAL;
 	float2 UV : TEXCOORD;
 	float4 Pos_WS : POSITION;
+	float WaterOffset : TEXCOORD2;
 };
 
 VtP VSMain(float3 Position : POSITION, float3 Normal : NORMAL, float2 UV : TEXCOORD)
@@ -20,6 +21,7 @@ VtP VSMain(float3 Position : POSITION, float3 Normal : NORMAL, float2 UV : TEXCO
 	output.Normal_WS = normalize(mul((float3x3)m_IT_M, Normal));
 	output.UV = UV;
 	output.Pos_WS = mul(m_M, float4(Position, 1));
+	output.WaterOffset = fmod(m_Time * 0.05f, 1.0f);
 
 	return output;
 }
@@ -38,7 +40,7 @@ LightingOutput ComputeLighting(float4 Pos_WS, float3 Normal)
 
 float4 PSMain(VtP input) : SV_TARGET
 {
-	float3 normal = (waterTexture.Sample(defaultSampler, input.UV + m_Time).xyz + waterTexture.Sample(defaultSampler, input.UV - m_Time).xyz + waterTexture.Sample(defaultSampler, input.UV + float2(m_Time, -m_Time)).xyz) / 3.0;
+	float3 normal = (waterTexture.Sample(defaultSampler, input.UV + input.WaterOffset).xyz + waterTexture.Sample(defaultSampler, input.UV - input.WaterOffset).xyz + waterTexture.Sample(defaultSampler, input.UV + float2(input.WaterOffset, -input.WaterOffset)).xyz) / 3.0;
 	normal = (normal * 2) - 1; // Expand from range [0,1] to [-1,1]
 	normal = normalize(mul((float3x3) m_M, normal)); // Texture to world space
 

@@ -23,7 +23,7 @@ namespace Panther
 
 		void Load() final override;
 		void Unload() final override;
-		void Update(float a_DT) final override;
+		void Update(float a_Time, float a_DT) final override;
 		void Render(CommandList& a_CommandList) final override;
 		void OnResize(uint32 a_Width, uint32 a_Height) final override;
 
@@ -92,7 +92,7 @@ namespace Panther
 		
 		float m_SunAngle = 90.0f;
 
-		float m_WaterOffset = 0.0f;
+		float m_Time = 0.0f;
 
 		Vector m_PreviousMousePosition = Vector();
 	};

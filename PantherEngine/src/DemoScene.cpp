@@ -211,8 +211,10 @@ namespace Panther
 	{
 	}
 
-	void DemoScene::Update(float a_DT)
+	void DemoScene::Update(float a_Time, float a_DT)
 	{
+		m_Time = a_Time;
+
 		Vector mousePosition(Input::GetMousePosition());
 		Vector mouseDelta = mousePosition - m_PreviousMousePosition;
 		if (Input::GetKey(Key::RButton))
@@ -238,8 +240,6 @@ namespace Panther
 		{
 			m_SunAngle -= (pi * 2);
 		}
-
-		m_WaterOffset = fmodf(m_WaterOffset + 0.05f * a_DT, 1.0f);
 
 		if (Input::GetKey(Key::Escape))
 		{
@@ -277,7 +277,7 @@ namespace Panther
 		FrameCB frameCB;
 		frameCB.m_Light0Direction = Vector(0, std::sinf(m_SunAngle), std::cosf(m_SunAngle), 0);
 		frameCB.m_CameraPosition = m_Camera->GetTransform().GetPosition();
-		frameCB.m_Time = m_WaterOffset; // TODO (JDL): Change this.
+		frameCB.m_Time = m_Time;
 		m_FrameCBuffer->CopyTo(m_FrameCBElementSlot, &frameCB, sizeof(FrameCB));
 
 		// Sky
