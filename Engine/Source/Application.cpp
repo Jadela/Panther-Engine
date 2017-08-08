@@ -7,6 +7,7 @@
 #include "DemoScene.h"
 
 #include <assert.h>
+#include <chrono>
 
 namespace Panther
 {
@@ -51,11 +52,9 @@ namespace Panther
 	int32 Application::Run()
 	{
 		MSG msg = { 0 };
-
-		static DWORD previousTime = timeGetTime();
-		static float totalTime = 0.0f;
-		static const float targetFramerate = 30.0f;
-		static const float maxTimeStep = 1.0f / targetFramerate;
+		auto startTimePoint = std::chrono::system_clock::now();
+		auto endTimePoint = startTimePoint;
+		static float totalTimeSeconds = 0.0f;
 
 		while (!m_RequestQuit)
 		{
@@ -70,16 +69,13 @@ namespace Panther
 			}
 			else
 			{
-				DWORD currentTime = timeGetTime();
-				float deltaTime = (currentTime - previousTime) / 1000.0f;
-				previousTime = currentTime;
+				startTimePoint = std::chrono::system_clock::now();
+				std::chrono::duration<float> timeDeltaSeconds = endTimePoint - startTimePoint;
+				endTimePoint = startTimePoint;
 
-				// Cap the delta time to the max time step (useful if your 
-				// debugging and you don't want the deltaTime value to explode.
-				deltaTime = Min(deltaTime, maxTimeStep);
-				totalTime += deltaTime;
+				totalTimeSeconds += timeDeltaSeconds.count();
 
-				m_Scene->Update(totalTime, deltaTime);
+				m_Scene->Update(totalTimeSeconds, timeDeltaSeconds.count());
 
 				CommandList& commandList(m_Renderer->StartRender());
 				m_Scene->Render(commandList);

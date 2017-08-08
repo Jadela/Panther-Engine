@@ -1,10 +1,12 @@
 #pragma once
 
-#include <windows.h>
-#include <string>
-
 #include "Core.h"
 #include "Keys.h"
+
+#ifndef _WINDEF_
+struct HINSTANCE__; // Forward or never
+typedef HINSTANCE__* HINSTANCE;
+#endif
 
 namespace Panther
 {

@@ -1,6 +1,6 @@
 #include "Window.h"
 
-#include "../resource.h"
+#include "Resources/resource.h"
 #include "Exceptions.h"
 #include "Keys.h"
 #include "Application.h"

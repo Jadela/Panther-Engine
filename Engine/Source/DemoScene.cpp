@@ -25,13 +25,13 @@ namespace Panther
 	// Hardcoded texture file locations.
 	const std::wstring g_Textures[] =
 	{
-		L"../rsc/textures/test.tga",
-		L"../rsc/textures/duckCM.tga",
-		L"../rsc/textures/SkyDay.tga",
-		L"../rsc/textures/SkyNight.tga",
-		L"../rsc/textures/Sun.tga",
-		L"../rsc/textures/Moon.tga",
-		L"../rsc/textures/WaterNormal.tga"
+		L"../Assets/Textures/test.tga",
+		L"../Assets/Textures/duckCM.tga",
+		L"../Assets/Textures/SkyDay.tga",
+		L"../Assets/Textures/SkyNight.tga",
+		L"../Assets/Textures/Sun.tga",
+		L"../Assets/Textures/Moon.tga",
+		L"../Assets/Textures/WaterNormal.tga"
 	};
 
 	struct AppCB
@@ -88,18 +88,18 @@ namespace Panther
 	void DemoScene::LoadShaders()
 	{
 		m_SkyShader = std::unique_ptr<Shader>(m_Renderer.CreateShader());
-		m_SkyShader->LoadVertexShader(L"../rsc/shaders/Sky.hlsl", "VSMain");
-		m_SkyShader->LoadPixelShader(L"../rsc/shaders/Sky.hlsl", "PSMain");
+		m_SkyShader->LoadVertexShader(L"../Assets/Shaders/Sky.hlsl", "VSMain");
+		m_SkyShader->LoadPixelShader(L"../Assets/Shaders/Sky.hlsl", "PSMain");
 		m_SkyShader->Finalize();
 
 		m_WaterShader = std::unique_ptr<Shader>(m_Renderer.CreateShader());
-		m_WaterShader->LoadVertexShader(L"../rsc/shaders/Water.hlsl", "VSMain");
-		m_WaterShader->LoadPixelShader(L"../rsc/shaders/Water.hlsl", "PSMain");
+		m_WaterShader->LoadVertexShader(L"../Assets/Shaders/Water.hlsl", "VSMain");
+		m_WaterShader->LoadPixelShader(L"../Assets/Shaders/Water.hlsl", "PSMain");
 		m_WaterShader->Finalize();
 
 		m_DefaultShader = std::unique_ptr<Shader>(m_Renderer.CreateShader());
-		m_DefaultShader->LoadVertexShader(L"../rsc/shaders/Default.hlsl", "VSMain");
-		m_DefaultShader->LoadPixelShader(L"../rsc/shaders/Default.hlsl", "PSMain");
+		m_DefaultShader->LoadVertexShader(L"../Assets/Shaders/Default.hlsl", "VSMain");
+		m_DefaultShader->LoadPixelShader(L"../Assets/Shaders/Default.hlsl", "PSMain");
 		m_DefaultShader->Finalize();
 	}
 
@@ -142,7 +142,7 @@ namespace Panther
 		m_SphereMesh->InitAsSphere(a_CommandList);
 
 		m_DuckMesh = std::unique_ptr<Mesh>(m_Renderer.CreateMesh());
-		m_DuckMesh->InitViaASSIMP(a_CommandList, "../rsc/models/duck.fbx");
+		m_DuckMesh->InitViaASSIMP(a_CommandList, "../Assets/Models/duck.fbx");
 	}
 
 	void DemoScene::CreateConstantBuffers()
