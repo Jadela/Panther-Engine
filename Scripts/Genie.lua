@@ -64,3 +64,6 @@ project "Engine"
 		"assimp-vc140-mt",
 	}
 	
+	configuration {}
+		postbuildcommands { "copy ..\\..\\assimp-vc140-mt.dll ..\\Binaries\\assimp-vc140-mt.dll" }
+	
