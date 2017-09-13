@@ -1,5 +1,5 @@
 solution "PantherEngine"
-	location "../Engine/Intermediate"
+	location ".."
 	
 	configurations {
 		"Debug",
@@ -15,11 +15,11 @@ solution "PantherEngine"
 		flags { "Unicode", "WinMain" }
 	
 	configuration "Debug"
-		defines { "_DEBUG" }
+		defines { "CONFIG_DEBUG" }
 		flags { "Symbols" }
 		
 	configuration "Release"
-		defines { "NDEBUG" }
+		defines { "CONFIG_RELEASE" }
 		flags { "Optimize" }
 	
 	language "C++"
