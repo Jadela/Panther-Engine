@@ -68,7 +68,7 @@ namespace Panther
 		if (m_APIInitialized) return true; // Renderer is already initialized.
 		if (!XMVerifyCPUSupport()) throw std::runtime_error("CPU is not supporting SSE2 or NEON!");
 
-#if defined(DEBUG) || defined(_DEBUG)
+#if CONFIG_DEBUG
 		ComPtr<ID3D12Debug> debugController;
 		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
 		debugController->EnableDebugLayer();
@@ -91,7 +91,7 @@ namespace Panther
 
 		ThrowIfFailed(m_D3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_D3DFence)));
 
-#ifdef _DEBUG
+#if CONFIG_DEBUG
 		m_Adapter->LogProperties();
 		std::wstring featureLevelString = std::to_wstring((chosenFeatureLevel >> 12) & 15) + L"." + std::to_wstring((chosenFeatureLevel >> 8) & 15);
 		OutputDebugString((L"\n\tSuccessfully created a device with feature level:\t" + featureLevelString + L"\n").c_str());
@@ -276,7 +276,7 @@ namespace Panther
 	{
 		ComPtr<IDXGIFactory5> DXGIFactory = nullptr;
 		UINT flags = 0;
-#if defined(_DEBUG)
+#if CONFIG_DEBUG
 		flags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 		ThrowIfFailed(CreateDXGIFactory2(flags, IID_PPV_ARGS(&DXGIFactory)));

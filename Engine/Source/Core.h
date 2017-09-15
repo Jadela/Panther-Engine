@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BuildConfigDefinitions.h"
+
 #include <cstdlib> 
 #include <cstdint>
 

@@ -22,7 +22,7 @@ namespace Panther
 		{
 			throw std::runtime_error("DX12SHADER: Vertex code not null while loading HLSL shader!");
 		}
-		m_VertexCode = LoadHLSLShader(a_Path, a_EntryPoint, "vs_5_0", (bool)(_DEBUG));
+		m_VertexCode = LoadHLSLShader(a_Path, a_EntryPoint, "vs_5_0", (bool)(CONFIG_DEBUG));
 		ComPtr<ID3D12ShaderReflection> shaderReflection(ReflectShader(m_VertexCode.Get()));
 		ObtainInputLayout(shaderReflection.Get());
 		ObtainRootParameters(shaderReflection.Get(), D3D12_SHADER_VISIBILITY_VERTEX);
@@ -34,7 +34,7 @@ namespace Panther
 		{
 			throw std::runtime_error("DX12SHADER: Pixel code not null while loading HLSL shader!");
 		}
-		m_PixelCode = LoadHLSLShader(a_Path, a_EntryPoint, "ps_5_0", (bool)(_DEBUG));
+		m_PixelCode = LoadHLSLShader(a_Path, a_EntryPoint, "ps_5_0", (bool)(CONFIG_DEBUG));
 		ComPtr<ID3D12ShaderReflection> shaderReflection(ReflectShader(m_PixelCode.Get()));
 		ObtainRootParameters(shaderReflection.Get(), D3D12_SHADER_VISIBILITY_PIXEL);
 	}
