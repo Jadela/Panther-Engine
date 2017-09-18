@@ -15,7 +15,7 @@
 #endif
 
 // Set options that rely solely on build configuration.
-#ifdef CONFIG_DEBUG
+#if CONFIG_DEBUG
 	#define ENABLE_ASSERTIONS 1
 #elif CONFIG_RELEASE
 	#define ENABLE_ASSERTIONS 0
