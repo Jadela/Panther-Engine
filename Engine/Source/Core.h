@@ -17,9 +17,6 @@ namespace Panther
 	typedef uint8_t		ubyte8;
 	typedef int8_t		byte8;
 
-	template <typename T>
-	constexpr T Min(const T a, const T b) { return (a < b) ? a : b; }
-
 	// countof constant expression: http://www.g-truc.net/post-0708.html
 	template <typename T, std::size_t N>
 	constexpr std::size_t Countof(T const (&)[N]) noexcept { return N; }

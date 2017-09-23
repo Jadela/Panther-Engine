@@ -22,6 +22,9 @@ solution "PantherEngine"
 		defines { "CONFIG_RELEASE" }
 		flags { "Optimize" }
 	
+	configuration "x64"
+		defines { "PLATFORM_WINDOWS" }
+	
 	language "C++"
 
 PROJ_DIR = path.getabsolute("..")
