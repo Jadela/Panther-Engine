@@ -1,7 +1,7 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 namespace Panther
 {
-	enum class Space : ubyte8 { World, Local };
+	enum class Space : uint8 { World, Local };
 }

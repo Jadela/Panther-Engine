@@ -1,6 +1,6 @@
 #include "DX12Texture.h"
 
-#include "Core.h"
+#include "Core.hpp"
 #include "Exceptions.h"
 #include "DX12CommandList.h"
 #include "DX12Renderer.h"

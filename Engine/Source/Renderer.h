@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 #include <d3d12.h>
 
@@ -7,7 +7,7 @@
 
 namespace Panther
 {
-	enum class DepthWrite : ubyte8;
+	enum class DepthWrite : uint8;
 	class Buffer;
 	class CommandList;
 	class DescriptorHeap;

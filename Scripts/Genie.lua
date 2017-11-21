@@ -32,13 +32,14 @@ PROJ_DIR = path.getabsolute("..")
 if _ACTION == "vs2012" or _ACTION == "vs2013" 
 or _ACTION == "vs2015" or _ACTION == "vs2017" then
 	local action = premake.action.current()
-	action.vstudio.windowsTargetPlatformVersion = "10.0.15063.0"
+	action.vstudio.windowsTargetPlatformVersion = "10.0.16299.0"
+	action.vstudio.intDirAbsolute = false
 end
 
 project "Engine"
 	kind "WindowedApp"
 	
-	location "../Engine/Intermediate"
+	location "../Engine/Intermediate/ProjectFiles"
 
 	debugdir "../Engine/Binaries"
 	objdir "../Engine/Intermediate"
@@ -46,6 +47,7 @@ project "Engine"
 	
 	includedirs {
 		"../Engine/Include",
+		"../Engine/Source/Core/Public"
 	}
 	
 	files {
@@ -57,10 +59,11 @@ project "Engine"
 	}
 		
 	libdirs {
-		"../Engine/Libraries/",
+		"../Engine/Libraries",
 	}
 	
 	links { 
+		--"Core",
 		"D3D12", 
 		"DXGI", 
 		"D3DCompiler",
@@ -68,5 +71,20 @@ project "Engine"
 	}
 	
 	configuration {}
-		postbuildcommands { "copy ..\\..\\assimp-vc140-mt.dll ..\\Binaries\\assimp-vc140-mt.dll" }
+		postbuildcommands { "copy ..\\..\\..\\assimp-vc140-mt.dll ..\\..\\Binaries\\assimp-vc140-mt.dll" }
 	
+project "Core"
+	kind "StaticLib"
+	
+	location "../Engine/Intermediate/ProjectFiles"
+	
+	objdir "../Engine/Intermediate/Core"
+	targetdir "../Engine/Libraries"
+	
+	includedirs {}
+	
+	files {
+		"../Engine/Source/Core/Public/*.hpp",
+		"../Engine/Source/Core/Private/*.cpp",
+		"../Engine/Source/Core/Private/*.hpp"
+	}

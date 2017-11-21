@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 #include "Material.h"
 
 #include <d3d12.h>

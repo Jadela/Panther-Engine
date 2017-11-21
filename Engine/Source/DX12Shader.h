@@ -1,7 +1,7 @@
 #pragma once
 #include "Shader.h"
 
-#include "Core.h"
+#include "Core.hpp"
 
 #include <D3DCompiler.h>
 #include <d3d12.h>

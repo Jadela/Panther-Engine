@@ -18,11 +18,11 @@ namespace Panther
 		// http://www.rastertek.com/dx11s2tut05.html
 		struct TargaHeader
 		{
-			ubyte8 data1[12];
-			ushort16 width;
-			ushort16 height;
-			ubyte8 bpp;
-			ubyte8 data2;
+			uint8 data1[12];
+			uint16 width;
+			uint16 height;
+			uint8 bpp;
+			uint8 data2;
 		};
 
 		int32 error, bpp, imageSize;
@@ -61,8 +61,8 @@ namespace Panther
 		imageSize = m_Width * m_Height * 4;
 
 		// Allocate memory for the targa image data.
-		std::unique_ptr<ubyte8[]> temp(new ubyte8[imageSize]);
-		m_Data = std::make_unique<ubyte8[]>(imageSize);
+		std::unique_ptr<uint8[]> temp(new uint8[imageSize]);
+		m_Data = std::make_unique<uint8[]>(imageSize);
 		if (!m_Data || !temp)
 		{
 			throw std::runtime_error("Panther Texture ERROR: Memory allocation failed.");

@@ -1,11 +1,11 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 #include <string>
 
 namespace Panther
 {
-	enum class DepthWrite : ubyte8 { Off, On };
+	enum class DepthWrite : uint8 { Off, On };
 	class CommandList;
 	class DescriptorHeap;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "RenderTarget.h"
-#include "Core.h"
+#include "Core.hpp"
 
 #include <dxgi1_5.h>
 #include <d3d12.h>

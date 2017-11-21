@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 #include <windows.h>
 #include <string>

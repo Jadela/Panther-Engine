@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "Core.h"
+#include "Core.hpp"
 
 #include <DirectXMath.h>
 

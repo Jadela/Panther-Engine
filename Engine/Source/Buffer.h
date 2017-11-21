@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 namespace Panther
 {
@@ -13,11 +13,11 @@ namespace Panther
 		void CopyTo(int32 a_ElementIndex, const void* a_SourceStart, size_t a_SizeInBytes);
 
 	protected:
-		enum class BufferType : ubyte8 { ConstantBuffer, UploadBuffer, Undefined };
+		enum class BufferType : uint8 { ConstantBuffer, UploadBuffer, Undefined };
 
 		Buffer(uint32 a_NumElements, size_t a_ElementSize, BufferType a_Type);
 
-		ubyte8* m_CPUBuffer = nullptr;
+		uint8* m_CPUBuffer = nullptr;
 
 	private:
 		Buffer() = delete;

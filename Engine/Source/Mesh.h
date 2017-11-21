@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 #include <DirectXMath.h>
 
@@ -15,7 +15,7 @@ namespace Panther
 	class Mesh
 	{
 	public:
-		typedef ushort16 Index;
+		typedef uint16 Index;
 		struct Vertex
 		{
 			DirectX::XMFLOAT3 position;

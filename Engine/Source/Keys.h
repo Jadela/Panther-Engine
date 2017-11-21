@@ -1,10 +1,10 @@
 #pragma once
-#include "Core.h"
+#include "Core.hpp"
 
 // Credits: Jeremiah van Oosten
 namespace Panther
 {
-	enum class Key : ubyte8
+	enum class Key : uint8
 	{
 		None				= 0x00, // No key was pressed
 		LButton				= 0x01, // Left mouse button
