@@ -19,5 +19,5 @@ namespace Panther
 	// Characters
 	typedef char		ANSIChar;	// Character representation, platforms could use 7-bit ASCII, 8-bit EASCII or something else.
 	typedef wchar_t		WideChar;	// Wide character representation, width varies per platform (Windows: 16-bit, Linux: 32-bit).
-	typedef WideChar	Character;	// Character type used in the engine, change value here if desired.
+	typedef WideChar	Char;		// Character type used in the engine, change value here if desired.
 }
