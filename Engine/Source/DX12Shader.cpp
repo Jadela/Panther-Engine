@@ -3,6 +3,7 @@
 #include "DX12Renderer.h"
 
 #include "Exceptions.h"
+#include <stdexcept>
 
 using Microsoft::WRL::ComPtr;
 

@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include <stdexcept>
 
 // NOTE (JDL): Disable wcstombs warning
 #pragma warning (disable: 4996)

@@ -3,6 +3,7 @@
 #include "CommandList.h"
 #include "DX12Buffer.h"
 #include "Renderer.h"
+#include <stdexcept>
 
 namespace Panther
 {

@@ -5,6 +5,7 @@
 #include "DX12Sampler.h"
 #include "DX12Texture.h"
 #include "DX12RenderTarget.h"
+#include <stdexcept>
 
 namespace Panther
 {

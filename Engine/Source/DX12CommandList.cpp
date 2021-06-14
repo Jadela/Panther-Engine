@@ -7,6 +7,7 @@
 #include "DX12Mesh.h"
 #include "DX12RenderTarget.h"
 #include "SwapChain.h"
+#include <stdexcept>
 
 namespace Panther
 {
