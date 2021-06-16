@@ -27,10 +27,7 @@ solution "PantherEngine"
 	
 	language "C++"
 
-PROJ_DIR = path.getabsolute("..")
-
-if _ACTION == "vs2012" or _ACTION == "vs2013" 
-or _ACTION == "vs2015" or _ACTION == "vs2017" then
+if string.match(_ACTION, "vs") ~= nil then
 	local action = premake.action.current()
 	action.vstudio.windowsTargetPlatformVersion = "10.0.16299.0"
 	action.vstudio.intDirAbsolute = false
